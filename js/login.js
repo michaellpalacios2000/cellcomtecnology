@@ -1,13 +1,14 @@
 // ╔══════════════════════════════════════════════════════════════╗
 // ║           CellCom Tecnology — Sistema POS v1.0              ║
 // ║                    js/login.js                               ║
-// ║    Lógica completa de la pantalla de Login                   ║
+// ║    Lógica completa y definitiva de la pantalla Login         ║
+// ║    Email + PIN + Sesión + Bloqueo + Animaciones Premium      ║
 // ╚══════════════════════════════════════════════════════════════╝
 
 'use strict';
 
 // ════════════════════════════════════════════════════════════════
-// ESTADO LOCAL DEL LOGIN
+// ESTADO GLOBAL DEL LOGIN
 // ════════════════════════════════════════════════════════════════
 
 const LOGIN_STATE = {
@@ -15,7 +16,8 @@ const LOGIN_STATE = {
   pinActual:        '',
   intentosFallidos: 0,
   procesando:       false,
-  bloqueadoTimer:   null
+  bloqueadoTimer:   null,
+  statusActual:     'conectando'
 };
 
 // ════════════════════════════════════════════════════════════════
@@ -27,31 +29,69 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function inicializarLogin() {
-  // Verificar si ya hay sesión activa
-  const sesion = AUTH.verificarSesionLocal();
-  if (sesion) {
-    mostrarBienvenida(sesion, true);
-    setTimeout(() => AUTH.redirigirSegunRol(), 1500);
-    return;
+  console.log('🚀 Inicializando CellCom Login...');
+
+  // Verificar sesión existente
+  try {
+    const sesion = AUTH.verificarSesionLocal();
+    if (sesion) {
+      console.log('✅ Sesión activa encontrada:', sesion.nombre);
+      mostrarBienvenida(sesion, true);
+      setTimeout(() => redirigirSegunRol(sesion.rol), 1800);
+      return;
+    }
+  } catch(e) {
+    console.warn('⚠️ Error verificando sesión:', e.message);
   }
 
-  // Verificar si el sistema está bloqueado
-  const bloqueo = AUTH.estaBloquado();
-  if (bloqueo.bloqueado) {
-    iniciarCountdownBloqueo(bloqueo.hasta);
-    deshabilitarFormularios(true);
+  // Verificar bloqueo activo
+  try {
+    const bloqueo = AUTH.estaBloquado();
+    if (bloqueo.bloqueado) {
+      deshabilitarFormularios(true);
+      iniciarCountdownBloqueo();
+    }
+  } catch(e) {
+    console.warn('⚠️ Error verificando bloqueo:', e.message);
   }
+
+  // Cargar tema guardado
+  cargarTema();
+
+  // Configurar eventos de teclado
+  configurarEventosTeclado();
 
   // Verificar conexión con el servidor
   await verificarConexion();
 
-  // Configurar eventos de teclado
-  configurarEventos();
-
-  // Focus en el primer campo
+  // Focus en email
   setTimeout(() => {
     document.getElementById('inputEmail')?.focus();
-  }, 300);
+  }, 400);
+}
+
+// ════════════════════════════════════════════════════════════════
+// TEMA OSCURO / CLARO
+// ════════════════════════════════════════════════════════════════
+
+function cargarTema() {
+  const tema = localStorage.getItem('cellcom_tema') || 'light';
+  document.documentElement.setAttribute('data-theme', tema);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = tema === 'dark' ? '☀️' : '🌙';
+}
+
+function toggleTema() {
+  const actual = document.documentElement.getAttribute('data-theme') || 'light';
+  const nuevo  = actual === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', nuevo);
+  localStorage.setItem('cellcom_tema', nuevo);
+  const btn = document.getElementById('themeToggle');
+  if (btn) {
+    btn.textContent  = nuevo === 'dark' ? '☀️' : '🌙';
+    btn.style.transform = 'rotate(360deg) scale(1.2)';
+    setTimeout(() => btn.style.transform = '', 300);
+  }
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -60,144 +100,200 @@ async function inicializarLogin() {
 
 async function verificarConexion() {
   actualizarStatus('conectando');
+
   try {
     const online = await API.ping();
-    actualizarStatus(online ? 'online' : 'error');
-    if (!online) {
-      mostrarAlerta('⚠️ Sin conexión con el servidor. Verifica tu internet.', 'warning');
+
+    if (online) {
+      actualizarStatus('online');
+      console.log('✅ Servidor online');
+    } else {
+      actualizarStatus('error');
+      mostrarAlerta(
+        'Sin conexión con el servidor. Verifica tu internet.',
+        'warning'
+      );
     }
   } catch(e) {
     actualizarStatus('error');
-    mostrarAlerta('⚠️ No se pudo conectar con el servidor.', 'warning');
+    console.warn('⚠️ Sin conexión:', e.message);
+    mostrarAlerta(
+      'No se pudo conectar con el servidor. Intenta nuevamente.',
+      'warning'
+    );
   }
 }
 
 function actualizarStatus(estado) {
+  LOGIN_STATE.statusActual = estado;
   const dot  = document.getElementById('statusDot');
+  const ring = document.getElementById('statusRing');
   const text = document.getElementById('statusText');
   if (!dot || !text) return;
 
   const cfg = {
-    conectando: { color: '#F6AD55', texto: 'Conectando con el servidor...', anim: 'pulseDot 1s ease-in-out infinite' },
-    online:     { color: '#48BB78', texto: `✅ Sistema online — ${APP_CONFIG.APP_NAME}`, anim: 'pulseDot 2s ease-in-out infinite' },
-    error:      { color: '#FC8181', texto: '❌ Sin conexión al servidor', anim: 'none' }
+    conectando: {
+      color: '#F6AD55',
+      texto: 'Conectando con el servidor...',
+      anim:  'pulseDot 1s ease-in-out infinite'
+    },
+    online: {
+      color: '#48BB78',
+      texto: `✅ Sistema online — ${APP_CONFIG.APP_NAME}`,
+      anim:  'pulseDot 2.5s ease-in-out infinite'
+    },
+    error: {
+      color: '#FC8181',
+      texto: '❌ Sin conexión al servidor',
+      anim:  'none'
+    }
   };
 
-  const c            = cfg[estado] || cfg.conectando;
-  dot.style.background  = c.color;
-  dot.style.animation   = c.anim;
-  text.textContent       = c.texto;
+  const c = cfg[estado] || cfg.conectando;
+  dot.style.background    = c.color;
+  dot.style.animation     = c.anim;
+  if (ring) ring.style.background = c.color;
+  text.textContent         = c.texto;
+  text.style.color         = estado === 'online'
+    ? '#48BB78'
+    : estado === 'error'
+    ? '#FC8181'
+    : '#A0AEC0';
 }
 
 // ════════════════════════════════════════════════════════════════
-// TABS — CAMBIO DE MODO
+// TABS
 // ════════════════════════════════════════════════════════════════
 
 function cambiarTab(tab) {
+  if (LOGIN_STATE.tabActiva === tab) return;
   LOGIN_STATE.tabActiva = tab;
   ocultarAlerta();
 
-  document.getElementById('tabEmail').classList.toggle('active', tab === 'email');
-  document.getElementById('tabPIN').classList.toggle('active',   tab === 'pin');
-  document.getElementById('panelEmail').classList.toggle('active', tab === 'email');
-  document.getElementById('panelPIN').classList.toggle('active',   tab === 'pin');
+  // Actualizar botones de tab
+  document.getElementById('tabEmail')
+    ?.classList.toggle('active', tab === 'email');
+  document.getElementById('tabPIN')
+    ?.classList.toggle('active', tab === 'pin');
+
+  // Mostrar panel correcto
+  document.getElementById('panelEmail')
+    ?.classList.toggle('active', tab === 'email');
+  document.getElementById('panelPIN')
+    ?.classList.toggle('active', tab === 'pin');
 
   if (tab === 'pin') {
     resetearPIN();
   } else {
-    setTimeout(() => document.getElementById('inputEmail')?.focus(), 100);
+    setTimeout(() => document.getElementById('inputEmail')?.focus(), 150);
   }
 }
 
 // ════════════════════════════════════════════════════════════════
-// LOGIN POR EMAIL
+// LOGIN POR EMAIL Y CONTRASEÑA
 // ════════════════════════════════════════════════════════════════
 
 async function hacerLogin() {
-  if (LOGIN_STATE.procesando || AUTH.estaBloquado().bloqueado) return;
+  // Verificar bloqueo
+  if (AUTH.estaBloquado().bloqueado) return;
+  if (LOGIN_STATE.procesando) return;
 
-  const email = document.getElementById('inputEmail').value.trim();
-  const pass  = document.getElementById('inputPass').value.trim();
   const emailEl = document.getElementById('inputEmail');
   const passEl  = document.getElementById('inputPass');
+  const email   = emailEl?.value.trim()  || '';
+  const pass    = passEl?.value.trim()   || '';
 
-  // Limpiar errores
-  emailEl.classList.remove('error');
-  passEl.classList.remove('error');
+  // Limpiar errores previos
+  emailEl?.classList.remove('error', 'success');
+  passEl?.classList.remove('error', 'success');
   ocultarAlerta();
 
-  // Validaciones
+  // ── Validaciones ──────────────────────────────────────────
   if (!email) {
     mostrarAlerta('📧 Ingresa tu correo electrónico', 'error');
-    emailEl.classList.add('error');
-    emailEl.focus();
-    animarError();
+    emailEl?.classList.add('error');
+    emailEl?.focus();
+    animarCardError();
     return;
   }
 
   if (!CONFIG_UTILS.validarEmail(email)) {
     mostrarAlerta('📧 El formato del correo no es válido', 'error');
-    emailEl.classList.add('error');
-    emailEl.focus();
-    animarError();
+    emailEl?.classList.add('error');
+    emailEl?.focus();
+    animarCardError();
     return;
   }
 
   if (!pass) {
     mostrarAlerta('🔒 Ingresa tu contraseña', 'error');
-    passEl.classList.add('error');
-    passEl.focus();
-    animarError();
+    passEl?.classList.add('error');
+    passEl?.focus();
+    animarCardError();
     return;
   }
 
   if (pass.length < 6) {
     mostrarAlerta('🔒 La contraseña debe tener al menos 6 caracteres', 'error');
-    passEl.classList.add('error');
-    animarError();
+    passEl?.classList.add('error');
+    animarCardError();
     return;
   }
 
-  // Iniciar proceso
+  // ── Iniciar proceso ───────────────────────────────────────
   setLoadingEmail(true);
 
   try {
+    console.log('🔐 Intentando login:', email);
     const resultado = await AUTH.login(email, pass);
 
     if (resultado.success) {
-      // ✅ Login exitoso
-      emailEl.classList.add('success');
-      passEl.classList.add('success');
+      // ✅ LOGIN EXITOSO
+      console.log('✅ Login exitoso:', resultado.usuario?.nombre);
+      emailEl?.classList.add('success');
+      passEl?.classList.add('success');
       LOGIN_STATE.intentosFallidos = 0;
       mostrarBienvenida(resultado.usuario, false);
-      setTimeout(() => AUTH.redirigirSegunRol(), 2200);
+      setTimeout(() => redirigirSegunRol(resultado.usuario?.rol), 2400);
+
     } else {
-      // ❌ Login fallido
+      // ❌ LOGIN FALLIDO
+      console.warn('❌ Login fallido:', resultado.mensaje);
       LOGIN_STATE.intentosFallidos++;
-      const bloqueo = AUTH.registrarIntentoFallido(LOGIN_STATE.intentosFallidos);
+      const bloqueoInfo = AUTH.registrarIntentoFallido(LOGIN_STATE.intentosFallidos);
 
-      emailEl.classList.add('error');
-      passEl.classList.add('error');
-      passEl.value = '';
+      emailEl?.classList.add('error');
+      passEl?.classList.add('error');
+      if (passEl) passEl.value = '';
 
-      if (bloqueo.bloqueado) {
+      if (bloqueoInfo.bloqueado) {
         deshabilitarFormularios(true);
-        iniciarCountdownBloqueo(Date.now() + (bloqueo.minutos * 60 * 1000));
-        mostrarAlerta(`🚫 Demasiados intentos. Bloqueado por ${bloqueo.minutos} minutos.`, 'error');
-      } else {
+        iniciarCountdownBloqueo();
         mostrarAlerta(
-          `❌ ${resultado.mensaje}${bloqueo.restantes <= 2 ? ` Te quedan ${bloqueo.restantes} intentos.` : ''}`,
+          `🚫 Demasiados intentos fallidos. Sistema bloqueado por ${bloqueoInfo.minutos} minutos.`,
+          'error'
+        );
+      } else {
+        const aviso = bloqueoInfo.restantes <= 2
+          ? ` ⚠️ Te quedan ${bloqueoInfo.restantes} intento${bloqueoInfo.restantes !== 1 ? 's' : ''}.`
+          : '';
+        mostrarAlerta(
+          `${resultado.mensaje || 'Credenciales incorrectas.'}${aviso}`,
           'error'
         );
       }
 
-      animarError();
-      passEl.focus();
+      animarCardError();
+      passEl?.focus();
     }
 
   } catch(e) {
-    mostrarAlerta(`❌ ${e.message}`, 'error');
-    animarError();
+    console.error('❌ Error en login:', e.message);
+    mostrarAlerta(
+      `Error de conexión: ${e.message}. Verifica tu internet.`,
+      'error'
+    );
+    animarCardError();
   } finally {
     setLoadingEmail(false);
   }
@@ -207,13 +303,18 @@ function setLoadingEmail(loading) {
   LOGIN_STATE.procesando = loading;
   const btn  = document.getElementById('btnLogin');
   const text = document.getElementById('btnLoginText');
+  const icon = btn?.querySelector('.btn-login-icon');
+
   if (!btn || !text) return;
 
   btn.disabled = loading;
+
   if (loading) {
-    text.innerHTML = `<div class="spinner" style="width:18px;height:18px;border-width:2px;"></div> Verificando...`;
+    text.innerHTML = `<div style="width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;"></div> Verificando...`;
+    if (icon) icon.style.display = 'none';
   } else {
     text.innerHTML = 'Ingresar al sistema';
+    if (icon) icon.style.display = '';
   }
 }
 
@@ -224,13 +325,17 @@ function setLoadingEmail(loading) {
 function presionarPIN(digito) {
   if (AUTH.estaBloquado().bloqueado) return;
   if (LOGIN_STATE.pinActual.length >= 4) return;
+  if (LOGIN_STATE.procesando) return;
+
+  // Vibración táctil
   if (navigator.vibrate) navigator.vibrate(25);
 
   LOGIN_STATE.pinActual += digito;
   actualizarDisplayPIN();
 
+  // Auto-login al completar
   if (LOGIN_STATE.pinActual.length === 4) {
-    setTimeout(() => hacerLoginPIN(), 200);
+    setTimeout(() => hacerLoginPIN(), 220);
   }
 }
 
@@ -245,20 +350,27 @@ function actualizarDisplayPIN(estado = 'normal') {
   for (let i = 0; i < 4; i++) {
     const dot = document.getElementById(`pinDot${i}`);
     if (!dot) continue;
+
     dot.classList.remove('filled', 'error', 'success');
 
-    if (estado === 'error') {
-      dot.classList.add('error');
-    } else if (estado === 'success') {
-      dot.classList.add('success', 'filled');
-    } else {
-      dot.classList.toggle('filled', i < LOGIN_STATE.pinActual.length);
+    switch(estado) {
+      case 'error':
+        dot.classList.add('error');
+        break;
+      case 'success':
+        dot.classList.add('success', 'filled');
+        break;
+      default:
+        if (i < LOGIN_STATE.pinActual.length) {
+          dot.classList.add('filled');
+        }
     }
   }
 }
 
 function resetearPIN(estado = 'normal') {
   if (estado === 'error') {
+    if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
     actualizarDisplayPIN('error');
     setTimeout(() => {
       LOGIN_STATE.pinActual = '';
@@ -277,57 +389,88 @@ async function hacerLoginPIN() {
   LOGIN_STATE.procesando = true;
   ocultarAlerta();
 
-  // Efecto visual de carga
+  // Efecto visual de procesando
   for (let i = 0; i < 4; i++) {
     const dot = document.getElementById(`pinDot${i}`);
     if (dot) dot.style.opacity = '0.5';
   }
 
   try {
+    console.log('🔢 Verificando PIN...');
     const resultado = await AUTH.loginPIN(LOGIN_STATE.pinActual);
 
     if (resultado.success) {
-      // ✅ PIN correcto
+      // ✅ PIN CORRECTO
+      console.log('✅ PIN correcto:', resultado.usuario?.nombre);
+      if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
       actualizarDisplayPIN('success');
-      if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-      await CONFIG_UTILS.esperar(400);
-      mostrarBienvenida(resultado.usuario, false);
-      setTimeout(() => AUTH.redirigirSegunRol(), 2200);
-    } else {
-      // ❌ PIN incorrecto
-      LOGIN_STATE.intentosFallidos++;
-      const bloqueo = AUTH.registrarIntentoFallido(LOGIN_STATE.intentosFallidos);
-      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
 
-      resetearPIN('error');
+      // Restaurar opacidad
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`pinDot${i}`);
+        if (dot) dot.style.opacity = '1';
+      }
+
+      await new Promise(r => setTimeout(r, 500));
+      mostrarBienvenida(resultado.usuario, false);
+      setTimeout(() => redirigirSegunRol(resultado.usuario?.rol), 2400);
+
+    } else {
+      // ❌ PIN INCORRECTO
+      console.warn('❌ PIN incorrecto');
+      LOGIN_STATE.intentosFallidos++;
+      const bloqueoInfo = AUTH.registrarIntentoFallido(LOGIN_STATE.intentosFallidos);
 
       for (let i = 0; i < 4; i++) {
         const dot = document.getElementById(`pinDot${i}`);
         if (dot) dot.style.opacity = '1';
       }
 
-      if (bloqueo.bloqueado) {
+      resetearPIN('error');
+
+      if (bloqueoInfo.bloqueado) {
         deshabilitarFormularios(true);
-        iniciarCountdownBloqueo(Date.now() + (bloqueo.minutos * 60 * 1000));
-        mostrarAlerta(`🚫 Bloqueado por ${bloqueo.minutos} minutos.`, 'error');
-      } else {
+        iniciarCountdownBloqueo();
         mostrarAlerta(
-          `❌ ${resultado.mensaje}${bloqueo.restantes <= 2 ? ` Te quedan ${bloqueo.restantes} intentos.` : ''}`,
+          `🚫 Bloqueado por ${bloqueoInfo.minutos} minutos.`,
+          'error'
+        );
+      } else {
+        const aviso = bloqueoInfo.restantes <= 2
+          ? ` ⚠️ Te quedan ${bloqueoInfo.restantes} intento${bloqueoInfo.restantes !== 1 ? 's' : ''}.`
+          : '';
+        mostrarAlerta(
+          `${resultado.mensaje || 'PIN incorrecto.'}${aviso}`,
           'error'
         );
       }
     }
 
   } catch(e) {
-    resetearPIN('error');
+    console.error('❌ Error con PIN:', e.message);
     for (let i = 0; i < 4; i++) {
       const dot = document.getElementById(`pinDot${i}`);
       if (dot) dot.style.opacity = '1';
     }
-    mostrarAlerta(`❌ ${e.message}`, 'error');
+    resetearPIN('error');
+    mostrarAlerta(`Error: ${e.message}`, 'error');
   } finally {
     LOGIN_STATE.procesando = false;
   }
+}
+
+// ════════════════════════════════════════════════════════════════
+// REDIRECCIÓN
+// ════════════════════════════════════════════════════════════════
+
+function redirigirSegunRol(rol) {
+  const base = APP_CONFIG.URLS.BASE;
+  const pagina = rol === 'Admin'
+    ? `${base}reportes.html`
+    : `${base}pos.html`;
+
+  console.log(`🚀 Redirigiendo a: ${pagina}`);
+  window.location.href = pagina;
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -337,53 +480,62 @@ async function hacerLoginPIN() {
 function mostrarBienvenida(usuario, esSesionExistente) {
   const wrapper = document.getElementById('loginWrapper');
   const welcome = document.getElementById('welcomeScreen');
+  if (!wrapper || !welcome) return;
 
-  // Ocultar login con animación
-  wrapper.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+  // Ocultar login
+  wrapper.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
   wrapper.style.opacity    = '0';
-  wrapper.style.transform  = 'scale(0.95)';
+  wrapper.style.transform  = 'scale(0.94) translateY(-10px)';
 
   setTimeout(() => {
-    wrapper.style.display = 'none';
-    welcome.style.display = 'block';
+    wrapper.style.display   = 'none';
+    welcome.style.display   = 'block';
 
-    const nombre  = usuario.nombre || 'Usuario';
-    const rol     = usuario.rol    || 'Vendedor';
+    const nombre  = usuario?.nombre || 'Usuario';
+    const rol     = usuario?.rol    || 'Vendedor';
     const esAdmin = rol === 'Admin';
 
-    document.getElementById('welcomeIcon').textContent  =
-      esAdmin ? '👑' : '🛒';
-    document.getElementById('welcomeTitle').textContent =
-      esSesionExistente
-        ? `¡Hola de nuevo, ${nombre.split(' ')[0]}!`
-        : `¡Bienvenido/a, ${nombre.split(' ')[0]}!`;
-    document.getElementById('welcomeSub').textContent   =
-      esAdmin
-        ? 'Cargando tu panel de administración...'
-        : 'Cargando el punto de venta...';
-    document.getElementById('welcomeRol').textContent   =
-      esAdmin ? '👑 Administrador' : '🧑‍💼 Vendedor';
+    const iconEl  = document.getElementById('welcomeIcon');
+    const titleEl = document.getElementById('welcomeTitle');
+    const subEl   = document.getElementById('welcomeSub');
+    const rolEl   = document.getElementById('welcomeRol');
 
-  }, 400);
+    if (iconEl)  iconEl.textContent  = esAdmin ? '👑' : '🛒';
+    if (titleEl) titleEl.textContent = esSesionExistente
+      ? `¡Hola de nuevo, ${nombre.split(' ')[0]}!`
+      : `¡Bienvenido/a, ${nombre.split(' ')[0]}!`;
+    if (subEl)   subEl.textContent   = esAdmin
+      ? 'Preparando tu panel de administración...'
+      : 'Cargando el punto de venta...';
+    if (rolEl)   rolEl.textContent   = esAdmin
+      ? '👑 Administrador'
+      : '🧑‍💼 Vendedor';
+
+  }, 450);
 }
 
 // ════════════════════════════════════════════════════════════════
-// BLOQUEO POR INTENTOS
+// BLOQUEO POR INTENTOS FALLIDOS
 // ════════════════════════════════════════════════════════════════
 
-function iniciarCountdownBloqueo(hasta) {
-  if (LOGIN_STATE.bloqueadoTimer) clearInterval(LOGIN_STATE.bloqueadoTimer);
+function iniciarCountdownBloqueo() {
+  if (LOGIN_STATE.bloqueadoTimer) {
+    clearInterval(LOGIN_STATE.bloqueadoTimer);
+  }
 
   const tick = () => {
     const bloqueo = AUTH.estaBloquado();
+
     if (!bloqueo.bloqueado) {
       clearInterval(LOGIN_STATE.bloqueadoTimer);
+      LOGIN_STATE.bloqueadoTimer   = null;
+      LOGIN_STATE.intentosFallidos = 0;
       deshabilitarFormularios(false);
       ocultarAlerta();
-      actualizarStatus('online');
-      LOGIN_STATE.intentosFallidos = 0;
+      actualizarStatus(LOGIN_STATE.statusActual === 'online' ? 'online' : 'error');
       return;
     }
+
     mostrarAlerta(
       `🚫 Sistema bloqueado. Espera ${bloqueo.texto} para reintentar.`,
       'error'
@@ -400,9 +552,10 @@ function deshabilitarFormularios(deshabilitar) {
     const el = document.getElementById(id);
     if (el) el.disabled = deshabilitar;
   });
+
   document.querySelectorAll('.pin-key').forEach(btn => {
     btn.disabled      = deshabilitar;
-    btn.style.opacity = deshabilitar ? '0.4' : '1';
+    btn.style.opacity = deshabilitar ? '0.35' : '1';
   });
 }
 
@@ -411,7 +564,9 @@ function deshabilitarFormularios(deshabilitar) {
 // ════════════════════════════════════════════════════════════════
 
 function mostrarAlerta(mensaje, tipo = 'error') {
-  const box = document.getElementById('alertBox');
+  const box     = document.getElementById('alertBox');
+  const iconEl  = document.getElementById('alertIcon');
+  const msgEl   = document.getElementById('alertMsg');
   if (!box) return;
 
   const iconos = {
@@ -421,51 +576,71 @@ function mostrarAlerta(mensaje, tipo = 'error') {
     info:    'ℹ️'
   };
 
-  box.className    = `login-alert alert-${tipo}`;
-  box.innerHTML    = `<span>${iconos[tipo] || '•'}</span> ${mensaje}`;
-  box.style.display = 'flex';
+  box.className        = `login-alert alert-${tipo}`;
+  if (iconEl) iconEl.textContent = iconos[tipo] || '•';
+  if (msgEl)  msgEl.textContent  = mensaje;
+  box.style.display    = 'flex';
 
+  // Auto-ocultar solo mensajes info/success
   if (tipo === 'success' || tipo === 'info') {
-    setTimeout(() => ocultarAlerta(), 5000);
+    setTimeout(() => ocultarAlerta(), 4000);
   }
 }
 
 function ocultarAlerta() {
   const box = document.getElementById('alertBox');
-  if (box) box.style.display = 'none';
+  if (box) {
+    box.style.opacity  = '0';
+    box.style.transform= 'translateY(-4px)';
+    setTimeout(() => {
+      box.style.display    = 'none';
+      box.style.opacity    = '';
+      box.style.transform  = '';
+    }, 200);
+  }
 }
 
-function animarError() {
+function animarCardError() {
   const card = document.getElementById('loginCard');
   if (!card) return;
   card.style.animation = 'none';
-  card.offsetHeight; // reflow
-  card.style.animation = 'shake 0.4s ease';
-  setTimeout(() => card.style.animation = '', 400);
+  void card.offsetWidth; // Forzar reflow
+  card.style.animation = 'shake 0.45s ease';
+  setTimeout(() => card.style.animation = '', 500);
 }
 
 function togglePass() {
   const input = document.getElementById('inputPass');
   const btn   = document.getElementById('btnTogglePass');
   if (!input || !btn) return;
-  input.type      = input.type === 'password' ? 'text' : 'password';
-  btn.textContent = input.type === 'password' ? '👁️' : '🙈';
+
+  const esPassword    = input.type === 'password';
+  input.type          = esPassword ? 'text' : 'password';
+  btn.textContent     = esPassword ? '🙈' : '👁️';
+  btn.style.transform = 'scale(1.2)';
+  setTimeout(() => btn.style.transform = '', 200);
 }
 
 // ════════════════════════════════════════════════════════════════
 // EVENTOS DE TECLADO
 // ════════════════════════════════════════════════════════════════
 
-function configurarEventos() {
-  // Email → Enter pasa a contraseña
+function configurarEventosTeclado() {
+  // Email → Tab/Enter pasa a contraseña
   document.getElementById('inputEmail')?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('inputPass')?.focus();
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      document.getElementById('inputPass')?.focus();
+    }
     document.getElementById('inputEmail')?.classList.remove('error');
   });
 
   // Pass → Enter hace login
   document.getElementById('inputPass')?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') hacerLogin();
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      hacerLogin();
+    }
     document.getElementById('inputPass')?.classList.remove('error');
   });
 
@@ -474,10 +649,10 @@ function configurarEventos() {
     if (LOGIN_STATE.tabActiva !== 'pin') return;
     if (e.key >= '0' && e.key <= '9') presionarPIN(e.key);
     if (e.key === 'Backspace') borrarPIN();
+    if (e.key === 'Escape') resetearPIN();
   });
 
-  // Cerrar alerta al hacer clic
+  // Cerrar alerta con clic
   document.getElementById('alertBox')?.addEventListener('click', ocultarAlerta);
 }
-
 
