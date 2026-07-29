@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="CellCom Tecnology — Sistema POS">
+  <meta name="theme-color" content="#4A90D9">
+  <title>CellCom Tecnology — Iniciar Sesión</title>
+
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Estilos globales -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    /* ══════════════════════════════════════════════
+       ESTILOS ESPECÍFICOS DEL LOGIN
+    ══════════════════════════════════════════════ */
+
+    html, body {
+      height:    100%;
+      overflow:  hidden;
+    }
+
+    body {
+      background: linear-gradient(135deg,
+        #0F2044 0%,
+        #1A3A6B 25%,
+        #1E4D8C 50%,
+        #2E6DB4 75%,
+        #4A90D9 100%
+      );
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      padding:         20px;
+      position:        relative;
+      min-height:      100vh;
+    }
+
+    /* ── Fondo animado ──────────────────────────── */
+    .bg-layer {
+      position:        fixed;
+      inset:           0;
+      pointer-events:  none;
+      z-index:         0;
+      overflow:        hidden;
+    }
+
+    .bg-orb {
+      position:        absolute;
+      border-radius:   50%;
+      filter:          blur(70px);
+      animation:       orbFloat 8s ease-in-out infinite;
+    }
+
+    .bg-orb-1 {
+      width:  500px; height: 500px;
+      background: radial-gradient(circle, rgba(74,144,217,0.45), transparent);
+      top: -150px; left: -150px;
+      animation-delay: 0s;
+    }
+
+    .bg-orb-2 {
+      width:  350px; height: 350px;
+      background: radial-gradient(circle, rgba(46,109,180,0.4), transparent);
+      bottom: -100px; right: -100px;
+      animation-delay: 3s;
+    }
+
+    .bg-orb-3 {
+      width:  250px; height: 250px;
+      background: radial-gradient(circle, rgba(123,179,232,0.3), transparent);
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      animation-delay: 1.5s;
+    }
+
+    .bg-orb-4 {
+      width:  180px; height: 180px;
+      background: radial-gradient(circle, rgba(159,122,234,0.25), transparent);
+      top: 20%; right: 15%;
+      animation-delay: 4s;
+    }
+
+    .bg-grid {
+      position:         fixed;
+      inset:            0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+      background-size:  44px 44px;
+      pointer-events:   none;
+      z-index:          0;
+    }
+
+    /* ── Wrapper principal ────────────────────── */
+    .login-wrapper {
+      position:        relative;
+      z-index:         10;
+      width:           100%;
+      max-width:       460px;
+      display:         flex;
+      flex-direction:  column;
+      gap:             22px;
+    }
+
+    /* ── Header de marca ──────────────────────── */
+    .brand-header {
+      text-align:      center;
+      animation:       fadeDown 0.7s cubic-bezier(0.4,0,0.2,1) both;
+    }
+
+    .brand-logo-wrap {
+      position:        relative;
+      display:         inline-block;
+      margin-bottom:   16px;
+    }
+
+    .brand-logo {
+      width:           84px;
+      height:          84px;
+      background:      linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.08));
+      border:          2px solid rgba(255,255,255,0.28);
+      border-radius:   24px;
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      margin:          0 auto;
+      font-size:       40px;
+      backdrop-filter: blur(12px);
+      box-shadow:      0 8px 32px rgba(0,0,0,0.2),
+                       inset 0 1px 0 rgba(255,255,255,0.3);
+      animation:       logoFloat 3s ease-in-out infinite;
+    }
+
+    .brand-logo-ring {
+      position:        absolute;
+      inset:           -8px;
+      border-radius:   32px;
+      border:          2px solid rgba(255,255,255,0.12);
+      animation:       pulse 3s ease-in-out infinite;
+    }
+
+    .brand-name {
+      font-size:       30px;
+      font-weight:     900;
+      color:           #fff;
+      letter-spacing:  -0.5px;
+      text-shadow:     0 2px 20px rgba(0,0,0,0.3);
+      margin-bottom:   4px;
+    }
+
+    .brand-sub {
+      font-size:       13px;
+      color:           rgba(255,255,255,0.65);
+      font-weight:     400;
+      letter-spacing:  0.5px;
+    }
+
+    /* ── Card de login ────────────────────────── */
+    .login-card {
+      background:      rgba(255,255,255,0.96);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius:   24px;
+      padding:         38px 36px;
+      box-shadow:      0 24px 64px rgba(74,144,217,0.25),
+                       0 2px 0 rgba(255,255,255,0.8) inset;
+      border:          1px solid rgba(255,255,255,0.85);
+      animation:       fadeUp 0.7s cubic-bezier(0.4,0,0.2,1) 0.1s both;
+    }
+
+    [data-theme="dark"] .login-card {
+      background:      rgba(26,43,69,0.95);
+      border-color:    rgba(255,255,255,0.08);
+    }
+
+    /* ── Tabs ─────────────────────────────────── */
+    .login-tabs {
+      display:         flex;
+      background:      var(--azul-soft);
+      border-radius:   14px;
+      padding:         4px;
+      margin-bottom:   28px;
+      gap:             4px;
+    }
+
+    [data-theme="dark"] .login-tabs {
+      background:      rgba(74,144,217,0.12);
+    }
+
+    .login-tab {
+      flex:            1;
+      padding:         11px 14px;
+      border:          none;
+      border-radius:   11px;
+      font-family:     var(--font);
+      font-size:       13px;
+      font-weight:     600;
+      cursor:          pointer;
+      transition:      var(--trans);
+      color:           var(--texto-mid);
+      background:      transparent;
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      gap:             6px;
+    }
+
+    .login-tab:hover:not(.active) {
+      color:           var(--azul);
+      background:      rgba(255,255,255,0.6);
+    }
+
+    .login-tab.active {
+      background:      #fff;
+      color:           var(--azul);
+      box-shadow:      0 2px 10px rgba(74,144,217,0.2);
+    }
+
+    [data-theme="dark"] .login-tab.active {
+      background:      rgba(74,144,217,0.2);
+      color:           var(--azul-light);
+    }
+
+    /* ── Panels ───────────────────────────────── */
+    .login-panel {
+      display:         none;
+      animation:       fadeIn 0.3s ease both;
+    }
+
+    .login-panel.active { display: block; }
+
+    .panel-title {
+      font-size:       20px;
+      font-weight:     800;
+      color:           var(--texto-dark);
+      margin-bottom:   4px;
+      letter-spacing:  -0.3px;
+    }
+
+    .panel-sub {
+      font-size:       13px;
+      color:           var(--texto-light);
+      margin-bottom:   24px;
+      line-height:     1.5;
+    }
+
+    /* ── Input group ──────────────────────────── */
+    .input-group {
+      margin-bottom:   16px;
+    }
+
+    .input-label {
+      display:         block;
+      font-size:       11px;
+      font-weight:     700;
+      color:           var(--texto-mid);
+      margin-bottom:   7px;
+      text-transform:  uppercase;
+      letter-spacing:  0.6px;
+    }
+
+    .input-wrap {
+      position:        relative;
+    }
+
+    .input-emoji {
+      position:        absolute;
+      left:            14px;
+      top:             50%;
+      transform:       translateY(-50%);
+      font-size:       18px;
+      pointer-events:  none;
+      z-index:         1;
+      line-height:     1;
+    }
+
+    .login-input {
+      width:           100%;
+      padding:         14px 46px;
+      border:          2px solid var(--borde);
+      border-radius:   13px;
+      font-family:     var(--font);
+      font-size:       15px;
+      color:           var(--texto-dark);
+      background:      var(--fondo-card);
+      outline:         none;
+      transition:      var(--trans-fast);
+      -webkit-appearance: none;
+    }
+
+    .login-input:focus {
+      border-color:    var(--azul);
+      box-shadow:      0 0 0 4px rgba(74,144,217,0.1);
+    }
+
+    .login-input::placeholder { color: var(--texto-placeholder); }
+
+    .login-input.error {
+      border-color:    var(--rojo);
+      box-shadow:      0 0 0 4px rgba(252,129,129,0.1);
+    }
+
+    .login-input.success {
+      border-color:    var(--verde);
+      box-shadow:      0 0 0 4px rgba(72,187,120,0.1);
+    }
+
+    .toggle-pass-btn {
+      position:        absolute;
+      right:           14px;
+      top:             50%;
+      transform:       translateY(-50%);
+      background:      none;
+      border:          none;
+      cursor:          pointer;
+      font-size:       18px;
+      padding:         4px;
+      color:           var(--texto-light);
+      transition:      var(--trans-fast);
+      z-index:         1;
+      line-height:     1;
+    }
+
+    .toggle-pass-btn:hover { color: var(--azul); }
+
+    /* ── Botón de login ───────────────────────── */
+    .btn-login {
+      width:           100%;
+      padding:         16px;
+      background:      linear-gradient(135deg, var(--azul), var(--azul-dark));
+      color:           #fff;
+      border:          none;
+      border-radius:   14px;
+      font-family:     var(--font);
+      font-size:       16px;
+      font-weight:     800;
+      cursor:          pointer;
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      gap:             10px;
+      margin-top:      8px;
+      box-shadow:      0 6px 20px rgba(74,144,217,0.4);
+      letter-spacing:  0.3px;
+      position:        relative;
+      overflow:        hidden;
+      transition:      var(--trans);
+    }
+
+    .btn-login::before {
+      content:         '';
+      position:        absolute;
+      top:             0;
+      left:            -100%;
+      width:           100%;
+      height:          100%;
+      background:      linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition:      left 0.5s;
+    }
+
+    .btn-login:hover::before { left: 100%; }
+
+    .btn-login:hover {
+      transform:       translateY(-2px);
+      box-shadow:      0 10px 30px rgba(74,144,217,0.5);
+    }
+
+    .btn-login:active { transform: scale(0.98); }
+
+    .btn-login:disabled {
+      opacity:         0.6;
+      cursor:          not-allowed;
+      transform:       none;
+      box-shadow:      none;
+    }
+
+    /* ── Alerta ───────────────────────────────── */
+    .login-alert {
+      padding:         12px 16px;
+      border-radius:   12px;
+      font-size:       13px;
+      font-weight:     500;
+      display:         flex;
+      align-items:     center;
+      gap:             10px;
+      margin-bottom:   16px;
+      animation:       fadeIn 0.3s ease;
+    }
+
+    .alert-error   { background: var(--rojo-soft);    border: 1px solid var(--rojo-border);    color: var(--rojo-dark); }
+    .alert-success { background: var(--verde-soft);   border: 1px solid var(--verde-border);   color: var(--verde-dark); }
+    .alert-info    { background: var(--azul-soft);    border: 1px solid rgba(74,144,217,0.25); color: var(--azul-dark); }
+    .alert-warning { background: var(--naranja-soft); border: 1px solid var(--naranja-border); color: var(--naranja-dark); }
+
+    /* ── Teclado PIN ──────────────────────────── */
+    .pin-display {
+      display:         flex;
+      gap:             14px;
+      justify-content: center;
+      margin-bottom:   28px;
+    }
+
+    .pin-dot {
+      width:           60px;
+      height:          60px;
+      border-radius:   16px;
+      border:          2px solid var(--borde);
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      font-size:       26px;
+      font-weight:     800;
+      color:           var(--azul);
+      background:      var(--azul-soft);
+      transition:      var(--trans);
+      position:        relative;
+      overflow:        hidden;
+    }
+
+    .pin-dot.filled {
+      border-color:    var(--azul);
+      background:      linear-gradient(135deg, var(--azul), var(--azul-dark));
+      color:           #fff;
+      box-shadow:      0 6px 16px rgba(74,144,217,0.35);
+      transform:       scale(1.06);
+    }
+
+    .pin-dot.filled::after {
+      content:         '●';
+      font-size:       22px;
+    }
+
+    .pin-dot.error {
+      border-color:    var(--rojo);
+      background:      var(--rojo-soft);
+      animation:       shake 0.4s ease;
+    }
+
+    .pin-dot.success {
+      border-color:    var(--verde);
+      background:      linear-gradient(135deg, var(--verde), var(--verde-dark));
+    }
+
+    .pin-keypad {
+      display:         grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:             12px;
+      max-width:       300px;
+      margin:          0 auto;
+    }
+
+    .pin-key {
+      height:          68px;
+      border:          2px solid var(--borde);
+      border-radius:   16px;
+      font-family:     var(--font);
+      font-size:       24px;
+      font-weight:     700;
+      color:           var(--texto-dark);
+      background:      var(--fondo-card);
+      cursor:          pointer;
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      transition:      var(--trans-spring);
+      -webkit-tap-highlight-color: transparent;
+      user-select:     none;
+      position:        relative;
+      overflow:        hidden;
+    }
+
+    .pin-key::after {
+      content:         '';
+      position:        absolute;
+      inset:           0;
+      background:      var(--azul);
+      opacity:         0;
+      transition:      opacity 0.15s;
+      border-radius:   14px;
+    }
+
+    .pin-key:active::after { opacity: 0.08; }
+
+    .pin-key:hover {
+      border-color:    var(--borde-hover);
+      background:      var(--azul-soft);
+      color:           var(--azul);
+      transform:       scale(0.97);
+      box-shadow:      var(--sombra-sm);
+    }
+
+    .pin-key:active { transform: scale(0.93); }
+
+    .pin-key.key-del {
+      font-size:       22px;
+      color:           var(--texto-light);
+    }
+
+    .pin-key.key-del:hover {
+      border-color:    var(--rojo);
+      background:      var(--rojo-soft);
+      color:           var(--rojo-dark);
+    }
+
+    .pin-key.key-empty {
+      opacity:         0;
+      pointer-events:  none;
+    }
+
+    /* ── Status de conexión ───────────────────── */
+    .card-footer-status {
+      margin-top:      24px;
+      padding-top:     18px;
+      border-top:      1px solid var(--borde);
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      gap:             8px;
+    }
+
+    .status-dot {
+      width:           8px;
+      height:          8px;
+      border-radius:   50%;
+      background:      var(--naranja);
+      animation:       pulseDot 2s ease-in-out infinite;
+      flex-shrink:     0;
+    }
+
+    .status-text {
+      font-size:       12px;
+      color:           var(--texto-light);
+      font-weight:     500;
+    }
+
+    /* ── Footer externo ───────────────────────── */
+    .login-footer {
+      text-align:      center;
+      animation:       fadeUp 0.7s cubic-bezier(0.4,0,0.2,1) 0.2s both;
+    }
+
+    .login-footer p {
+      font-size:       12px;
+      color:           rgba(255,255,255,0.45);
+    }
+
+    /* ── Pantalla de bienvenida ───────────────── */
+    .welcome-screen {
+      display:         none;
+      text-align:      center;
+      padding:         20px;
+      animation:       zoomIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+      position:        relative;
+      z-index:         10;
+    }
+
+    .welcome-icon-wrap {
+      width:           100px;
+      height:          100px;
+      background:      linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.08));
+      border:          2px solid rgba(255,255,255,0.25);
+      border-radius:   28px;
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      margin:          0 auto 20px;
+      font-size:       48px;
+      backdrop-filter: blur(12px);
+      animation:       bounce 1s ease-in-out infinite;
+    }
+
+    .welcome-title {
+      font-size:       26px;
+      font-weight:     900;
+      color:           #fff;
+      margin-bottom:   8px;
+      letter-spacing:  -0.5px;
+    }
+
+    .welcome-sub {
+      font-size:       15px;
+      color:           rgba(255,255,255,0.75);
+      margin-bottom:   24px;
+      line-height:     1.5;
+    }
+
+    .welcome-badge {
+      display:         inline-flex;
+      align-items:     center;
+      gap:             8px;
+      background:      rgba(255,255,255,0.18);
+      border:          1px solid rgba(255,255,255,0.28);
+      border-radius:   50px;
+      padding:         10px 22px;
+      font-size:       14px;
+      color:           #fff;
+      font-weight:     700;
+      backdrop-filter: blur(10px);
+    }
+
+    /* ── Loader de bienvenida ─────────────────── */
+    .welcome-loader {
+      width:           200px;
+      height:          4px;
+      background:      rgba(255,255,255,0.2);
+      border-radius:   4px;
+      overflow:        hidden;
+      margin:          20px auto 0;
+    }
+
+    .welcome-loader-fill {
+      height:          100%;
+      background:      linear-gradient(90deg, rgba(255,255,255,0.6), #fff, rgba(255,255,255,0.6));
+      border-radius:   4px;
+      animation:       loaderFill 2s ease forwards;
+    }
+
+    /* ── Responsive ───────────────────────────── */
+    @media (max-width: 480px) {
+      body             { padding: 16px; }
+      .login-card      { padding: 28px 22px; }
+      .brand-name      { font-size: 26px; }
+      .brand-logo      { width: 72px; height: 72px; font-size: 34px; }
+      .pin-key         { height: 60px; font-size: 22px; }
+      .pin-dot         { width: 52px; height: 52px; }
+      .pin-keypad      { gap: 10px; }
+    }
+
+    @media (min-width: 768px) {
+      .login-wrapper   { max-width: 500px; }
+      .login-card      { padding: 44px 42px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Fondo animado -->
+  <div class="bg-layer">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+    <div class="bg-orb bg-orb-4"></div>
+  </div>
+  <div class="bg-grid"></div>
+
+  <!-- ════════════════════════════════════════════
+       WRAPPER PRINCIPAL — LOGIN
+  ════════════════════════════════════════════ -->
+  <div class="login-wrapper" id="loginWrapper">
+
+    <!-- Marca -->
+    <div class="brand-header">
+      <div class="brand-logo-wrap">
+        <div class="brand-logo">📱</div>
+        <div class="brand-logo-ring"></div>
+      </div>
+      <h1 class="brand-name">CellCom Tecnology</h1>
+      <p class="brand-sub">Sistema de Gestión Integral — POS v1.0</p>
+    </div>
+
+    <!-- Card de login -->
+    <div class="login-card" id="loginCard">
+
+      <!-- Alerta -->
+      <div class="login-alert" id="alertBox" style="display:none;"></div>
+
+      <!-- Tabs -->
+      <div class="login-tabs">
+        <button class="login-tab active" id="tabEmail" onclick="cambiarTab('email')">
+          ✉️ Correo
+        </button>
+        <button class="login-tab" id="tabPIN" onclick="cambiarTab('pin')">
+          🔢 PIN Rápido
+        </button>
+      </div>
+
+      <!-- ════════════════════════
+           PANEL EMAIL
+      ════════════════════════ -->
+      <div class="login-panel active" id="panelEmail">
+        <h2 class="panel-title">Bienvenido de vuelta 👋</h2>
+        <p class="panel-sub">Ingresa tus credenciales para acceder al sistema</p>
+
+        <div class="input-group">
+          <label class="input-label" for="inputEmail">Correo electrónico</label>
+          <div class="input-wrap">
+            <span class="input-emoji">📧</span>
+            <input
+              type="email"
+              class="login-input"
+              id="inputEmail"
+              placeholder="tucorreo@gmail.com"
+              autocomplete="email"
+              inputmode="email"
+              spellcheck="false"
+            >
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label" for="inputPass">Contraseña</label>
+          <div class="input-wrap">
+            <span class="input-emoji">🔒</span>
+            <input
+              type="password"
+              class="login-input"
+              id="inputPass"
+              placeholder="Tu contraseña"
+              autocomplete="current-password"
+            >
+            <button class="toggle-pass-btn" onclick="togglePass()" id="btnTogglePass" type="button">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-login" id="btnLogin" onclick="hacerLogin()">
+          <span id="btnLoginText">Ingresar al sistema</span>
+        </button>
+      </div>
+
+      <!-- ════════════════════════
+           PANEL PIN
+      ════════════════════════ -->
+      <div class="login-panel" id="panelPIN">
+        <h2 class="panel-title">Acceso Rápido 🔢</h2>
+        <p class="panel-sub">Ingresa tu PIN de 4 dígitos para acceder rápidamente</p>
+
+        <!-- Display de puntos -->
+        <div class="pin-display">
+          <div class="pin-dot" id="pinDot0"></div>
+          <div class="pin-dot" id="pinDot1"></div>
+          <div class="pin-dot" id="pinDot2"></div>
+          <div class="pin-dot" id="pinDot3"></div>
+        </div>
+
+        <!-- Teclado numérico -->
+        <div class="pin-keypad">
+          <button class="pin-key" onclick="presionarPIN('1')">1</button>
+          <button class="pin-key" onclick="presionarPIN('2')">2</button>
+          <button class="pin-key" onclick="presionarPIN('3')">3</button>
+          <button class="pin-key" onclick="presionarPIN('4')">4</button>
+          <button class="pin-key" onclick="presionarPIN('5')">5</button>
+          <button class="pin-key" onclick="presionarPIN('6')">6</button>
+          <button class="pin-key" onclick="presionarPIN('7')">7</button>
+          <button class="pin-key" onclick="presionarPIN('8')">8</button>
+          <button class="pin-key" onclick="presionarPIN('9')">9</button>
+          <button class="pin-key key-empty"></button>
+          <button class="pin-key" onclick="presionarPIN('0')">0</button>
+          <button class="pin-key key-del" onclick="borrarPIN()">⌫</button>
+        </div>
+      </div>
+
+      <!-- Status de conexión -->
+      <div class="card-footer-status">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="status-text" id="statusText">Conectando con el servidor...</span>
+      </div>
+
+    </div><!-- fin login-card -->
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p>CellCom Tecnology © 2025 — Cieneguilla, Lima, Perú</p>
+    </div>
+
+  </div><!-- fin login-wrapper -->
+
+  <!-- ════════════════════════════════════════════
+       PANTALLA DE BIENVENIDA (post-login)
+  ════════════════════════════════════════════ -->
+  <div class="welcome-screen" id="welcomeScreen">
+    <div class="welcome-icon-wrap" id="welcomeIcon">✅</div>
+    <h2 class="welcome-title" id="welcomeTitle">¡Bienvenido!</h2>
+    <p class="welcome-sub" id="welcomeSub">Cargando tu espacio de trabajo...</p>
+    <div class="welcome-badge" id="welcomeBadge">
+      <span>⚙️</span>
+      <span id="welcomeRol">Cargando...</span>
+    </div>
+    <div class="welcome-loader">
+      <div class="welcome-loader-fill"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/login.js"></script>
+
+</body>
+</html>
