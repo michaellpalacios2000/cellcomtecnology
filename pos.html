@@ -2,7 +2,7 @@
 <html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=3.0, user-scalable=yes">
   <meta name="theme-color" content="#4A90D9">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>CellCom Tecnology — Punto de Venta</title>
@@ -27,25 +27,48 @@
     ══════════════════════════════════════════════ */
 
     html, body {
-      height: 100%;
-      overflow: hidden;
-      touch-action: manipulation;
-    }
+  height: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  html, body {
+    overflow: auto;
+    overflow-x: hidden;
+    height: auto;
+    min-height: 100vh;
+  }
+}
 
     /* ── Layout principal mitad/mitad ─────────── */
     .pos-layout {
-      display: grid;
-      grid-template-rows: auto 1fr;
-      height: 100vh;
-      overflow: hidden;
-    }
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .pos-layout {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+}
 
     .pos-content {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      overflow: hidden;
-      gap: 0;
-    }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  gap: 0;
+}
+
+@media (max-width: 1024px) {
+  .pos-content {
+    grid-template-columns: 1fr;
+    overflow: visible;
+  }
+}
 
     /* ── Header del POS ──────────────────────── */
     .pos-header {
@@ -154,12 +177,20 @@
 
     /* ── LADO IZQUIERDO — Venta rápida ────────── */
     .pos-left {
-      background: var(--fondo);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      border-right: 2px solid var(--borde);
-    }
+  background: var(--fondo);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 2px solid var(--borde);
+}
+
+@media (max-width: 1024px) {
+  .pos-left {
+    overflow: visible;
+    border-right: none;
+    border-bottom: 2px solid var(--borde);
+  }
+}
 
     .venta-form {
       padding: 16px 18px;
@@ -429,11 +460,18 @@
 
     /* ── LADO DERECHO — Resumen del día ───────── */
     .pos-right {
-      background: var(--fondo-card);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+  background: var(--fondo-card);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .pos-right {
+    overflow: visible;
+    min-height: auto;
+  }
+}
 
     /* KPIs superiores */
     .kpi-strip {
@@ -535,10 +573,17 @@
 
     /* Lista de ventas del día */
     .ventas-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 8px 12px;
-    }
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+}
+
+@media (max-width: 1024px) {
+  .ventas-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+}
 
     .ventas-list::-webkit-scrollbar { width: 3px; }
     .ventas-list::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 3px; }
