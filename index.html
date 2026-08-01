@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#4A90D9">
+  <meta name="description" content="CellCom Tecnology — Sistema POS Integral">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="CellCom POS">
+  <title>CellCom Tecnology — Sistema POS</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+      --azul:     #4A90D9;
+      --azul-d:   #2E6DB4;
+      --azul-dd:  #1A4F8A;
+      --azul-ddd: #0F2044;
+      --verde:    #48BB78;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg,
+        #050E1F 0%,
+        #0A1A35 15%,
+        #0F2044 35%,
+        #1A3A6B 55%,
+        #2E6DB4 80%,
+        #4A90D9 100%
+      );
+      background-size: 400% 400%;
+      animation: gradBG 15s ease infinite;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @keyframes gradBG {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ── Fondo animado ───────────────────────── */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      mix-blend-mode: screen;
+    }
+
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle at 30% 30%, rgba(74,144,217,0.5), transparent 70%);
+      top: -200px; left: -200px;
+      animation: orbMove 10s ease-in-out infinite;
+    }
+
+    .orb-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle at 70% 70%, rgba(26,79,138,0.4), transparent 70%);
+      bottom: -180px; right: -180px;
+      animation: orbMove 12s ease-in-out infinite 3s;
+    }
+
+    .orb-3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(123,179,232,0.3), transparent 70%);
+      top: 40%; left: 50%;
+      transform: translate(-50%,-50%);
+      animation: orbMove 8s ease-in-out infinite 1.5s;
+    }
+
+    .orb-4 {
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(72,187,120,0.2), transparent 70%);
+      bottom: 25%; left: 12%;
+      animation: orbMove 14s ease-in-out infinite 4s;
+    }
+
+    @keyframes orbMove {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; }
+      33%       { transform: translateY(-25px) scale(1.05); opacity: 0.9; }
+      66%       { transform: translateY(15px) scale(0.97); opacity: 0.6; }
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-lines {
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg, transparent, transparent 250px,
+        rgba(255,255,255,0.012) 250px,
+        rgba(255,255,255,0.012) 251px
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Contenido central ───────────────────── */
+    .splash {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      animation: fadeIn 0.8s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Logo */
+    .logo-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .logo {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg,
+        rgba(255,255,255,0.22),
+        rgba(255,255,255,0.06)
+      );
+      border: 2.5px solid rgba(255,255,255,0.28);
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow:
+        0 12px 48px rgba(0,0,0,0.3),
+        0 2px 0 rgba(255,255,255,0.15) inset;
+      animation: logoFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50%       { transform: translateY(-10px) rotate(2deg); }
+    }
+
+    .logo-ring-1 {
+      position: absolute;
+      inset: -12px;
+      border-radius: 38px;
+      border: 2px solid rgba(255,255,255,0.12);
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    .logo-ring-2 {
+      position: absolute;
+      inset: -24px;
+      border-radius: 48px;
+      border: 1px solid rgba(255,255,255,0.06);
+      animation: pulse 3s ease-in-out infinite 0.5s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(1.03); }
+    }
+
+    /* Textos */
+    .titulo {
+      font-size: 36px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1px;
+      text-shadow:
+        0 2px 20px rgba(0,0,0,0.4),
+        0 0 60px rgba(74,144,217,0.4);
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .slogan {
+      font-size: 15px;
+      color: rgba(255,255,255,0.6);
+      font-weight: 400;
+      letter-spacing: 1px;
+    }
+
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 50px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+      margin-top: 14px;
+    }
+
+    .version-dot {
+      width: 7px;
+      height: 7px;
+      background: #48BB78;
+      border-radius: 50%;
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    /* Barra de progreso */
+    .progress-wrap {
+      width: 260px;
+      margin-top: 28px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 5px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2) inset;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0.4),
+        #fff,
+        rgba(255,255,255,0.4)
+      );
+      border-radius: 5px;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 0 12px rgba(255,255,255,0.3);
+    }
+
+    .status-text {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      font-weight: 500;
+      margin-top: 12px;
+      transition: all 0.3s ease;
+      min-height: 20px;
+    }
+
+    /* Etapas */
+    .steps {
+      display: flex;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .step-dot.done {
+      background: #48BB78;
+      box-shadow: 0 0 8px rgba(72,187,120,0.5);
+    }
+
+    .step-dot.active {
+      background: #fff;
+      box-shadow: 0 0 8px rgba(255,255,255,0.5);
+      transform: scale(1.3);
+    }
+
+    /* Footer */
+    .footer {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      text-align: center;
+    }
+
+    .footer p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.3px;
+    }
+
+    /* Error state */
+    .error-box {
+      background: rgba(252,129,129,0.15);
+      border: 1px solid rgba(252,129,129,0.3);
+      border-radius: 16px;
+      padding: 16px 22px;
+      margin-top: 20px;
+      animation: shake 0.4s ease;
+      display: none;
+    }
+
+    .error-box.visible { display: block; }
+
+    .error-text {
+      color: #FCA5A5;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .retry-btn {
+      margin-top: 12px;
+      padding: 10px 24px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      backdrop-filter: blur(8px);
+    }
+
+    .retry-btn:hover {
+      background: rgba(255,255,255,0.25);
+      transform: translateY(-2px);
+    }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-6px); }
+      40%      { transform: translateX(6px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .titulo  { font-size: 28px; }
+      .logo    { width: 85px; height: 85px; font-size: 42px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Fondo animado -->
+  <div class="bg-layer">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+  </div>
+  <div class="bg-grid"></div>
+  <div class="bg-lines"></div>
+
+  <!-- Contenido central -->
+  <div class="splash">
+
+    <div class="logo-wrap">
+      <div class="logo">📱</div>
+      <div class="logo-ring-1"></div>
+      <div class="logo-ring-2"></div>
+    </div>
+
+    <h1 class="titulo">CellCom Tecnology</h1>
+    <p class="slogan">Sistema POS — Punto de Venta Integral</p>
+
+    <div class="version-badge">
+      <div class="version-dot"></div>
+      POS v1.0.0 — Cieneguilla, Lima
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <div class="status-text" id="statusText">
+      Iniciando sistema...
+    </div>
+
+    <div class="steps">
+      <div class="step-dot" id="step0"></div>
+      <div class="step-dot" id="step1"></div>
+      <div class="step-dot" id="step2"></div>
+      <div class="step-dot" id="step3"></div>
+      <div class="step-dot" id="step4"></div>
+    </div>
+
+    <div class="error-box" id="errorBox">
+      <p class="error-text" id="errorText">Error</p>
+      <button class="retry-btn" onclick="iniciarSistema()">
+        🔄 Reintentar
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>CellCom Tecnology © 2025 — Cieneguilla, Lima, Perú</p>
+  </div>
+
+  <!-- Config primero -->
+  <script src="/cellcomtecnology/js/config.js"></script>
+
+  <script>
+  // ════════════════════════════════════════════════════════════════
+  // INDEX ROUTER — CellCom Tecnology
+  // Detecta sesión y redirige al módulo correcto
+  // ════════════════════════════════════════════════════════════════
+
+  const STEPS = {
+    current: 0,
+    total:   5,
+    textos: [
+      'Verificando sesión...',
+      'Cargando configuración...',
+      'Verificando conexión...',
+      'Preparando tu panel...',
+      '¡Listo! Redirigiendo...'
+    ]
+  };
+
+  // ── Funciones de UI ──────────────────────────────────────────
+  function setProgress(porcentaje) {
+    const fill = document.getElementById('progressFill');
+    if (fill) fill.style.width = `${porcentaje}%`;
+  }
+
+  function setStatus(texto) {
+    const el = document.getElementById('statusText');
+    if (el) {
+      el.style.opacity = '0';
+      setTimeout(() => {
+        el.textContent = texto;
+        el.style.opacity = '1';
+      }, 150);
+    }
+  }
+
+  function setStep(num) {
+    STEPS.current = num;
+    for (let i = 0; i < STEPS.total; i++) {
+      const dot = document.getElementById(`step${i}`);
+      if (!dot) continue;
+      dot.classList.remove('done', 'active');
+      if (i < num)  dot.classList.add('done');
+      if (i === num) dot.classList.add('active');
+    }
+    setStatus(STEPS.textos[num] || '');
+    setProgress(((num + 1) / STEPS.total) * 100);
+  }
+
+  function mostrarError(mensaje) {
+    const box  = document.getElementById('errorBox');
+    const text = document.getElementById('errorText');
+    if (box)  box.classList.add('visible');
+    if (text) text.textContent = mensaje;
+  }
+
+  function esperar(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+  // ── Verificación de sesión ────────────────────────────────────
+  function verificarSesion() {
+    try {
+      const token   = localStorage.getItem('cellcom_token');
+      const userStr = localStorage.getItem('cellcom_usuario');
+      const tiempo  = localStorage.getItem('cellcom_login_time');
+
+      if (!token || !userStr || !tiempo) {
+        return { activa: false, razon: 'sin_sesion' };
+      }
+
+      // Verificar expiración (12 horas)
+      const horasTransc = (Date.now() - parseInt(tiempo)) / 3600000;
+      if (horasTransc > 12) {
+        localStorage.removeItem('cellcom_token');
+        localStorage.removeItem('cellcom_usuario');
+        localStorage.removeItem('cellcom_login_time');
+        localStorage.removeItem('cellcom_permisos');
+        return { activa: false, razon: 'expirada' };
+      }
+
+      const usuario = JSON.parse(userStr);
+      return {
+        activa:  true,
+        usuario,
+        nombre:  usuario.nombre || 'Usuario',
+        rol:     usuario.rol    || 'Vendedor',
+        esAdmin: usuario.rol    === 'Admin'
+      };
+
+    } catch(e) {
+      console.error('Error verificando sesión:', e);
+      return { activa: false, razon: 'error' };
+    }
+  }
+
+  // ── Verificar conexión con el servidor ────────────────────────
+  async function verificarConexion() {
+    try {
+      const url = APP_CONFIG.API_URL + '?action=ping';
+      const response = await fetch(url, {
+        method:   'GET',
+        redirect: 'follow'
+      });
+
+      const texto = await response.text();
+      const data  = JSON.parse(texto);
+      return !!(data && data.success);
+
+    } catch(e) {
+      console.warn('Sin conexión:', e.message);
+      return false;
+    }
+  }
+
+  // ── Sistema principal ─────────────────────────────────────────
+  async function iniciarSistema() {
+    // Ocultar error si hay
+    const errorBox = document.getElementById('errorBox');
+    if (errorBox) errorBox.classList.remove('visible');
+
+    try {
+      console.log('🚀 CellCom Tecnology — Iniciando sistema...');
+
+      // PASO 1 — Verificar sesión
+      setStep(0);
+      await esperar(400);
+
+      const sesion = verificarSesion();
+      console.log('Sesión:', sesion);
+
+      // Si no hay sesión → ir al login
+      if (!sesion.activa) {
+        setStep(1);
+        await esperar(300);
+
+        const mensajes = {
+          sin_sesion: 'No hay sesión activa. Ve al login...',
+          expirada:   'Tu sesión expiró. Inicia sesión nuevamente...',
+          error:      'Error de sesión. Redirigiendo al login...'
+        };
+
+        setStatus(mensajes[sesion.razon] || 'Redirigiendo al login...');
+        setProgress(100);
+
+        for (let i = 0; i < STEPS.total; i++) {
+          const dot = document.getElementById(`step${i}`);
+          if (dot) dot.classList.add('done');
+        }
+
+        await esperar(1200);
+        window.location.href = '/cellcomtecnology/login.html';
+        return;
+      }
+
+      // PASO 2 — Sesión válida
+      setStep(1);
+      await esperar(500);
+
+      const nombre = sesion.nombre.split(' ')[0];
+      setStatus(`¡Hola ${nombre}! Verificando sistema...`);
+
+      // PASO 3 — Verificar conexión
+      setStep(2);
+      await esperar(400);
+
+      const online = await verificarConexion();
+      console.log('Servidor online:', online);
+
+      if (!online) {
+        setStatus('⚠️ Sin conexión. Cargando modo offline...');
+        await esperar(1000);
+      }
+
+      // PASO 4 — Preparar redirección
+      setStep(3);
+      await esperar(500);
+
+      const rolTexto = sesion.esAdmin ? '👑 Administrador' : '🧑‍💼 Vendedor';
+      setStatus(`${nombre} — ${rolTexto}`);
+
+      // PASO 5 — Redirigir
+      setStep(4);
+      await esperar(800);
+
+      setStatus('🚀 ¡Abriendo tu panel de trabajo!');
+
+      for (let i = 0; i < STEPS.total; i++) {
+        const dot = document.getElementById(`step${i}`);
+        if (dot) dot.classList.add('done');
+      }
+
+      await esperar(600);
+
+      // Todos van al POS por ahora
+      // Cuando exista reportes.html → Admin irá ahí
+      window.location.href = '/cellcomtecnology/pos.html';
+
+    } catch(e) {
+      console.error('Error en sistema:', e);
+      mostrarError(`Error: ${e.message}. Haz clic en reintentar.`);
+    }
+  }
+
+  // ── Cargar tema guardado ──────────────────────────────────────
+  function cargarTema() {
+    const tema = localStorage.getItem('cellcom_tema') || 'light';
+    document.documentElement.setAttribute('data-theme', tema);
+  }
+
+  // ── Iniciar todo ──────────────────────────────────────────────
+  window.addEventListener('load', () => {
+    cargarTema();
+    setTimeout(iniciarSistema, 300);
+  });
+  </script>
+
+</body>
+</html>
+
+
