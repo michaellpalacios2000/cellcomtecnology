@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#4A90D9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>CellCom Tecnology — Punto de Venta</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Librerías externas -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- CSS global -->
+  <link rel="stylesheet" href="/cellcomtecnology/css/styles.css">
+
+  <style>
+    /* ══════════════════════════════════════════════
+       POS — ESTILOS ESPECÍFICOS
+    ══════════════════════════════════════════════ */
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    /* ── Layout principal mitad/mitad ─────────── */
+    .pos-layout {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .pos-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+      gap: 0;
+    }
+
+    /* ── Header del POS ──────────────────────── */
+    .pos-header {
+      background: linear-gradient(135deg, #0F2044 0%, #1A3A6B 50%, #2E6DB4 100%);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: 100;
+    }
+
+    .pos-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pos-brand-icon {
+      width: 38px; height: 38px;
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .pos-brand-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    .pos-brand-sub {
+      font-size: 10px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .pos-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pos-hdr-btn {
+      height: 36px;
+      padding: 0 14px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .pos-hdr-btn:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-1px);
+    }
+
+    .pos-hdr-btn:active { transform: scale(0.97); }
+
+    .pos-user-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 5px 12px;
+    }
+
+    .pos-user-avatar {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, #7BB3E8, #4A90D9);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .pos-user-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .pos-user-role {
+      font-size: 10px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ── LADO IZQUIERDO — Venta rápida ────────── */
+    .pos-left {
+      background: var(--fondo);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-right: 2px solid var(--borde);
+    }
+
+    .venta-form {
+      padding: 16px 18px;
+      flex-shrink: 0;
+    }
+
+    .venta-titulo {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--texto-dark);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Input de producto */
+    .campo-producto {
+      margin-bottom: 10px;
+    }
+
+    .campo-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--texto-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    .campo-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid var(--borde);
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--texto-dark);
+      background: var(--fondo-card);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .campo-input:focus {
+      border-color: #4A90D9;
+      box-shadow: 0 0 0 3px rgba(74,144,217,0.1);
+    }
+
+    .campo-input::placeholder { color: #A0AEC0; }
+
+    /* Campos de precio y costo en grid */
+    .campos-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .campos-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .campo-moneda {
+      position: relative;
+    }
+
+    .campo-moneda-prefix {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--texto-mid);
+      pointer-events: none;
+    }
+
+    .campo-moneda .campo-input {
+      padding-left: 30px;
+      font-size: 18px;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    /* Ganancia calculada */
+    .ganancia-box {
+      background: var(--verde-soft);
+      border: 1.5px solid rgba(72,187,120,0.3);
+      border-radius: 12px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      transition: all 0.3s;
+    }
+
+    .ganancia-box.negativa {
+      background: #FFF5F5;
+      border-color: rgba(252,129,129,0.3);
+    }
+
+    .ganancia-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #276749;
+    }
+
+    .ganancia-box.negativa .ganancia-label { color: #C53030; }
+
+    .ganancia-valor {
+      font-size: 18px;
+      font-weight: 900;
+      color: #276749;
+    }
+
+    .ganancia-box.negativa .ganancia-valor { color: #C53030; }
+
+    /* Teclado numérico */
+    .teclado-wrap {
+      padding: 0 18px 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .teclado {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      flex: 1;
+    }
+
+    .tec-btn {
+      border: 2px solid var(--borde);
+      border-radius: 14px;
+      background: var(--fondo-card);
+      font-family: 'Inter', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--texto-dark);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tec-btn:hover {
+      border-color: #7BB3E8;
+      background: #EBF4FF;
+      color: #4A90D9;
+      transform: scale(0.97);
+    }
+
+    .tec-btn:active {
+      transform: scale(0.92);
+      background: #D4E9FF;
+    }
+
+    .tec-btn.tec-action {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .tec-btn.tec-clear {
+      background: #FFF5F5;
+      border-color: rgba(252,129,129,0.3);
+      color: #C53030;
+      font-size: 18px;
+    }
+
+    .tec-btn.tec-clear:hover {
+      background: #FFECEC;
+    }
+
+    .tec-btn.tec-del {
+      font-size: 20px;
+      color: #718096;
+    }
+
+    .tec-btn.tec-vender {
+      background: linear-gradient(135deg, #48BB78, #276749);
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 16px rgba(72,187,120,0.35);
+      grid-column: span 2;
+    }
+
+    .tec-btn.tec-vender:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(72,187,120,0.45);
+      color: #fff;
+    }
+
+    .tec-btn.tec-vender:active {
+      transform: scale(0.97);
+    }
+
+    .tec-btn.tec-dot { font-size: 28px; }
+
+    /* Campo activo indicator */
+    .campo-activo-tag {
+      font-size: 9px;
+      font-weight: 700;
+      color: #4A90D9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      background: #EBF4FF;
+      border-radius: 50px;
+      display: inline-flex;
+      margin-left: 6px;
+    }
+
+    /* Opciones de pago */
+    .pago-opciones {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .pago-btn {
+      flex: 1;
+      padding: 8px 4px;
+      border: 2px solid var(--borde);
+      border-radius: 10px;
+      background: var(--fondo-card);
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--texto-mid);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .pago-btn:hover {
+      border-color: #7BB3E8;
+      background: #EBF4FF;
+    }
+
+    .pago-btn.active {
+      border-color: #4A90D9;
+      background: #EBF4FF;
+      color: #2E6DB4;
+    }
+
+    .pago-icon { font-size: 18px; }
+
+    /* ── LADO DERECHO — Resumen del día ───────── */
+    .pos-right {
+      background: var(--fondo-card);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* KPIs superiores */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border-bottom: 2px solid var(--borde);
+      flex-shrink: 0;
+    }
+
+    .kpi-mini {
+      padding: 14px 12px;
+      text-align: center;
+      border-right: 1px solid var(--borde);
+      transition: all 0.2s;
+    }
+
+    .kpi-mini:last-child { border-right: none; }
+
+    .kpi-mini:hover { background: var(--azul-soft); }
+
+    .kpi-mini-icon { font-size: 16px; margin-bottom: 2px; }
+
+    .kpi-mini-valor {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--texto-dark);
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    .kpi-mini-label {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--texto-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 3px;
+    }
+
+    /* Caja del día */
+    .caja-info {
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #0F2044, #1A3A6B);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .caja-item {
+      text-align: center;
+    }
+
+    .caja-label {
+      font-size: 9px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .caja-valor {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .caja-valor.verde { color: #48BB78; }
+    .caja-valor.rojo  { color: #FC8181; }
+
+    /* Header de ventas */
+    .ventas-header {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--borde);
+      flex-shrink: 0;
+    }
+
+    .ventas-titulo {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--texto-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ventas-count {
+      background: #EBF4FF;
+      color: #2E6DB4;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 50px;
+    }
+
+    /* Lista de ventas del día */
+    .ventas-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+    }
+
+    .ventas-list::-webkit-scrollbar { width: 3px; }
+    .ventas-list::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 3px; }
+
+    .venta-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-bottom: 6px;
+      border: 1.5px solid var(--borde);
+      background: var(--fondo);
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+
+    .venta-item:hover {
+      border-color: #7BB3E8;
+      background: #EBF4FF;
+      transform: translateX(3px);
+    }
+
+    .venta-hora {
+      font-size: 10px;
+      font-weight: 700;
+      color: #4A90D9;
+      min-width: 40px;
+    }
+
+    .venta-desc {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .venta-nombre {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--texto-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .venta-detalle {
+      font-size: 10px;
+      color: var(--texto-light);
+      margin-top: 1px;
+    }
+
+    .venta-monto {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .venta-precio {
+      font-size: 14px;
+      font-weight: 900;
+      color: #2E6DB4;
+    }
+
+    .venta-ganancia {
+      font-size: 10px;
+      font-weight: 700;
+      color: #276749;
+    }
+
+    .venta-metodo {
+      font-size: 14px;
+    }
+
+    /* Empty state para ventas */
+    .ventas-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--texto-light);
+    }
+
+    .ventas-empty-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+      opacity: 0.4;
+    }
+
+    .ventas-empty-texto {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Footer con botones de acción */
+    .pos-footer {
+      padding: 10px 16px;
+      border-top: 2px solid var(--borde);
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+      background: var(--fondo);
+    }
+
+    .footer-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1.5px solid var(--borde);
+      background: var(--fondo-card);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--texto-mid);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+
+    .footer-btn:hover {
+      border-color: #4A90D9;
+      color: #4A90D9;
+      background: #EBF4FF;
+      transform: translateY(-1px);
+    }
+
+    .footer-btn:active { transform: scale(0.97); }
+
+    .footer-btn.danger:hover {
+      border-color: #FC8181;
+      color: #C53030;
+      background: #FFF5F5;
+    }
+
+    /* ── Responsive ───────────────────────────── */
+    @media (max-width: 768px) {
+      .pos-content {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+      }
+
+      .pos-right {
+        max-height: 40vh;
+        border-top: 2px solid var(--borde);
+      }
+
+      .pos-left { border-right: none; }
+      .pos-brand-name { display: none; }
+      .pos-brand-sub  { display: none; }
+      .pos-user-name  { display: none; }
+      .pos-user-role  { display: none; }
+    }
+
+    @media (min-width: 1024px) {
+      .tec-btn { min-height: 64px; font-size: 28px; }
+      .campo-moneda .campo-input { font-size: 22px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="pos-layout">
+
+  <!-- ══════════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════════ -->
+  <header class="pos-header">
+    <div class="pos-brand">
+      <div class="pos-brand-icon">📱</div>
+      <div>
+        <div class="pos-brand-name">CellCom Tecnology</div>
+        <div class="pos-brand-sub">Punto de Venta</div>
+      </div>
+    </div>
+
+    <div class="pos-header-actions">
+      <button class="pos-hdr-btn" onclick="abrirCaja()" id="btnCaja">
+        💰 <span id="btnCajaText">Abrir caja</span>
+      </button>
+      <button class="pos-hdr-btn" onclick="verInventario()">📦 Inventario</button>
+      <button class="pos-hdr-btn" onclick="exportarPDF()">📄 Exportar PDF</button>
+      <button class="pos-hdr-btn" onclick="toggleTema()">🌙</button>
+
+      <div class="pos-user-chip">
+        <div class="pos-user-avatar" id="posAvatar">?</div>
+        <div>
+          <div class="pos-user-name" id="posUserName">Usuario</div>
+          <div class="pos-user-role" id="posUserRole">Rol</div>
+        </div>
+      </div>
+
+      <button class="pos-hdr-btn danger" onclick="cerrarSesion()">🚪</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════
+       CONTENIDO PRINCIPAL
+  ══════════════════════════════════════════════ -->
+  <div class="pos-content">
+
+    <!-- ── LADO IZQUIERDO — Venta Rápida ──────── -->
+    <div class="pos-left">
+
+      <div class="venta-form">
+        <div class="venta-titulo">
+          🛒 Venta Rápida
+        </div>
+
+        <!-- Producto -->
+        <div class="campo-producto">
+          <label class="campo-label">Descripción del producto</label>
+          <input type="text" class="campo-input" id="inputProducto"
+                 placeholder="Ej: Audífono Bluetooth, Cable USB..."
+                 autocomplete="off">
+        </div>
+
+        <!-- Precio + Costo + Cantidad -->
+        <div class="campos-grid-3">
+          <div class="campo-moneda">
+            <label class="campo-label">
+              Precio venta
+              <span class="campo-activo-tag" id="tagPrecio" style="display:none">Activo</span>
+            </label>
+            <span class="campo-moneda-prefix">S/</span>
+            <input type="text" class="campo-input" id="inputPrecio"
+                   placeholder="0.00" readonly
+                   onclick="activarCampo('precio')">
+          </div>
+          <div class="campo-moneda">
+            <label class="campo-label">
+              Costo
+              <span class="campo-activo-tag" id="tagCosto" style="display:none">Activo</span>
+            </label>
+            <span class="campo-moneda-prefix">S/</span>
+            <input type="text" class="campo-input" id="inputCosto"
+                   placeholder="0.00" readonly
+                   onclick="activarCampo('costo')">
+          </div>
+          <div>
+            <label class="campo-label">
+              Cantidad
+              <span class="campo-activo-tag" id="tagCantidad" style="display:none">Activo</span>
+            </label>
+            <input type="text" class="campo-input" id="inputCantidad"
+                   value="1" readonly
+                   style="text-align:center;font-size:18px;font-weight:800;"
+                   onclick="activarCampo('cantidad')">
+          </div>
+        </div>
+
+        <!-- Ganancia calculada -->
+        <div class="ganancia-box" id="gananciaBox">
+          <span class="ganancia-label" id="gananciaLabel">📈 Ganancia bruta:</span>
+          <span class="ganancia-valor" id="gananciaValor">S/ 0.00</span>
+        </div>
+
+        <!-- Método de pago -->
+        <div class="pago-opciones">
+          <button class="pago-btn active" data-metodo="Efectivo" onclick="seleccionarPago('Efectivo', this)">
+            <span class="pago-icon">💵</span> Efectivo
+          </button>
+          <button class="pago-btn" data-metodo="Yape" onclick="seleccionarPago('Yape', this)">
+            <span class="pago-icon">📱</span> Yape
+          </button>
+          <button class="pago-btn" data-metodo="Plin" onclick="seleccionarPago('Plin', this)">
+            <span class="pago-icon">📲</span> Plin
+          </button>
+          <button class="pago-btn" data-metodo="Tarjeta" onclick="seleccionarPago('Tarjeta', this)">
+            <span class="pago-icon">💳</span> Tarjeta
+          </button>
+          <button class="pago-btn" data-metodo="BCP" onclick="seleccionarPago('BCP', this)">
+            <span class="pago-icon">🏦</span> BCP
+          </button>
+        </div>
+      </div>
+
+      <!-- Teclado numérico -->
+      <div class="teclado-wrap">
+        <div class="teclado">
+          <button class="tec-btn" onclick="tecla('7')">7</button>
+          <button class="tec-btn" onclick="tecla('8')">8</button>
+          <button class="tec-btn" onclick="tecla('9')">9</button>
+          <button class="tec-btn tec-del" onclick="tecla('borrar')">⌫</button>
+
+          <button class="tec-btn" onclick="tecla('4')">4</button>
+          <button class="tec-btn" onclick="tecla('5')">5</button>
+          <button class="tec-btn" onclick="tecla('6')">6</button>
+          <button class="tec-btn tec-clear" onclick="tecla('limpiar')">C</button>
+
+          <button class="tec-btn" onclick="tecla('1')">1</button>
+          <button class="tec-btn" onclick="tecla('2')">2</button>
+          <button class="tec-btn" onclick="tecla('3')">3</button>
+          <button class="tec-btn tec-action" onclick="agregarAlInventario()" style="font-size:12px;">
+            📦 + Inv
+          </button>
+
+          <button class="tec-btn" onclick="tecla('0')">0</button>
+          <button class="tec-btn tec-dot" onclick="tecla('.')">.</button>
+          <button class="tec-btn tec-vender" onclick="registrarVenta()">
+            ✅ VENDER
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── LADO DERECHO — Resumen del día ─────── -->
+    <div class="pos-right">
+
+      <!-- KPIs -->
+      <div class="kpi-strip">
+        <div class="kpi-mini">
+          <div class="kpi-mini-icon">💰</div>
+          <div class="kpi-mini-valor" id="kpiVentas">S/0</div>
+          <div class="kpi-mini-label">Ventas hoy</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="kpi-mini-icon">📈</div>
+          <div class="kpi-mini-valor" id="kpiGanancia">S/0</div>
+          <div class="kpi-mini-label">Ganancia</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="kpi-mini-icon">🛒</div>
+          <div class="kpi-mini-valor" id="kpiCount">0</div>
+          <div class="kpi-mini-label">Ventas</div>
+        </div>
+      </div>
+
+      <!-- Info de caja -->
+      <div class="caja-info">
+        <div class="caja-item">
+          <div class="caja-label">Inicio caja</div>
+          <div class="caja-valor" id="cajaInicio">S/0.00</div>
+        </div>
+        <div class="caja-item">
+          <div class="caja-label">Ingresos</div>
+          <div class="caja-valor verde" id="cajaIngresos">S/0.00</div>
+        </div>
+        <div class="caja-item">
+          <div class="caja-label">Gastos</div>
+          <div class="caja-valor rojo" id="cajaGastos">S/0.00</div>
+        </div>
+        <div class="caja-item">
+          <div class="caja-label">En caja</div>
+          <div class="caja-valor verde" id="cajaTotal">S/0.00</div>
+        </div>
+      </div>
+
+      <!-- Header ventas del día -->
+      <div class="ventas-header">
+        <div class="ventas-titulo">
+          📋 Ventas del día
+          <span class="ventas-count" id="ventasCount">0</span>
+        </div>
+      </div>
+
+      <!-- Lista de ventas -->
+      <div class="ventas-list" id="ventasList">
+        <div class="ventas-empty">
+          <div class="ventas-empty-icon">🛒</div>
+          <div class="ventas-empty-texto">
+            Sin ventas hoy<br>
+            <span style="font-weight:400;font-size:11px;color:var(--texto-muted);">
+              Registra tu primera venta del día
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer acciones -->
+      <div class="pos-footer">
+        <button class="footer-btn" onclick="verHistorial()">📊 Historial</button>
+        <button class="footer-btn" onclick="registrarGasto()">💸 Gasto</button>
+        <button class="footer-btn" onclick="cerrarCaja()">🔒 Cerrar caja</button>
+        <button class="footer-btn danger" onclick="cerrarSesion()">🚪 Salir</button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toastContainer"></div>
+
+<!-- Scripts -->
+<script src="/cellcomtecnology/js/config.js"></script>
+<script src="/cellcomtecnology/js/api.js"></script>
+<script src="/cellcomtecnology/js/auth.js"></script>
+<script src="/cellcomtecnology/js/pos.js"></script>
+
+</body>
+</html>
