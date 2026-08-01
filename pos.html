@@ -27,48 +27,48 @@
     ══════════════════════════════════════════════ */
 
     html, body {
-  height: 100%;
-  overflow: hidden;
-}
+      height: 100%;
+      overflow: hidden;
+    }
 
-@media (max-width: 1024px) {
-  html, body {
-    overflow: auto;
-    overflow-x: hidden;
-    height: auto;
-    min-height: 100vh;
-  }
-}
+    @media (max-width: 1024px) {
+      html, body {
+        overflow: auto;
+        overflow-x: hidden;
+        height: auto;
+        min-height: 100vh;
+      }
+    }
 
     /* ── Layout principal mitad/mitad ─────────── */
     .pos-layout {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  height: 100vh;
-  overflow: hidden;
-}
+      display: grid;
+      grid-template-rows: auto 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-@media (max-width: 1024px) {
-  .pos-layout {
-    height: auto;
-    min-height: 100vh;
-    overflow: visible;
-  }
-}
+    @media (max-width: 1024px) {
+      .pos-layout {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+      }
+    }
 
     .pos-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  overflow: hidden;
-  gap: 0;
-}
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+      gap: 0;
+    }
 
-@media (max-width: 1024px) {
-  .pos-content {
-    grid-template-columns: 1fr;
-    overflow: visible;
-  }
-}
+    @media (max-width: 1024px) {
+      .pos-content {
+        grid-template-columns: 1fr;
+        overflow: visible;
+      }
+    }
 
     /* ── Header del POS ──────────────────────── */
     .pos-header {
@@ -177,31 +177,31 @@
 
     /* ── LADO IZQUIERDO — Venta rápida ────────── */
     .pos-left {
-  background: var(--fondo);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border-right: 2px solid var(--borde);
-}
+      background: var(--fondo);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-right: 2px solid var(--borde);
+    }
 
-@media (max-width: 1024px) {
-  .pos-left {
-    overflow: visible;
-    border-right: none;
-    border-bottom: 2px solid var(--borde);
-  }
-}
+    @media (max-width: 1024px) {
+      .pos-left {
+        overflow: visible;
+        border-right: none;
+        border-bottom: 2px solid var(--borde);
+      }
+    }
 
     .venta-form {
-      padding: 16px 18px;
+      padding: 14px 18px;
       flex-shrink: 0;
     }
 
     .venta-titulo {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       color: var(--texto-dark);
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -209,7 +209,7 @@
 
     /* Input de producto */
     .campo-producto {
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .campo-label {
@@ -218,13 +218,13 @@
       color: var(--texto-mid);
       text-transform: uppercase;
       letter-spacing: 0.6px;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
       display: block;
     }
 
     .campo-input {
       width: 100%;
-      padding: 10px 14px;
+      padding: 9px 14px;
       border: 2px solid var(--borde);
       border-radius: 12px;
       font-family: 'Inter', sans-serif;
@@ -244,23 +244,14 @@
     .campo-input::placeholder { color: #A0AEC0; }
 
     /* Campos de precio y costo en grid */
-    .campos-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
     .campos-grid-3 {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
-    .campo-moneda {
-      position: relative;
-    }
+    .campo-moneda { position: relative; }
 
     .campo-moneda-prefix {
       position: absolute;
@@ -280,16 +271,199 @@
       text-align: right;
     }
 
+    /* Campo activo indicator */
+    .campo-activo-tag {
+      font-size: 9px;
+      font-weight: 700;
+      color: #4A90D9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      background: #EBF4FF;
+      border-radius: 50px;
+      display: inline-flex;
+      margin-left: 6px;
+    }
+
+    /* ── DNI del cliente ─────────────────────── */
+    .dni-section {
+      margin-bottom: 8px;
+    }
+
+    .dni-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dni-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 2px solid var(--borde);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--texto-dark);
+      background: var(--fondo-card);
+      outline: none;
+      transition: all 0.2s;
+      letter-spacing: 2px;
+    }
+
+    .dni-input:focus {
+      border-color: #4A90D9;
+      box-shadow: 0 0 0 3px rgba(74,144,217,0.1);
+    }
+
+    .dni-input::placeholder {
+      color: #A0AEC0;
+      letter-spacing: 0;
+      font-weight: 400;
+    }
+
+    .dni-search-btn {
+      padding: 0 14px;
+      height: 38px;
+      background: linear-gradient(135deg, #4A90D9, #2E6DB4);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 3px 10px rgba(74,144,217,0.3);
+    }
+
+    .dni-search-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 16px rgba(74,144,217,0.4);
+    }
+
+    .dni-search-btn:active { transform: scale(0.97); }
+
+    /* Info del cliente encontrado */
+    .cliente-info-box {
+      display: none;
+      margin-top: 5px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1.5px solid;
+      transition: all 0.3s;
+      line-height: 1.4;
+    }
+
+    .cliente-info-box.encontrado {
+      background: #F0FFF4;
+      border-color: rgba(72,187,120,0.3);
+      color: #276749;
+    }
+
+    .cliente-info-box.no-encontrado {
+      background: #FFFAF0;
+      border-color: rgba(246,173,85,0.3);
+      color: #C05621;
+    }
+
+    /* ── Se probó — OBLIGATORIO ──────────────── */
+    .se-probo-section {
+      margin-bottom: 8px;
+    }
+
+    .se-probo-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--texto-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .se-probo-obligatorio {
+      font-size: 9px;
+      font-weight: 700;
+      color: #C53030;
+      background: #FFF5F5;
+      border-radius: 50px;
+      padding: 1px 7px;
+      letter-spacing: 0.3px;
+    }
+
+    .se-probo-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .se-probo-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border: 2px solid var(--borde);
+      border-radius: 12px;
+      background: var(--fondo-card);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--texto-mid);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .se-probo-btn:active { transform: scale(0.97); }
+
+    .se-probo-btn.si-activo {
+      background: linear-gradient(135deg, #48BB78, #276749);
+      color: #fff;
+      border-color: #48BB78;
+      box-shadow: 0 4px 14px rgba(72,187,120,0.40);
+      transform: scale(1.02);
+    }
+
+    .se-probo-btn.no-activo {
+      background: linear-gradient(135deg, #C53030, #FC8181);
+      color: #fff;
+      border-color: #FC8181;
+      box-shadow: 0 4px 14px rgba(252,129,129,0.40);
+      transform: scale(1.02);
+    }
+
+    .se-probo-indicador {
+      display: none;
+      margin-top: 5px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      border: 1.5px solid;
+    }
+
     /* Ganancia calculada */
     .ganancia-box {
       background: var(--verde-soft);
       border: 1.5px solid rgba(72,187,120,0.3);
-      border-radius: 12px;
-      padding: 8px 14px;
+      border-radius: 10px;
+      padding: 7px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       transition: all 0.3s;
     }
 
@@ -307,14 +481,53 @@
     .ganancia-box.negativa .ganancia-label { color: #C53030; }
 
     .ganancia-valor {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 900;
       color: #276749;
     }
 
     .ganancia-box.negativa .ganancia-valor { color: #C53030; }
 
-    /* Teclado numérico */
+    /* Opciones de pago */
+    .pago-opciones {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .pago-btn {
+      flex: 1;
+      padding: 7px 4px;
+      border: 2px solid var(--borde);
+      border-radius: 10px;
+      background: var(--fondo-card);
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--texto-mid);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .pago-btn:hover {
+      border-color: #7BB3E8;
+      background: #EBF4FF;
+    }
+
+    .pago-btn.active {
+      border-color: #4A90D9;
+      background: #EBF4FF;
+      color: #2E6DB4;
+    }
+
+    .pago-icon { font-size: 16px; }
+
+    /* ── Teclado numérico ────────────────────── */
     .teclado-wrap {
       padding: 0 18px 12px;
       flex: 1;
@@ -373,9 +586,7 @@
       font-size: 18px;
     }
 
-    .tec-btn.tec-clear:hover {
-      background: #FFECEC;
-    }
+    .tec-btn.tec-clear:hover { background: #FFECEC; }
 
     .tec-btn.tec-del {
       font-size: 20px;
@@ -386,7 +597,7 @@
       background: linear-gradient(135deg, #48BB78, #276749);
       border: none;
       color: #fff;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 900;
       letter-spacing: 0.5px;
       box-shadow: 0 4px 16px rgba(72,187,120,0.35);
@@ -399,79 +610,23 @@
       color: #fff;
     }
 
-    .tec-btn.tec-vender:active {
-      transform: scale(0.97);
-    }
-
+    .tec-btn.tec-vender:active { transform: scale(0.97); }
     .tec-btn.tec-dot { font-size: 28px; }
-
-    /* Campo activo indicator */
-    .campo-activo-tag {
-      font-size: 9px;
-      font-weight: 700;
-      color: #4A90D9;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 2px 8px;
-      background: #EBF4FF;
-      border-radius: 50px;
-      display: inline-flex;
-      margin-left: 6px;
-    }
-
-    /* Opciones de pago */
-    .pago-opciones {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-
-    .pago-btn {
-      flex: 1;
-      padding: 8px 4px;
-      border: 2px solid var(--borde);
-      border-radius: 10px;
-      background: var(--fondo-card);
-      font-family: 'Inter', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--texto-mid);
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.15s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-    }
-
-    .pago-btn:hover {
-      border-color: #7BB3E8;
-      background: #EBF4FF;
-    }
-
-    .pago-btn.active {
-      border-color: #4A90D9;
-      background: #EBF4FF;
-      color: #2E6DB4;
-    }
-
-    .pago-icon { font-size: 18px; }
 
     /* ── LADO DERECHO — Resumen del día ───────── */
     .pos-right {
-  background: var(--fondo-card);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+      background: var(--fondo-card);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-@media (max-width: 1024px) {
-  .pos-right {
-    overflow: visible;
-    min-height: auto;
-  }
-}
+    @media (max-width: 1024px) {
+      .pos-right {
+        overflow: visible;
+        min-height: auto;
+      }
+    }
 
     /* KPIs superiores */
     .kpi-strip {
@@ -483,20 +638,18 @@
     }
 
     .kpi-mini {
-      padding: 14px 12px;
+      padding: 12px 10px;
       text-align: center;
       border-right: 1px solid var(--borde);
       transition: all 0.2s;
     }
 
     .kpi-mini:last-child { border-right: none; }
-
     .kpi-mini:hover { background: var(--azul-soft); }
-
-    .kpi-mini-icon { font-size: 16px; margin-bottom: 2px; }
+    .kpi-mini-icon { font-size: 15px; margin-bottom: 2px; }
 
     .kpi-mini-valor {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 900;
       color: var(--texto-dark);
       letter-spacing: -0.5px;
@@ -514,7 +667,7 @@
 
     /* Caja del día */
     .caja-info {
-      padding: 10px 16px;
+      padding: 9px 16px;
       background: linear-gradient(135deg, #0F2044, #1A3A6B);
       display: flex;
       align-items: center;
@@ -522,9 +675,7 @@
       flex-shrink: 0;
     }
 
-    .caja-item {
-      text-align: center;
-    }
+    .caja-item { text-align: center; }
 
     .caja-label {
       font-size: 9px;
@@ -535,7 +686,7 @@
     }
 
     .caja-valor {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
       color: #fff;
     }
@@ -545,7 +696,7 @@
 
     /* Header de ventas */
     .ventas-header {
-      padding: 10px 16px;
+      padding: 9px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -573,26 +724,29 @@
 
     /* Lista de ventas del día */
     .ventas-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 12px;
-}
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+    }
 
-@media (max-width: 1024px) {
-  .ventas-list {
-    max-height: 400px;
-    overflow-y: auto;
-  }
-}
+    @media (max-width: 1024px) {
+      .ventas-list {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+    }
 
     .ventas-list::-webkit-scrollbar { width: 3px; }
-    .ventas-list::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 3px; }
+    .ventas-list::-webkit-scrollbar-thumb {
+      background: var(--borde);
+      border-radius: 3px;
+    }
 
     .venta-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 12px;
+      padding: 9px 12px;
       border-radius: 12px;
       margin-bottom: 6px;
       border: 1.5px solid var(--borde);
@@ -611,13 +765,10 @@
       font-size: 10px;
       font-weight: 700;
       color: #4A90D9;
-      min-width: 40px;
+      min-width: 38px;
     }
 
-    .venta-desc {
-      flex: 1;
-      min-width: 0;
-    }
+    .venta-desc { flex: 1; min-width: 0; }
 
     .venta-nombre {
       font-size: 12px;
@@ -632,15 +783,15 @@
       font-size: 10px;
       color: var(--texto-light);
       margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .venta-monto {
-      text-align: right;
-      flex-shrink: 0;
-    }
+    .venta-monto { text-align: right; flex-shrink: 0; }
 
     .venta-precio {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 900;
       color: #2E6DB4;
     }
@@ -648,22 +799,19 @@
     .venta-ganancia {
       font-size: 10px;
       font-weight: 700;
-      color: #276749;
     }
 
-    .venta-metodo {
-      font-size: 14px;
-    }
+    .venta-metodo { font-size: 14px; flex-shrink: 0; }
 
     /* Empty state para ventas */
     .ventas-empty {
       text-align: center;
-      padding: 40px 20px;
+      padding: 36px 20px;
       color: var(--texto-light);
     }
 
     .ventas-empty-icon {
-      font-size: 48px;
+      font-size: 44px;
       margin-bottom: 10px;
       opacity: 0.4;
     }
@@ -722,13 +870,8 @@
         grid-template-columns: 1fr;
         grid-template-rows: 1fr auto;
       }
-
-      .pos-right {
-        max-height: 40vh;
-        border-top: 2px solid var(--borde);
-      }
-
-      .pos-left { border-right: none; }
+      .pos-right { max-height: 40vh; border-top: 2px solid var(--borde); }
+      .pos-left  { border-right: none; }
       .pos-brand-name { display: none; }
       .pos-brand-sub  { display: none; }
       .pos-user-name  { display: none; }
@@ -738,6 +881,7 @@
     @media (min-width: 1024px) {
       .tec-btn { min-height: 64px; font-size: 28px; }
       .campo-moneda .campo-input { font-size: 22px; }
+      .tec-btn.tec-vender { font-size: 17px; }
     }
   </style>
 </head>
@@ -769,8 +913,8 @@
       <div class="pos-user-chip">
         <div class="pos-user-avatar" id="posAvatar">?</div>
         <div>
-          <div class="pos-user-name" id="posUserName">Usuario</div>
-          <div class="pos-user-role" id="posUserRole">Rol</div>
+          <div class="pos-user-name"  id="posUserName">Usuario</div>
+          <div class="pos-user-role"  id="posUserRole">Rol</div>
         </div>
       </div>
 
@@ -787,29 +931,69 @@
     <div class="pos-left">
 
       <div class="venta-form">
-        <div class="venta-titulo">
-          🛒 Venta Rápida
-        </div>
+        <div class="venta-titulo">🛒 Venta Rápida</div>
 
-        <!-- Producto -->
+        <!-- ═══════════════════════════════
+             DESCRIPCIÓN DEL PRODUCTO
+        ═══════════════════════════════ -->
         <div class="campo-producto">
-          <label class="campo-label">Descripción del producto</label>
-          <input type="text" class="campo-input" id="inputProducto"
-                 placeholder="Ej: Audífono Bluetooth, Cable USB..."
-                 autocomplete="off">
+          <label class="campo-label">Descripción del producto *</label>
+          <input
+            type="text"
+            class="campo-input"
+            id="inputProducto"
+            placeholder="Ej: Audífono Bluetooth, Cable USB..."
+            autocomplete="off"
+            spellcheck="false"
+          >
         </div>
 
-        <!-- Precio + Costo + Cantidad -->
+        <!-- ═══════════════════════════════
+             DNI DEL CLIENTE — OPCIONAL
+        ═══════════════════════════════ -->
+        <div class="dni-section">
+          <label class="campo-label">
+            DNI del cliente
+            <span style="font-size:9px;font-weight:500;color:var(--texto-light);margin-left:4px;text-transform:none;letter-spacing:0;">
+              (opcional — sin DNI = venta rápida)
+            </span>
+          </label>
+          <div class="dni-row">
+            <input
+              type="text"
+              class="dni-input"
+              id="inputDNI"
+              placeholder="Ingresa DNI (8 dígitos)"
+              maxlength="8"
+              inputmode="numeric"
+              autocomplete="off"
+              onkeydown="if(event.key==='Enter')buscarClienteDNI()"
+            >
+            <button class="dni-search-btn" onclick="buscarClienteDNI()">
+              🔍 Buscar
+            </button>
+          </div>
+          <div class="cliente-info-box" id="clienteInfoBox"></div>
+        </div>
+
+        <!-- ═══════════════════════════════
+             PRECIO + COSTO + CANTIDAD
+        ═══════════════════════════════ -->
         <div class="campos-grid-3">
           <div class="campo-moneda">
             <label class="campo-label">
-              Precio venta
+              Precio venta *
               <span class="campo-activo-tag" id="tagPrecio" style="display:none">Activo</span>
             </label>
             <span class="campo-moneda-prefix">S/</span>
-            <input type="text" class="campo-input" id="inputPrecio"
-                   placeholder="0.00" readonly
-                   onclick="activarCampo('precio')">
+            <input
+              type="text"
+              class="campo-input"
+              id="inputPrecio"
+              placeholder="0.00"
+              readonly
+              onclick="activarCampo('precio')"
+            >
           </div>
           <div class="campo-moneda">
             <label class="campo-label">
@@ -817,49 +1001,98 @@
               <span class="campo-activo-tag" id="tagCosto" style="display:none">Activo</span>
             </label>
             <span class="campo-moneda-prefix">S/</span>
-            <input type="text" class="campo-input" id="inputCosto"
-                   placeholder="0.00" readonly
-                   onclick="activarCampo('costo')">
+            <input
+              type="text"
+              class="campo-input"
+              id="inputCosto"
+              placeholder="0.00"
+              readonly
+              onclick="activarCampo('costo')"
+            >
           </div>
           <div>
             <label class="campo-label">
               Cantidad
               <span class="campo-activo-tag" id="tagCantidad" style="display:none">Activo</span>
             </label>
-            <input type="text" class="campo-input" id="inputCantidad"
-                   value="1" readonly
-                   style="text-align:center;font-size:18px;font-weight:800;"
-                   onclick="activarCampo('cantidad')">
+            <input
+              type="text"
+              class="campo-input"
+              id="inputCantidad"
+              value="1"
+              readonly
+              style="text-align:center;font-size:18px;font-weight:800;"
+              onclick="activarCampo('cantidad')"
+            >
           </div>
         </div>
 
-        <!-- Ganancia calculada -->
+        <!-- ═══════════════════════════════
+             ¿SE PROBÓ EL PRODUCTO? — OBLIGATORIO
+        ═══════════════════════════════ -->
+        <div class="se-probo-section">
+          <div class="se-probo-label">
+            ¿Se probó el producto?
+            <span class="se-probo-obligatorio">OBLIGATORIO</span>
+          </div>
+          <div class="se-probo-btns">
+            <button
+              class="se-probo-btn"
+              id="btnSeProboSI"
+              onclick="seleccionarSeProbo('SI')"
+            >
+              ✅ SÍ, probado
+            </button>
+            <button
+              class="se-probo-btn"
+              id="btnSeProboNO"
+              onclick="seleccionarSeProbo('NO')"
+            >
+              ❌ NO probado
+            </button>
+          </div>
+          <div class="se-probo-indicador" id="seProboIndicador"></div>
+        </div>
+
+        <!-- ═══════════════════════════════
+             GANANCIA CALCULADA
+        ═══════════════════════════════ -->
         <div class="ganancia-box" id="gananciaBox">
           <span class="ganancia-label" id="gananciaLabel">📈 Ganancia bruta:</span>
-          <span class="ganancia-valor" id="gananciaValor">S/ 0.00</span>
+          <span class="ganancia-valor"  id="gananciaValor">S/ 0.00</span>
         </div>
 
-        <!-- Método de pago -->
+        <!-- ═══════════════════════════════
+             MÉTODO DE PAGO
+        ═══════════════════════════════ -->
         <div class="pago-opciones">
-          <button class="pago-btn active" data-metodo="Efectivo" onclick="seleccionarPago('Efectivo', this)">
-            <span class="pago-icon">💵</span> Efectivo
+          <button class="pago-btn active" data-metodo="Efectivo"
+                  onclick="seleccionarPago('Efectivo', this)">
+            <span class="pago-icon">💵</span>Efectivo
           </button>
-          <button class="pago-btn" data-metodo="Yape" onclick="seleccionarPago('Yape', this)">
-            <span class="pago-icon">📱</span> Yape
+          <button class="pago-btn" data-metodo="Yape"
+                  onclick="seleccionarPago('Yape', this)">
+            <span class="pago-icon">📱</span>Yape
           </button>
-          <button class="pago-btn" data-metodo="Plin" onclick="seleccionarPago('Plin', this)">
-            <span class="pago-icon">📲</span> Plin
+          <button class="pago-btn" data-metodo="Plin"
+                  onclick="seleccionarPago('Plin', this)">
+            <span class="pago-icon">📲</span>Plin
           </button>
-          <button class="pago-btn" data-metodo="Tarjeta" onclick="seleccionarPago('Tarjeta', this)">
-            <span class="pago-icon">💳</span> Tarjeta
+          <button class="pago-btn" data-metodo="Tarjeta"
+                  onclick="seleccionarPago('Tarjeta', this)">
+            <span class="pago-icon">💳</span>Tarjeta
           </button>
-          <button class="pago-btn" data-metodo="BCP" onclick="seleccionarPago('BCP', this)">
-            <span class="pago-icon">🏦</span> BCP
+          <button class="pago-btn" data-metodo="BCP"
+                  onclick="seleccionarPago('BCP', this)">
+            <span class="pago-icon">🏦</span>BCP
           </button>
         </div>
-      </div>
 
-      <!-- Teclado numérico -->
+      </div><!-- fin venta-form -->
+
+      <!-- ═══════════════════════════════
+           TECLADO NUMÉRICO TÁCTIL
+      ═══════════════════════════════ -->
       <div class="teclado-wrap">
         <div class="teclado">
           <button class="tec-btn" onclick="tecla('7')">7</button>
@@ -875,8 +1108,10 @@
           <button class="tec-btn" onclick="tecla('1')">1</button>
           <button class="tec-btn" onclick="tecla('2')">2</button>
           <button class="tec-btn" onclick="tecla('3')">3</button>
-          <button class="tec-btn tec-action" onclick="agregarAlInventario()" style="font-size:12px;">
-            📦 + Inv
+          <button class="tec-btn tec-action"
+                  onclick="agregarAlInventario()"
+                  style="font-size:11px;">
+            📦 +Inv
           </button>
 
           <button class="tec-btn" onclick="tecla('0')">0</button>
@@ -887,7 +1122,7 @@
         </div>
       </div>
 
-    </div>
+    </div><!-- fin pos-left -->
 
     <!-- ── LADO DERECHO — Resumen del día ─────── -->
     <div class="pos-right">
@@ -960,10 +1195,10 @@
         <button class="footer-btn danger" onclick="cerrarSesion()">🚪 Salir</button>
       </div>
 
-    </div>
+    </div><!-- fin pos-right -->
 
-  </div>
-</div>
+  </div><!-- fin pos-content -->
+</div><!-- fin pos-layout -->
 
 <!-- Toast container -->
 <div id="toastContainer"></div>
