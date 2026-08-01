@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#4A90D9">
+  <title>CellCom Tecnology — Historial de Ventas</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/cellcomtecnology/css/styles.css">
+
+  <style>
+    html, body { height: 100%; overflow: hidden; }
+
+    /* ── Layout principal ─────────────────────────────── */
+    .ventas-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--fondo);
+    }
+
+    /* ── Header ───────────────────────────────────────── */
+    .ventas-header {
+      background: linear-gradient(135deg, #0F2044, #1A3A6B, #2E6DB4);
+      padding: 0 20px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .vh-back {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .vh-back:hover {
+      background: rgba(255,255,255,0.22);
+      transform: scale(1.05);
+    }
+
+    .vh-title { flex: 1; }
+    .vh-title h1 { font-size: 17px; font-weight: 800; color: #fff; }
+    .vh-title p  { font-size: 11px; color: rgba(255,255,255,0.55); }
+
+    .vh-btn {
+      height: 38px;
+      padding: 0 14px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .vh-btn:hover {
+      background: rgba(255,255,255,0.22);
+      transform: translateY(-1px);
+    }
+
+    /* ── Contenido scrolleable ────────────────────────── */
+    .ventas-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--borde) transparent;
+    }
+
+    .ventas-content::-webkit-scrollbar { width: 4px; }
+    .ventas-content::-webkit-scrollbar-thumb {
+      background: var(--borde);
+      border-radius: 4px;
+    }
+
+    /* ── KPIs superiores ──────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .kpi-box {
+      background: var(--fondo-card);
+      border-radius: 16px;
+      border: 1.5px solid var(--borde);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 16px rgba(74,144,217,0.08);
+      transition: all 0.25s;
+      animation: fadeUp 0.4s ease both;
+      cursor: default;
+    }
+
+    .kpi-box:hover {
+      border-color: var(--borde-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(74,144,217,0.14);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .kpi-icon-wrap {
+      width: 46px; height: 46px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .kpi-icon-wrap.azul   { background: #EBF4FF; }
+    .kpi-icon-wrap.verde  { background: #F0FFF4; }
+    .kpi-icon-wrap.naranja{ background: #FFFAF0; }
+    .kpi-icon-wrap.rojo   { background: #FFF5F5; }
+    .kpi-icon-wrap.morado { background: #FAF5FF; }
+
+    .kpi-box-valor {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--texto-dark);
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    .kpi-box-label {
+      font-size: 11px;
+      color: var(--texto-light);
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    /* ── Panel de búsqueda avanzada ───────────────────── */
+    .search-panel {
+      background: var(--fondo-card);
+      border-radius: 18px;
+      border: 1.5px solid var(--borde);
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 16px rgba(74,144,217,0.07);
+    }
+
+    .search-panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--texto-mid);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-methods {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .search-method-btn {
+      padding: 9px 12px;
+      border: 1.5px solid var(--borde);
+      border-radius: 10px;
+      background: var(--fondo);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--texto-mid);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      text-align: left;
+    }
+
+    .search-method-btn:hover {
+      border-color: #7BB3E8;
+      color: #4A90D9;
+      background: #EBF4FF;
+    }
+
+    .search-method-btn.active {
+      background: linear-gradient(135deg, #4A90D9, #2E6DB4);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(74,144,217,0.3);
+    }
+
+    .search-input-area {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .search-field {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .search-field label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--texto-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .search-input {
+      padding: 10px 14px;
+      border: 1.5px solid var(--borde);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: var(--texto-dark);
+      background: var(--fondo-card);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: #4A90D9;
+      box-shadow: 0 0 0 3px rgba(74,144,217,0.1);
+    }
+
+    .search-input::placeholder { color: var(--texto-muted); }
+
+    .btn-buscar {
+      padding: 10px 22px;
+      background: linear-gradient(135deg, #4A90D9, #2E6DB4);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(74,144,217,0.3);
+      height: 42px;
+      white-space: nowrap;
+    }
+
+    .btn-buscar:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(74,144,217,0.4); }
+
+    .btn-limpiar {
+      padding: 10px 16px;
+      background: var(--fondo);
+      border: 1.5px solid var(--borde);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--texto-mid);
+      cursor: pointer;
+      transition: all 0.2s;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-limpiar:hover { border-color: #FC8181; color: #C53030; background: #FFF5F5; }
+
+    /* ── Filtros rápidos ──────────────────────────────── */
+    .quick-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .qf-btn {
+      padding: 6px 14px;
+      border: 1.5px solid var(--borde);
+      border-radius: 50px;
+      background: var(--fondo-card);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--texto-mid);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .qf-btn:hover { border-color: #7BB3E8; color: #4A90D9; background: #EBF4FF; }
+
+    .qf-btn.active {
+      background: #4A90D9;
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 2px 8px rgba(74,144,217,0.3);
+    }
+
+    /* ── Resultados header ────────────────────────────── */
+    .results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .results-info {
+      font-size: 13px;
+      color: var(--texto-mid);
+      font-weight: 600;
+    }
+
+    .results-info strong { color: #4A90D9; }
+
+    .results-summary {
+      display: flex;
+      gap: 16px;
+    }
+
+    .rs-item {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--texto-mid);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .rs-val { color: #2E6DB4; }
+
+    /* ── Lista de ventas ──────────────────────────────── */
+    .ventas-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .venta-card {
+      background: var(--fondo-card);
+      border-radius: 16px;
+      border: 1.5px solid var(--borde);
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(74,144,217,0.07);
+      transition: all 0.2s;
+      animation: fadeUp 0.3s ease both;
+    }
+
+    .venta-card:hover {
+      border-color: #7BB3E8;
+      box-shadow: 0 8px 28px rgba(74,144,217,0.13);
+    }
+
+    .venta-card.completada { border-left: 4px solid #48BB78; }
+    .venta-card.separada   { border-left: 4px solid #F6AD55; }
+    .venta-card.proforma   { border-left: 4px solid #7BB3E8; }
+
+    .vc-header {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .vc-header:hover { background: var(--azul-soft); }
+
+    .vc-nota { flex-shrink: 0; }
+
+    .vc-nota-num {
+      font-size: 15px;
+      font-weight: 800;
+      color: #2E6DB4;
+    }
+
+    .vc-nota-fecha {
+      font-size: 11px;
+      color: var(--texto-light);
+      margin-top: 1px;
+    }
+
+    .vc-cliente { flex: 1; min-width: 0; }
+
+    .vc-nombre {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--texto-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .vc-vendedor {
+      font-size: 11px;
+      color: var(--texto-light);
+      margin-top: 2px;
+    }
+
+    .vc-estado {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 50px;
+      flex-shrink: 0;
+    }
+
+    .estado-completada { background: #F0FFF4; color: #276749; }
+    .estado-separada   { background: #FFFAF0; color: #C05621; }
+    .estado-proforma   { background: #EBF4FF; color: #2E6DB4; }
+
+    .vc-monto { text-align: right; flex-shrink: 0; }
+
+    .vc-total {
+      font-size: 18px;
+      font-weight: 900;
+      color: #2E6DB4;
+      letter-spacing: -0.5px;
+    }
+
+    .vc-metodo {
+      font-size: 11px;
+      color: var(--texto-light);
+      margin-top: 2px;
+    }
+
+    .vc-chevron {
+      font-size: 14px;
+      color: var(--texto-light);
+      transition: transform 0.25s;
+      flex-shrink: 0;
+    }
+
+    .venta-card.expanded .vc-chevron {
+      transform: rotate(180deg);
+    }
+
+    /* Detalle expandible */
+    .vc-detalle {
+      display: none;
+      border-top: 1.5px solid var(--borde);
+      padding: 16px;
+      background: var(--fondo);
+      animation: fadeUp 0.2s ease;
+    }
+
+    .venta-card.expanded .vc-detalle { display: block; }
+
+    .detalle-titulo {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--texto-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .detalle-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--fondo-card);
+      border-radius: 10px;
+      padding: 10px 14px;
+      border: 1.5px solid var(--borde);
+      margin-bottom: 8px;
+    }
+
+    .di-nombre {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--texto-dark);
+    }
+
+    .di-meta {
+      font-size: 11px;
+      color: var(--texto-light);
+      margin-top: 2px;
+    }
+
+    .di-precio {
+      font-size: 15px;
+      font-weight: 800;
+      color: #2E6DB4;
+    }
+
+    .di-ganancia {
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* Resumen financiero del detalle */
+    .detalle-resumen {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .dr-item {
+      background: var(--fondo-card);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      border: 1.5px solid var(--borde);
+    }
+
+    .dr-valor {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--texto-dark);
+    }
+
+    .dr-label {
+      font-size: 10px;
+      color: var(--texto-light);
+      font-weight: 600;
+      margin-top: 3px;
+    }
+
+    /* Alerta saldo pendiente */
+    .saldo-alert {
+      background: #FFFAF0;
+      border: 1.5px solid rgba(246,173,85,0.4);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .saldo-alert-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: #C05621;
+    }
+
+    .saldo-alert-monto {
+      font-size: 16px;
+      font-weight: 900;
+      color: #C05621;
+    }
+
+    /* Acciones del detalle */
+    .detalle-acciones {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .da-btn {
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid var(--borde);
+      background: var(--fondo-card);
+      color: var(--texto-mid);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+
+    .da-btn:hover { border-color: #4A90D9; color: #4A90D9; background: #EBF4FF; transform: translateY(-1px); }
+
+    .da-btn.primary {
+      background: linear-gradient(135deg, #4A90D9, #2E6DB4);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 4px 10px rgba(74,144,217,0.3);
+    }
+
+    .da-btn.primary:hover { color: #fff; box-shadow: 0 6px 18px rgba(74,144,217,0.4); }
+
+    .da-btn.wa {
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .da-btn.wa:hover { color: #fff; }
+
+    .da-btn.success {
+      background: linear-gradient(135deg, #48BB78, #276749);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .da-btn.success:hover { color: #fff; }
+
+    /* ── Paginación ────────────────────────────────────── */
+    .paginacion {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 18px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pag-info {
+      font-size: 12px;
+      color: var(--texto-light);
+    }
+
+    .pag-btns { display: flex; gap: 4px; }
+
+    .pag-btn {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--borde);
+      border-radius: 10px;
+      background: var(--fondo-card);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--texto-mid);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .pag-btn:hover { border-color: #4A90D9; color: #4A90D9; }
+    .pag-btn.active { background: #4A90D9; color: #fff; border-color: #4A90D9; }
+    .pag-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* ── Empty state ──────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-icon  { font-size: 60px; margin-bottom: 16px; opacity: 0.6; }
+    .empty-title { font-size: 18px; font-weight: 700; color: var(--texto-dark); margin-bottom: 8px; }
+    .empty-sub   { font-size: 14px; color: var(--texto-light); line-height: 1.6; }
+
+    /* ── Toast ────────────────────────────────────────── */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    /* ── Spinner ──────────────────────────────────────── */
+    .spinner-wrap {
+      text-align: center;
+      padding: 50px;
+    }
+
+    .spinner {
+      width: 44px; height: 44px;
+      border: 4px solid rgba(74,144,217,0.2);
+      border-top-color: #4A90D9;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ───────────────────────────────────── */
+    @media (max-width: 768px) {
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .search-methods { grid-template-columns: repeat(2, 1fr); }
+      .results-summary { display: none; }
+      .detalle-resumen { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .kpi-row { grid-template-columns: 1fr 1fr; }
+      .ventas-content { padding: 12px; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="ventas-layout">
+
+  <!-- ══════════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════════ -->
+  <header class="ventas-header">
+    <button class="vh-back" onclick="volverAlPOS()">←</button>
+    <div class="vh-title">
+      <h1>📊 Historial de Ventas</h1>
+      <p id="headerSub">11 métodos de búsqueda avanzada</p>
+    </div>
+    <button class="vh-btn" onclick="recargarDatos()">🔄 Actualizar</button>
+    <button class="vh-btn" onclick="exportarResumen()">📄 Exportar</button>
+    <button class="vh-btn" onclick="registrarVentaPerdida()">📝 Venta perdida</button>
+  </header>
+
+  <!-- ══════════════════════════════════════════════
+       CONTENIDO
+  ══════════════════════════════════════════════ -->
+  <div class="ventas-content" id="ventasContent">
+
+    <!-- Spinner inicial -->
+    <div class="spinner-wrap" id="spinnerInicial">
+      <div class="spinner"></div>
+      <div style="font-size:14px;font-weight:600;color:var(--texto-mid);">Cargando historial...</div>
+    </div>
+
+    <!-- Contenido principal (oculto hasta cargar) -->
+    <div id="mainContent" style="display:none;">
+
+      <!-- KPIs -->
+      <div class="kpi-row" id="kpiRow">
+        <div class="kpi-box" style="animation-delay:0ms">
+          <div class="kpi-icon-wrap azul">📊</div>
+          <div>
+            <div class="kpi-box-valor" id="kpiTotal">0</div>
+            <div class="kpi-box-label">Total ventas</div>
+          </div>
+        </div>
+        <div class="kpi-box" style="animation-delay:60ms">
+          <div class="kpi-icon-wrap verde">💰</div>
+          <div>
+            <div class="kpi-box-valor" id="kpiMonto">S/0</div>
+            <div class="kpi-box-label">Monto total</div>
+          </div>
+        </div>
+        <div class="kpi-box" style="animation-delay:120ms">
+          <div class="kpi-icon-wrap naranja">🕐</div>
+          <div>
+            <div class="kpi-box-valor" id="kpiSeparados">0</div>
+            <div class="kpi-box-label">Separados</div>
+          </div>
+        </div>
+        <div class="kpi-box" style="animation-delay:180ms">
+          <div class="kpi-icon-wrap morado">🎯</div>
+          <div>
+            <div class="kpi-box-valor" id="kpiTicket">S/0</div>
+            <div class="kpi-box-label">Ticket promedio</div>
+          </div>
+        </div>
+        <div class="kpi-box" style="animation-delay:240ms" id="kpiGananciaBox">
+          <div class="kpi-icon-wrap verde">📈</div>
+          <div>
+            <div class="kpi-box-valor" id="kpiGanancia">S/0</div>
+            <div class="kpi-box-label">Ganancia bruta</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel de búsqueda avanzada -->
+      <div class="search-panel">
+        <div class="search-panel-title">🔍 Búsqueda avanzada — Selecciona el método:</div>
+
+        <div class="search-methods" id="searchMethods">
+          <button class="search-method-btn active" data-m="numeroNota" onclick="selMetodo('numeroNota',this)">🧾 N° de nota</button>
+          <button class="search-method-btn" data-m="nombreCliente" onclick="selMetodo('nombreCliente',this)">👤 Nombre cliente</button>
+          <button class="search-method-btn" data-m="telefonoCliente" onclick="selMetodo('telefonoCliente',this)">📱 Teléfono</button>
+          <button class="search-method-btn" data-m="fechaExacta" onclick="selMetodo('fechaExacta',this)">📅 Fecha exacta</button>
+          <button class="search-method-btn" data-m="rangoFechas" onclick="selMetodo('rangoFechas',this)">📆 Rango de fechas</button>
+          <button class="search-method-btn" data-m="mes" onclick="selMetodo('mes',this)">🗓️ Por mes</button>
+          <button class="search-method-btn" data-m="rangoMonto" onclick="selMetodo('rangoMonto',this)">💰 Rango de monto</button>
+          <button class="search-method-btn" data-m="vendedor" onclick="selMetodo('vendedor',this)">🧑‍💼 Por vendedor</button>
+          <button class="search-method-btn" data-m="producto" onclick="selMetodo('producto',this)">📦 Por producto</button>
+          <button class="search-method-btn" data-m="metodoPago" onclick="selMetodo('metodoPago',this)">💳 Método de pago</button>
+          <button class="search-method-btn" data-m="estado" onclick="selMetodo('estado',this)">✅ Por estado</button>
+        </div>
+
+        <div class="search-input-area" id="searchInputArea">
+          <!-- Se llena dinámicamente -->
+        </div>
+      </div>
+
+      <!-- Filtros rápidos -->
+      <div class="quick-filters">
+        <button class="qf-btn active" data-qf="todos"     onclick="filtroRapido('todos',this)">📋 Todos</button>
+        <button class="qf-btn" data-qf="hoy"              onclick="filtroRapido('hoy',this)">☀️ Hoy</button>
+        <button class="qf-btn" data-qf="semana"           onclick="filtroRapido('semana',this)">📅 Esta semana</button>
+        <button class="qf-btn" data-qf="mes"              onclick="filtroRapido('mes',this)">🗓️ Este mes</button>
+        <button class="qf-btn" data-qf="separados"        onclick="filtroRapido('separados',this)">🕐 Separados</button>
+        <button class="qf-btn" data-qf="conPerdida"       onclick="filtroRapido('conPerdida',this)">📉 Con pérdida</button>
+      </div>
+
+      <!-- Barra de resultados -->
+      <div class="results-bar">
+        <div class="results-info" id="resultsInfo">
+          Mostrando <strong>0</strong> ventas
+        </div>
+        <div class="results-summary" id="resultsSummary">
+          <div class="rs-item">Total: <span class="rs-val" id="sumTotal">S/0.00</span></div>
+          <div class="rs-item" id="sumGananciaWrap">Ganancia: <span class="rs-val" id="sumGanancia">S/0.00</span></div>
+        </div>
+      </div>
+
+      <!-- Lista de ventas -->
+      <div class="ventas-lista" id="ventasLista"></div>
+
+      <!-- Paginación -->
+      <div class="paginacion" id="paginacion"></div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Scripts -->
+<script src="/cellcomtecnology/js/config.js"></script>
+<script src="/cellcomtecnology/js/api.js"></script>
+<script src="/cellcomtecnology/js/auth.js"></script>
+<script>
+// ╔══════════════════════════════════════════════════════════════╗
+// ║           CellCom Tecnology — ventas.html                   ║
+// ║           JavaScript Completo — Historial v1.0              ║
+// ║   11 Búsquedas + Filtros + Separados + Notas + Perdidas     ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+'use strict';
+
+// ════════════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ════════════════════════════════════════════════════════════════
+
+const VNT = {
+  ventas:          [],
+  ventasFiltradas: [],
+  metodoBusqueda:  'numeroNota',
+  filtroRapidoAct: 'todos',
+  paginaActual:    1,
+  porPagina:       10,
+  ventaSeparadaId: null,
+  metodoPagoSep:   'Efectivo',
+  token:           '',
+  usuario:         null,
+  esAdmin:         false
+};
+
+// ════════════════════════════════════════════════════════════════
+// INICIALIZACIÓN
+// ════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await inicializarVentas();
+});
+
+async function inicializarVentas() {
+  // Verificar sesión
+  VNT.token   = localStorage.getItem(APP_CONFIG.STORAGE.TOKEN) || '';
+  const uStr  = localStorage.getItem(APP_CONFIG.STORAGE.USUARIO) || '';
+  if (!VNT.token || !uStr) { window.location.href = '/cellcomtecnology/login.html'; return; }
+  VNT.usuario = JSON.parse(uStr);
+  VNT.esAdmin = VNT.usuario.rol === 'Admin';
+
+  // Aplicar tema
+  const tema = localStorage.getItem(APP_CONFIG.STORAGE.TEMA) || 'light';
+  document.documentElement.setAttribute('data-theme', tema);
+
+  // Ocultar KPI de ganancia si es vendedor
+  if (!VNT.esAdmin) {
+    document.getElementById('kpiGananciaBox')?.style && (document.getElementById('kpiGananciaBox').style.display = 'none');
+    document.getElementById('sumGananciaWrap')?.style && (document.getElementById('sumGananciaWrap').style.display = 'none');
+  }
+
+  // Configurar búsqueda inicial
+  configurarBusqueda('numeroNota');
+
+  // Cargar datos
+  await cargarVentas();
+}
+
+// ════════════════════════════════════════════════════════════════
+// CARGA DE DATOS
+// ════════════════════════════════════════════════════════════════
+
+async function cargarVentas(filtros = {}) {
+  mostrarSpinner(true);
+
+  try {
+    const params = {
+      rol: VNT.usuario?.rol || 'Vendedor',
+      ...filtros
+    };
+
+    if (!VNT.esAdmin) {
+      params.vendedor = VNT.usuario?.nombre || '';
+    }
+
+    const resultado = await llamarAPI('GET', 'getVentas', params);
+
+    if (resultado.success) {
+      VNT.ventas          = resultado.data.ventas    || [];
+      VNT.ventasFiltradas = [...VNT.ventas];
+
+      actualizarKPIs(resultado.data.resumen || {});
+      actualizarHeaderSub();
+    }
+
+    VNT.paginaActual = 1;
+    renderizarVentas();
+    mostrarSpinner(false);
+
+  } catch(e) {
+    console.error('Error:', e);
+    mostrarToast(`❌ Error: ${e.message}`, 'error');
+    mostrarSpinner(false);
+  }
+}
+
+async function recargarDatos() {
+  VNT.ventasFiltradas = [];
+  renderizarVentas();
+  await cargarVentas();
+  mostrarToast('🔄 Historial actualizado', 'success');
+}
+
+function mostrarSpinner(show) {
+  document.getElementById('spinnerInicial').style.display = show ? 'block' : 'none';
+  document.getElementById('mainContent').style.display   = show ? 'none'  : 'block';
+}
+
+// ════════════════════════════════════════════════════════════════
+// KPIs
+// ════════════════════════════════════════════════════════════════
+
+function actualizarKPIs(resumen) {
+  const t = VNT.ventasFiltradas;
+  const completadas = t.filter(v => v.Estado_Venta === 'Completada');
+  const monto       = completadas.reduce((s, v) => s + (Number(v.Total_Venta) || 0), 0);
+  const ganancia    = completadas.reduce((s, v) => s + (Number(v.Ganancia_Venta) || 0), 0);
+  const ticket      = completadas.length > 0 ? monto / completadas.length : 0;
+  const separados   = t.filter(v => v.Estado_Venta === 'Separada').length;
+
+  setEl('kpiTotal',     t.length);
+  setEl('kpiMonto',     fmtK(monto));
+  setEl('kpiSeparados', separados);
+  setEl('kpiTicket',    fmtK(ticket));
+  if (VNT.esAdmin) setEl('kpiGanancia', fmtK(ganancia));
+  setEl('sumTotal',     fmt(monto));
+  if (VNT.esAdmin) setEl('sumGanancia', fmt(ganancia));
+}
+
+function actualizarHeaderSub() {
+  const sub = document.getElementById('headerSub');
+  if (sub) sub.textContent = `${VNT.ventas.length} ventas encontradas`;
+}
+
+// ════════════════════════════════════════════════════════════════
+// BÚSQUEDA AVANZADA — 11 MÉTODOS
+// ════════════════════════════════════════════════════════════════
+
+function selMetodo(metodo, btn) {
+  VNT.metodoBusqueda = metodo;
+  document.querySelectorAll('.search-method-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  configurarBusqueda(metodo);
+}
+
+function configurarBusqueda(metodo) {
+  const area = document.getElementById('searchInputArea');
+
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const ahora = new Date();
+  let opsMeses = '<option value="">Seleccionar...</option>';
+  for (let i = 0; i < 12; i++) {
+    let m = ahora.getMonth() - i;
+    let y = ahora.getFullYear();
+    if (m < 0) { m += 12; y--; }
+    const label = `${MESES[m]}-${y}`;
+    opsMeses += `<option value="${label}">${label}</option>`;
+  }
+
+  const inputs = {
+    numeroNota:      `<div class="search-field"><label>Número de nota</label><input type="text" class="search-input" id="sInput" placeholder="VNT-0001" onkeydown="if(event.key==='Enter')ejecutarBusqueda()"></div>`,
+    nombreCliente:   `<div class="search-field"><label>Nombre del cliente</label><input type="text" class="search-input" id="sInput" placeholder="Nombre completo" onkeydown="if(event.key==='Enter')ejecutarBusqueda()"></div>`,
+    telefonoCliente: `<div class="search-field"><label>Teléfono del cliente</label><input type="tel" class="search-input" id="sInput" placeholder="987654321" inputmode="tel" onkeydown="if(event.key==='Enter')ejecutarBusqueda()"></div>`,
+    fechaExacta:     `<div class="search-field"><label>Fecha (dd/mm/aaaa)</label><input type="text" class="search-input" id="sInput" placeholder="15/01/2025" onkeydown="if(event.key==='Enter')ejecutarBusqueda()"></div>`,
+    rangoFechas:     `<div class="search-field"><label>Desde (dd/mm/aaaa)</label><input type="text" class="search-input" id="sDesde" placeholder="01/01/2025"></div><div class="search-field"><label>Hasta (dd/mm/aaaa)</label><input type="text" class="search-input" id="sHasta" placeholder="31/01/2025"></div>`,
+    mes:             `<div class="search-field"><label>Mes y año</label><select class="search-input" id="sInput" style="cursor:pointer;">${opsMeses}</select></div>`,
+    rangoMonto:      `<div class="search-field"><label>Monto mínimo (S/)</label><input type="number" class="search-input" id="sDesde" placeholder="0.00" inputmode="decimal"></div><div class="search-field"><label>Monto máximo (S/)</label><input type="number" class="search-input" id="sHasta" placeholder="9999.00" inputmode="decimal"></div>`,
+    vendedor:        `<div class="search-field"><label>Nombre del vendedor</label><input type="text" class="search-input" id="sInput" placeholder="Juan Pérez" onkeydown="if(event.key==='Enter')ejecutarBusqueda()"></div>`,
+    producto:        `<div class="search-field"><label>Nombre del producto</label><input type="text" class="search-input" id="sInput" placeholder="Audífono, cable..." onkeydown="if(event.key==='Enter')ejecutarBusqueda()"></div>`,
+    metodoPago:      `<div class="search-field"><label>Método de pago</label><select class="search-input" id="sInput" style="cursor:pointer;"><option value="">Seleccionar...</option><option>Efectivo</option><option>Yape</option><option>Plin</option><option>Tarjeta</option><option>BCP</option></select></div>`,
+    estado:          `<div class="search-field"><label>Estado de la venta</label><select class="search-input" id="sInput" style="cursor:pointer;"><option value="">Todos</option><option value="Completada">✅ Completada</option><option value="Separada">🕐 Separada</option><option value="Proforma">📋 Proforma</option></select></div>`
+  };
+
+  area.innerHTML = `
+    ${inputs[metodo] || ''}
+    <button class="btn-buscar" onclick="ejecutarBusqueda()">🔍 Buscar</button>
+    <button class="btn-limpiar" onclick="limpiarBusqueda()">✕ Limpiar</button>
+  `;
+
+  setTimeout(() => {
+    document.getElementById('sInput')?.focus();
+  }, 100);
+}
+
+function ejecutarBusqueda() {
+  const metodo = VNT.metodoBusqueda;
+  const filtros = {};
+
+  if (metodo === 'rangoFechas') {
+    const d = document.getElementById('sDesde')?.value.trim();
+    const h = document.getElementById('sHasta')?.value.trim();
+    if (!d || !h) { mostrarToast('📅 Ingresa ambas fechas', 'warning'); return; }
+    filtros.fechaDesde = d; filtros.fechaHasta = h;
+  } else if (metodo === 'rangoMonto') {
+    const d = document.getElementById('sDesde')?.value;
+    const h = document.getElementById('sHasta')?.value;
+    if (!d || !h) { mostrarToast('💰 Ingresa ambos montos', 'warning'); return; }
+    filtros.montoDesde = parseFloat(d);
+    filtros.montoHasta = parseFloat(h);
+  } else {
+    const val = document.getElementById('sInput')?.value.trim();
+    if (!val) { mostrarToast('🔍 Ingresa un valor para buscar', 'warning'); return; }
+    const map = {
+      numeroNota: 'numeroNota', nombreCliente: 'nombreCliente',
+      telefonoCliente: 'telefonoCliente', fechaExacta: 'fechaExacta',
+      mes: 'mes', vendedor: 'vendedor', producto: 'idProducto',
+      metodoPago: 'metodoPago', estado: 'estadoVenta'
+    };
+    filtros[map[metodo]] = val;
+  }
+
+  aplicarFiltrosLocal(filtros);
+}
+
+function limpiarBusqueda() {
+  document.querySelectorAll('#searchInputArea input, #searchInputArea select').forEach(el => el.value = '');
+  VNT.ventasFiltradas = [...VNT.ventas];
+  VNT.paginaActual    = 1;
+  document.querySelectorAll('.qf-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-qf="todos"]')?.classList.add('active');
+  VNT.filtroRapidoAct = 'todos';
+  actualizarKPIs({});
+  renderizarVentas();
+  mostrarToast('🗑️ Filtros limpiados', 'info');
+}
+
+// ════════════════════════════════════════════════════════════════
+// FILTROS LOCALES
+// ════════════════════════════════════════════════════════════════
+
+function aplicarFiltrosLocal(filtros) {
+  let r = [...VNT.ventas];
+
+  if (filtros.numeroNota)      r = r.filter(v => incluye(v.Numero_Nota || '', filtros.numeroNota));
+  if (filtros.nombreCliente)   r = r.filter(v => incluye(v.Nombre_Cliente || '', filtros.nombreCliente));
+  if (filtros.telefonoCliente) r = r.filter(v => (v.Telefono_Cliente || '').includes(filtros.telefonoCliente));
+  if (filtros.fechaExacta)     r = r.filter(v => (v.Fecha_Hora || '').startsWith(filtros.fechaExacta));
+  if (filtros.fechaDesde && filtros.fechaHasta) {
+    r = r.filter(v => {
+      const fv = parseFecha(v.Fecha_Hora);
+      return fv >= parseFecha(filtros.fechaDesde) && fv <= parseFecha(filtros.fechaHasta);
+    });
+  }
+  if (filtros.mes)             r = r.filter(v => esMes(v.Fecha_Hora, filtros.mes));
+  if (filtros.montoDesde !== undefined) {
+    r = r.filter(v => Number(v.Total_Venta) >= filtros.montoDesde && Number(v.Total_Venta) <= filtros.montoHasta);
+  }
+  if (filtros.vendedor)        r = r.filter(v => incluye(v.Vendedor || '', filtros.vendedor));
+  if (filtros.idProducto)      r = r.filter(v => (v.items || []).some(i => incluye(i.Nombre || i.ID_Producto || '', filtros.idProducto)));
+  if (filtros.metodoPago)      r = r.filter(v => v.Metodo_1 === filtros.metodoPago || v.Metodo_2 === filtros.metodoPago);
+  if (filtros.estadoVenta)     r = r.filter(v => v.Estado_Venta === filtros.estadoVenta);
+  if (filtros.soloHoy)         r = r.filter(v => (v.Fecha_Hora || '').startsWith(getFechaHoy()));
+  if (filtros.soloSemana) {
+    const { d, h } = getRangoSemana();
+    r = r.filter(v => { const fv = parseFecha(v.Fecha_Hora); return fv >= d && fv <= h; });
+  }
+  if (filtros.conPerdida)      r = r.filter(v => (Number(v.Ganancia_Venta) || 0) < 0);
+  if (filtros.estadoSeparado)  r = r.filter(v => v.Estado_Venta === 'Separada');
+
+  VNT.ventasFiltradas = r;
+  VNT.paginaActual    = 1;
+  actualizarKPIs({});
+  renderizarVentas();
+  mostrarToast(`🔍 ${r.length} resultado${r.length !== 1 ? 's' : ''} encontrado${r.length !== 1 ? 's' : ''}`, r.length > 0 ? 'success' : 'warning', 2000);
+}
+
+// ════════════════════════════════════════════════════════════════
+// FILTROS RÁPIDOS
+// ════════════════════════════════════════════════════════════════
+
+function filtroRapido(tipo, btn) {
+  VNT.filtroRapidoAct = tipo;
+  document.querySelectorAll('.qf-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const ahora = new Date();
+
+  const filtros = {};
+  switch(tipo) {
+    case 'hoy':       filtros.soloHoy      = true; break;
+    case 'semana':    filtros.soloSemana   = true; break;
+    case 'mes':       filtros.mes          = `${MESES[ahora.getMonth()]}-${ahora.getFullYear()}`; break;
+    case 'separados': filtros.estadoSeparado = true; break;
+    case 'conPerdida':filtros.conPerdida   = true; break;
+    default:
+      VNT.ventasFiltradas = [...VNT.ventas];
+      VNT.paginaActual    = 1;
+      actualizarKPIs({});
+      renderizarVentas();
+      return;
+  }
+
+  aplicarFiltrosLocal(filtros);
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDERIZAR VENTAS
+// ════════════════════════════════════════════════════════════════
+
+function renderizarVentas() {
+  const lista  = document.getElementById('ventasLista');
+  const ventas = VNT.ventasFiltradas;
+  const inicio = (VNT.paginaActual - 1) * VNT.porPagina;
+  const pagina = ventas.slice(inicio, inicio + VNT.porPagina);
+
+  // Actualizar barra de resultados
+  const monto   = ventas.filter(v => v.Estado_Venta === 'Completada').reduce((s,v) => s + (Number(v.Total_Venta)||0), 0);
+  const ganancia= ventas.reduce((s,v) => s + (Number(v.Ganancia_Venta)||0), 0);
+
+  setEl('resultsInfo', `Mostrando <strong>${pagina.length}</strong> de <strong>${ventas.length}</strong> venta${ventas.length !== 1 ? 's' : ''}`);
+  document.getElementById('resultsInfo').innerHTML = `Mostrando <strong>${pagina.length}</strong> de <strong>${ventas.length}</strong> venta${ventas.length !== 1 ? 's' : ''}`;
+  setEl('sumTotal', fmt(monto));
+  if (VNT.esAdmin) setEl('sumGanancia', fmt(ganancia));
+
+  actualizarKPIs({});
+
+  if (pagina.length === 0) {
+    lista.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📊</div>
+        <div class="empty-title">Sin ventas encontradas</div>
+        <div class="empty-sub">Ajusta los filtros de búsqueda<br>o realiza tu primera venta</div>
+      </div>`;
+    document.getElementById('paginacion').innerHTML = '';
+    return;
+  }
+
+  lista.innerHTML = pagina.map((v, idx) => {
+    const total    = Number(v.Total_Venta)    || 0;
+    const ganancia = Number(v.Ganancia_Venta) || 0;
+    const saldo    = Number(v.Saldo_Pendiente)|| 0;
+    const items    = v.items || [];
+    const itemCount= items.reduce((s,i) => s + (Number(i.Cantidad)||0), 0);
+    const estado   = v.Estado_Venta || 'Completada';
+    const estCls   = estado === 'Completada' ? 'completada' : estado === 'Separada' ? 'separada' : 'proforma';
+    const estEmoji = estado === 'Completada' ? '✅' : estado === 'Separada' ? '🕐' : '📋';
+
+    return `
+      <div class="venta-card ${estCls}"
+           id="vc-${v.ID_Venta}"
+           style="animation-delay:${Math.min(idx*30,300)}ms">
+
+        <div class="vc-header" onclick="toggleDetalle('${v.ID_Venta}')">
+          <div class="vc-nota">
+            <div class="vc-nota-num">${v.Numero_Nota || v.ID_Venta}</div>
+            <div class="vc-nota-fecha">${v.Fecha_Hora || '—'}</div>
+          </div>
+          <div class="vc-cliente">
+            <div class="vc-nombre">${v.Nombre_Cliente || 'Cliente general'}</div>
+            <div class="vc-vendedor">🧑‍💼 ${v.Vendedor || '—'} · ${itemCount} artículo${itemCount !== 1 ? 's' : ''}</div>
+          </div>
+          <span class="vc-estado estado-${estCls}">${estEmoji} ${estado}</span>
+          <div class="vc-monto">
+            <div class="vc-total">S/${total.toFixed(2)}</div>
+            <div class="vc-metodo">${v.Metodo_1 || ''}${v.Metodo_2 ? ` + ${v.Metodo_2}` : ''}</div>
+          </div>
+          <div class="vc-chevron">▼</div>
+        </div>
+
+        <div class="vc-detalle" id="det-${v.ID_Venta}">
+
+          ${saldo > 0 ? `
+            <div class="saldo-alert">
+              <span class="saldo-alert-text">⏳ Saldo pendiente</span>
+              <span class="saldo-alert-monto">S/${saldo.toFixed(2)}</span>
+            </div>
+          ` : ''}
+
+          <div class="detalle-titulo">📦 Productos vendidos</div>
+          <div style="margin-bottom:12px;">
+            ${items.length > 0
+              ? items.map(item => {
+                  const cant    = Number(item.Cantidad)     || 0;
+                  const precio  = Number(item.Precio_Final) || 0;
+                  const sub     = Number(item.Subtotal)      || 0;
+                  const gan     = Number(item.Ganancia_Real) || 0;
+                  return `
+                    <div class="detalle-item">
+                      <div>
+                        <div class="di-nombre">${item.Nombre || item.ID_Producto || '—'}</div>
+                        <div class="di-meta">${cant} und. × S/${precio.toFixed(2)}</div>
+                      </div>
+                      <div style="text-align:right;">
+                        <div class="di-precio">S/${sub.toFixed(2)}</div>
+                        ${VNT.esAdmin ? `
+                          <div class="di-ganancia" style="color:${gan >= 0 ? '#276749' : '#C53030'}">
+                            ${gan >= 0 ? '📈' : '📉'} S/${Math.abs(gan).toFixed(2)}
+                          </div>
+                        ` : ''}
+                      </div>
+                    </div>`;
+                }).join('')
+              : '<div style="text-align:center;padding:16px;color:var(--texto-light);font-size:13px;">Sin detalle disponible</div>'
+            }
+          </div>
+
+          <div class="detalle-resumen">
+            <div class="dr-item">
+              <div class="dr-valor">S/${total.toFixed(2)}</div>
+              <div class="dr-label">Total venta</div>
+            </div>
+            <div class="dr-item">
+              <div class="dr-valor">${v.Metodo_1 || '—'}</div>
+              <div class="dr-label">Método pago</div>
+            </div>
+            ${VNT.esAdmin ? `
+              <div class="dr-item">
+                <div class="dr-valor" style="color:${ganancia >= 0 ? '#276749' : '#C53030'}">
+                  S/${ganancia.toFixed(2)}
+                </div>
+                <div class="dr-label">Ganancia real</div>
+              </div>
+            ` : ''}
+            ${saldo > 0 ? `
+              <div class="dr-item">
+                <div class="dr-valor" style="color:#C05621;">S/${saldo.toFixed(2)}</div>
+                <div class="dr-label">Saldo pendiente</div>
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="detalle-acciones">
+            <button class="da-btn primary" onclick="reimprimir('${v.ID_Venta}')">
+              🖨️ Reimprimir nota
+            </button>
+            ${v.Telefono_Cliente ? `
+              <button class="da-btn wa" onclick="enviarWA('${v.ID_Venta}')">
+                📱 WhatsApp
+              </button>
+            ` : ''}
+            ${estado === 'Separada' && saldo > 0 ? `
+              <button class="da-btn success" onclick="completarSeparado('${v.ID_Venta}', ${saldo}, '${v.Numero_Nota || v.ID_Venta}')">
+                💰 Completar pago
+              </button>
+            ` : ''}
+          </div>
+
+        </div>
+      </div>`;
+  }).join('');
+
+  renderizarPaginacion();
+}
+
+function toggleDetalle(idVenta) {
+  const card = document.getElementById(`vc-${idVenta}`);
+  if (card) card.classList.toggle('expanded');
+}
+
+// ════════════════════════════════════════════════════════════════
+// PAGINACIÓN
+// ════════════════════════════════════════════════════════════════
+
+function renderizarPaginacion() {
+  const total     = VNT.ventasFiltradas.length;
+  const totalPags = Math.ceil(total / VNT.porPagina);
+  const pag       = document.getElementById('paginacion');
+
+  if (totalPags <= 1) { pag.innerHTML = ''; return; }
+
+  const inicio = ((VNT.paginaActual - 1) * VNT.porPagina) + 1;
+  const fin    = Math.min(VNT.paginaActual * VNT.porPagina, total);
+
+  let btns = `<button class="pag-btn" onclick="irPagina(${VNT.paginaActual - 1})" ${VNT.paginaActual === 1 ? 'disabled' : ''}>←</button>`;
+
+  let ini = Math.max(1, VNT.paginaActual - 2);
+  let fin2 = Math.min(totalPags, ini + 4);
+  if (fin2 - ini < 4) ini = Math.max(1, fin2 - 4);
+
+  for (let i = ini; i <= fin2; i++) {
+    btns += `<button class="pag-btn ${i === VNT.paginaActual ? 'active' : ''}" onclick="irPagina(${i})">${i}</button>`;
+  }
+
+  btns += `<button class="pag-btn" onclick="irPagina(${VNT.paginaActual + 1})" ${VNT.paginaActual === totalPags ? 'disabled' : ''}>→</button>`;
+
+  pag.innerHTML = `
+    <span class="pag-info">${inicio}-${fin} de ${total}</span>
+    <div class="pag-btns">${btns}</div>`;
+}
+
+function irPagina(n) {
+  const total = Math.ceil(VNT.ventasFiltradas.length / VNT.porPagina);
+  if (n < 1 || n > total) return;
+  VNT.paginaActual = n;
+  renderizarVentas();
+  document.getElementById('ventasContent')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ════════════════════════════════════════════════════════════════
+// ACCIONES DE VENTA
+// ════════════════════════════════════════════════════════════════
+
+async function reimprimir(idVenta) {
+  mostrarToast('🖨️ Generando nota...', 'info', 2000);
+  try {
+    const resultado = await llamarAPI('GET', 'generarNotaVenta', { id: idVenta });
+    if (resultado.success && resultado.data?.htmlNota) {
+      const ventana = window.open('', '_blank', 'width=460,height=720,scrollbars=yes');
+      if (ventana) {
+        ventana.document.write(resultado.data.htmlNota);
+        ventana.document.close();
+        ventana.focus();
+        setTimeout(() => ventana.print(), 600);
+      }
+      await llamarAPI('POST', 'marcarNotaEnviadaWA', { idVenta });
+      mostrarToast('✅ Nota abierta para imprimir', 'success');
+    } else {
+      mostrarToast('❌ No se pudo generar la nota', 'error');
+    }
+  } catch(e) {
+    mostrarToast(`❌ ${e.message}`, 'error');
+  }
+}
+
+async function enviarWA(idVenta) {
+  mostrarToast('📱 Preparando WhatsApp...', 'info', 1500);
+  try {
+    const resultado = await llamarAPI('GET', 'generarNotaVenta', { id: idVenta });
+    if (resultado.success && resultado.data?.urlWhatsApp) {
+      window.open(resultado.data.urlWhatsApp, '_blank');
+      await llamarAPI('POST', 'marcarNotaEnviadaWA', { idVenta });
+      mostrarToast('📱 WhatsApp abierto', 'success');
+    } else {
+      mostrarToast('📱 Sin número de WhatsApp para este cliente', 'warning');
+    }
+  } catch(e) {
+    mostrarToast(`❌ ${e.message}`, 'error');
+  }
+}
+
+async function completarSeparado(idVenta, saldo, numeroNota) {
+  const { value: datos } = await Swal.fire({
+    title: '💰 Completar Pago Separado',
+    html: `
+      <div style="font-family:'Inter',sans-serif;text-align:left;">
+        <div style="background:#FFFAF0;border:1.5px solid rgba(246,173,85,0.3);border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="font-size:12px;color:#C05621;font-weight:600;">Saldo pendiente — ${numeroNota}</div>
+          <div style="font-size:26px;font-weight:900;color:#C05621;margin-top:4px;">S/${Number(saldo).toFixed(2)}</div>
+        </div>
+        <label style="font-size:11px;font-weight:700;color:#4A5568;text-transform:uppercase;">Método de pago</label>
+        <select id="metSep" class="swal2-select" style="margin:6px 0 12px;font-size:14px;">
+          <option value="Efectivo">💵 Efectivo</option>
+          <option value="Yape">📱 Yape</option>
+          <option value="Plin">📲 Plin</option>
+          <option value="Tarjeta">💳 Tarjeta</option>
+          <option value="BCP">🏦 BCP</option>
+        </select>
+        <label style="font-size:11px;font-weight:700;color:#4A5568;text-transform:uppercase;">Monto recibido (S/)</label>
+        <input id="montoSep" class="swal2-input" type="number" value="${Number(saldo).toFixed(2)}" step="0.01" min="0" style="font-size:18px;font-weight:800;margin-top:6px;">
+      </div>
+    `,
+    showCancelButton:  true,
+    confirmButtonText: '✅ Completar pago',
+    cancelButtonText:  'Cancelar',
+    confirmButtonColor:'#48BB78',
+    preConfirm: () => {
+      const metodo = document.getElementById('metSep').value;
+      const monto  = parseFloat(document.getElementById('montoSep').value);
+      if (!monto || monto <= 0) return Swal.showValidationMessage('Ingresa el monto');
+      return { metodo, monto };
+    }
+  });
+
+  if (!datos) return;
+
+  try {
+    const resultado = await llamarAPI('POST', 'completarSeparado', {
+      idVenta, montoPagado: datos.monto, metodoPago: datos.metodo
+    });
+    if (resultado.success) {
+      mostrarToast('✅ Separado completado', 'success', 3000);
+      await cargarVentas();
+    } else {
+      mostrarToast(`❌ ${resultado.message}`, 'error');
+    }
+  } catch(e) {
+    mostrarToast(`❌ ${e.message}`, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// REGISTRAR VENTA PERDIDA
+// ════════════════════════════════════════════════════════════════
+
+async function registrarVentaPerdida() {
+  const { value: datos } = await Swal.fire({
+    title: '📝 Registrar Venta Perdida',
+    html: `
+      <div style="font-family:'Inter',sans-serif;text-align:left;">
+        <p style="font-size:13px;color:#718096;margin-bottom:14px;">
+          Registra productos que pidieron y no tenías. Útil para análisis de demanda.
+        </p>
+        <label style="font-size:11px;font-weight:700;color:#4A5568;text-transform:uppercase;">Producto solicitado</label>
+        <input id="vpProducto" class="swal2-input" placeholder="¿Qué pidió el cliente?" style="font-size:14px;margin:6px 0 12px;">
+        <label style="font-size:11px;font-weight:700;color:#4A5568;text-transform:uppercase;">Cantidad aproximada</label>
+        <input id="vpCantidad" class="swal2-input" type="number" value="1" min="1" style="font-size:14px;margin:6px 0 12px;">
+        <label style="font-size:11px;font-weight:700;color:#4A5568;text-transform:uppercase;">Comentarios (opcional)</label>
+        <input id="vpComentario" class="swal2-input" placeholder="Precio, urgencia, etc..." style="font-size:14px;margin-top:6px;">
+      </div>
+    `,
+    showCancelButton:  true,
+    confirmButtonText: '📝 Registrar',
+    cancelButtonText:  'Cancelar',
+    confirmButtonColor:'#C53030',
+    preConfirm: () => {
+      const prod = document.getElementById('vpProducto').value.trim();
+      if (!prod) return Swal.showValidationMessage('Ingresa el producto');
+      return {
+        Producto_Solicitado: prod,
+        Cantidad_Estimada:   parseInt(document.getElementById('vpCantidad').value) || 1,
+        Comentarios:         document.getElementById('vpComentario').value.trim()
+      };
+    }
+  });
+
+  if (!datos) return;
+
+  try {
+    const resultado = await llamarAPI('POST', 'registrarVentaPerdida', datos);
+    if (resultado.success) {
+      mostrarToast(`✅ "${datos.Producto_Solicitado}" registrado como venta perdida`, 'success', 3000);
+    } else {
+      mostrarToast(`❌ ${resultado.message}`, 'error');
+    }
+  } catch(e) {
+    mostrarToast(`❌ ${e.message}`, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// EXPORTAR RESUMEN
+// ════════════════════════════════════════════════════════════════
+
+function exportarResumen() {
+  const ventas  = VNT.ventasFiltradas;
+  const fecha   = new Date().toLocaleDateString('es-PE');
+  const hora    = new Date().toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit' });
+  const completadas = ventas.filter(v => v.Estado_Venta === 'Completada');
+  const monto   = completadas.reduce((s,v) => s + (Number(v.Total_Venta)||0), 0);
+  const ganancia= completadas.reduce((s,v) => s + (Number(v.Ganancia_Venta)||0), 0);
+
+  let filas = '';
+  ventas.forEach(v => {
+    const gan = Number(v.Ganancia_Venta) || 0;
+    filas += `
+      <tr>
+        <td style="padding:8px 10px;border-bottom:1px solid #EBF4FF;font-size:12px;">${v.Numero_Nota || v.ID_Venta}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #EBF4FF;font-size:12px;">${(v.Fecha_Hora || '').split(' ')[0]}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #EBF4FF;font-size:12px;font-weight:600;">${v.Nombre_Cliente || 'General'}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #EBF4FF;font-size:12px;">${v.Vendedor || '—'}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #EBF4FF;font-size:12px;text-align:right;font-weight:700;color:#2E6DB4;">S/${Number(v.Total_Venta||0).toFixed(2)}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #EBF4FF;font-size:12px;text-align:center;">${v.Estado_Venta}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #EBF4FF;font-size:12px;">${v.Metodo_1 || ''}${v.Metodo_2 ? '+'+v.Metodo_2 : ''}</td>
+        ${VNT.esAdmin ? `<td style="padding:8px 10px;border-bottom:1px solid #EBF4FF;font-size:12px;text-align:right;color:${gan >= 0 ? '#276749' : '#C53030'};font-weight:700;">S/${gan.toFixed(2)}</td>` : ''}
+      </tr>`;
+  });
+
+  const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reporte de Ventas — CellCom</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; padding:24px; color:#1A1A2E; }
+    .header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding-bottom:14px; border-bottom:3px solid #4A90D9; }
+    .header h1 { font-size:20px; font-weight:900; color:#2E6DB4; }
+    .header p  { font-size:11px; color:#718096; margin-top:2px; }
+    .kpis { display:flex; gap:10px; margin-bottom:18px; }
+    .kpi  { flex:1; background:#EBF4FF; border-radius:12px; padding:12px; text-align:center; }
+    .kpi-v { font-size:20px; font-weight:900; color:#2E6DB4; }
+    .kpi-l { font-size:10px; color:#718096; font-weight:600; text-transform:uppercase; }
+    .kpi.g { background:#F0FFF4; } .kpi.g .kpi-v { color:#276749; }
+    table  { width:100%; border-collapse:collapse; }
+    thead  { background:linear-gradient(135deg,#EBF4FF,#D4E9FF); }
+    th     { padding:9px 10px; font-size:10px; font-weight:800; color:#2E6DB4; text-transform:uppercase; letter-spacing:0.4px; text-align:left; }
+    .footer { text-align:center; margin-top:20px; padding-top:14px; border-top:2px solid #EBF4FF; font-size:10px; color:#A0AEC0; }
+    .no-print { text-align:center; margin-top:20px; }
+    .btn-p { padding:12px 28px; background:linear-gradient(135deg,#4A90D9,#2E6DB4); color:#fff; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; }
+    @media print { .no-print { display:none; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>📊 Reporte de Ventas</h1>
+      <p>CellCom Tecnology — ${ventas.length} ventas</p>
+    </div>
+    <div style="text-align:right;font-size:12px;color:#718096;">
+      <strong style="color:#1A1A2E;font-size:15px;">${fecha}</strong><br>
+      ${hora} · ${VNT.usuario?.nombre || '—'}
+    </div>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><div class="kpi-v">${ventas.length}</div><div class="kpi-l">Total ventas</div></div>
+    <div class="kpi"><div class="kpi-v">S/${monto.toFixed(2)}</div><div class="kpi-l">Monto total</div></div>
+    ${VNT.esAdmin ? `<div class="kpi g"><div class="kpi-v">S/${ganancia.toFixed(2)}</div><div class="kpi-l">Ganancia bruta</div></div>` : ''}
+    <div class="kpi"><div class="kpi-v">${completadas.length}</div><div class="kpi-l">Completadas</div></div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>N° Nota</th><th>Fecha</th><th>Cliente</th><th>Vendedor</th>
+        <th style="text-align:right;">Total</th><th style="text-align:center;">Estado</th>
+        <th>Pago</th>${VNT.esAdmin ? '<th style="text-align:right;">Ganancia</th>' : ''}
+      </tr>
+    </thead>
+    <tbody>${filas || '<tr><td colspan="8" style="text-align:center;padding:20px;color:#A0AEC0;">Sin datos</td></tr>'}</tbody>
+  </table>
+  <div class="footer"><p>CellCom Tecnology POS v1.0.0 — ${fecha} ${hora}</p></div>
+  <div class="no-print">
+    <button class="btn-p" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+  </div>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
+  if (w) {
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    mostrarToast('📄 Reporte generado', 'success');
+  } else {
+    mostrarToast('⚠️ Permite las ventanas emergentes', 'warning');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// UTILIDADES
+// ════════════════════════════════════════════════════════════════
+
+function incluye(texto, termino) {
+  return normalizar(texto).includes(normalizar(termino));
+}
+
+function normalizar(txt) {
+  return String(txt || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+
+function parseFecha(str) {
+  try {
+    const s = String(str || '').split(' ')[0];
+    const p = s.split('/');
+    if (p.length !== 3) return new Date(0);
+    return new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0]));
+  } catch(e) { return new Date(0); }
+}
+
+function esMes(fechaStr, mesAnio) {
+  try {
+    const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const [mes, anio] = mesAnio.split('-');
+    const mNum = MESES.indexOf(mes);
+    if (mNum === -1) return false;
+    const f = parseFecha(fechaStr);
+    return f.getMonth() === mNum && f.getFullYear() === parseInt(anio);
+  } catch(e) { return false; }
+}
+
+function getFechaHoy() {
+  const h = new Date();
+  return `${String(h.getDate()).padStart(2,'0')}/${String(h.getMonth()+1).padStart(2,'0')}/${h.getFullYear()}`;
+}
+
+function getRangoSemana() {
+  const hoy  = new Date();
+  const dia  = hoy.getDay();
+  const lun  = new Date(hoy);
+  lun.setDate(hoy.getDate() - (dia === 0 ? 6 : dia - 1));
+  const dom  = new Date(lun);
+  dom.setDate(lun.getDate() + 6);
+  return { d: lun, h: dom };
+}
+
+function fmt(monto) {
+  return `S/${(Number(monto)||0).toFixed(2)}`;
+}
+
+function fmtK(monto) {
+  const n = Number(monto) || 0;
+  if (Math.abs(n) >= 10000) return `S/${(n/1000).toFixed(1)}k`;
+  if (Math.abs(n) >= 1000)  return `S/${(n/1000).toFixed(2)}k`;
+  return `S/${n.toFixed(0)}`;
+}
+
+function setEl(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function volverAlPOS() {
+  window.location.href = '/cellcomtecnology/pos.html';
+}
+
+// ════════════════════════════════════════════════════════════════
+// COMUNICACIÓN CON LA API
+// ════════════════════════════════════════════════════════════════
+
+async function llamarAPI(metodo, action, data = {}) {
+  const token = VNT.token || localStorage.getItem(APP_CONFIG.STORAGE.TOKEN) || '';
+  try {
+    if (metodo === 'GET') {
+      const params = new URLSearchParams({ action, token, ...data });
+      const res    = await fetch(`${APP_CONFIG.API_URL}?${params}`, { method:'GET', redirect:'follow' });
+      return await res.json();
+    } else {
+      const res = await fetch(APP_CONFIG.API_URL, {
+        method:'POST', redirect:'follow',
+        headers:{ 'Content-Type':'text/plain' },
+        body: JSON.stringify({ action, data, token })
+      });
+      return await res.json();
+    }
+  } catch(e) {
+    throw new Error('Error de conexión con el servidor');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// TOASTS
+// ════════════════════════════════════════════════════════════════
+
+function mostrarToast(mensaje, tipo = 'info', duracion = 3000) {
+  const colores = {
+    success: 'linear-gradient(135deg,#276749,#48BB78)',
+    error:   'linear-gradient(135deg,#C53030,#FC8181)',
+    warning: 'linear-gradient(135deg,#C05621,#F6AD55)',
+    info:    'linear-gradient(135deg,#1A4F8A,#4A90D9)'
+  };
+  if (typeof Toastify === 'function') {
+    Toastify({
+      text: mensaje, duration: duracion,
+      gravity: 'bottom', position: 'center',
+      style: {
+        background: colores[tipo] || colores.info,
+        borderRadius: '14px', fontFamily: "'Inter',sans-serif",
+        fontSize: '13px', fontWeight: '600', padding: '12px 20px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.15)'
+      }
+    }).showToast();
+  }
+}
+</script>
+</body>
+</html>
+
+
+
+
