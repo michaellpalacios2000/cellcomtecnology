@@ -1,9 +1,9 @@
 // ╔══════════════════════════════════════════════════════════════╗
-// ║           CellCom Tecnology — Sistema POS v1.0              ║
-// ║                      js/api.js                               ║
-// ║    Cliente HTTP Avanzado → Google Apps Script API            ║
-// ║    CORS Compatible + Cache + Retry + Error Handling          ║
-// ║    Cieneguilla, Lima, Perú                                   ║
+// ║ CellCom Tecnology — Sistema POS v1.0                        ║
+// ║ js/api.js                                                    ║
+// ║ Cliente HTTP Avanzado → Google Apps Script API               ║
+// ║ CORS Compatible + Cache + Retry + Error Handling             ║
+// ║ Cieneguilla, Lima, Perú                                      ║
 // ╚══════════════════════════════════════════════════════════════╝
 
 'use strict';
@@ -15,15 +15,15 @@
 class CellComAPI {
 
   constructor() {
-    this.baseURL      = APP_CONFIG.API_URL;
-    this.timeout      = 30000;
-    this.maxRetries   = 2;
-    this.retryDelay   = 1000;
-    this._cache       = new Map();
-    this._cacheTime   = new Map();
-    this.CACHE_TTL    = 60000;
-    this._pendientes  = new Map();
-    this._online      = null;
+    this.baseURL     = APP_CONFIG.API_URL;
+    this.timeout     = 30000;
+    this.maxRetries  = 2;
+    this.retryDelay  = 1000;
+    this._cache      = new Map();
+    this._cacheTime  = new Map();
+    this.CACHE_TTL   = 60000;
+    this._pendientes = new Map();
+    this._online     = null;
   }
 
   // ════════════════════════════════════════════════════════════
@@ -127,10 +127,10 @@ class CellComAPI {
 
       console.log(`📡 GET → ${action}`, params);
 
+      // ✅ SIN mode:'cors' — evita preflight innecesario
       const response = await fetch(url, {
         method:   'GET',
         redirect: 'follow',
-        mode:     'cors',
         signal:   controller.signal
       });
 
@@ -207,11 +207,12 @@ class CellComAPI {
 
       console.log(`📡 POST → ${action}`, Object.keys(data));
 
+      // ✅ SIN mode:'cors' — evita preflight OPTIONS que Apps Script no maneja
+      // ✅ Content-Type: 'text/plain;charset=utf-8' — no dispara preflight
       const response = await fetch(this.baseURL, {
         method:   'POST',
         redirect: 'follow',
-        mode:     'cors',
-        headers:  { 'Content-Type': 'text/plain' },
+        headers:  { 'Content-Type': 'text/plain;charset=utf-8' },
         body,
         signal:   controller.signal
       });
@@ -270,10 +271,10 @@ class CellComAPI {
   _esErrorDeRed(error) {
     const msg = (error.message || '').toLowerCase();
     return msg.includes('failed to fetch') ||
-           msg.includes('network') ||
-           msg.includes('net::') ||
-           msg.includes('cors') ||
-           msg.includes('load failed') ||
+           msg.includes('network')         ||
+           msg.includes('net::')           ||
+           msg.includes('cors')            ||
+           msg.includes('load failed')     ||
            msg.includes('type error');
   }
 
@@ -307,10 +308,10 @@ class CellComAPI {
       const controller = new AbortController();
       const timeoutId  = setTimeout(() => controller.abort(), 10000);
 
+      // ✅ SIN mode:'cors' — evita preflight
       const response = await fetch(url, {
         method:   'GET',
         redirect: 'follow',
-        mode:     'cors',
         signal:   controller.signal
       });
 
