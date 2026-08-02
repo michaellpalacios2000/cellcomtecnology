@@ -590,9 +590,10 @@ async function registrarVenta() {
       throw new Error(resultado.message || resultado.data?.mensaje || 'Error al registrar');
     }
 
-  } catch(e) {
+    } catch(e) {
     console.error('❌ Error en venta:', e);
-    mostrarToast(`❌ ${e.message}`, 'error');
+    const msgError = String(e.message || 'Error desconocido');
+    mostrarToast('❌ ' + msgError, 'error');
   } finally {
     if (btnVender) {
       btnVender.disabled    = false;
