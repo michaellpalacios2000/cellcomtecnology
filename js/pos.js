@@ -193,46 +193,44 @@ async function buscarClienteDNI() {
       POS.nombreCliente   = cliente.Nombre;
       POS.dniActual       = dni;
 
-      mostrarInfoCliente(
-        `✅ ${cliente.Nombre}${cliente.Telefono_WA ? ` · 📱 ${cliente.Telefono_WA}` : ''} · DNI: ${dni}`,
-        'encontrado'
-      );
-      mostrarToast(`👤 Cliente: ${cliente.Nombre}`, 'success', 2000);
+      const htmlEnc = '✅ ' + cliente.Nombre +
+  (cliente.Telefono_WA ? ' · 📱 ' + cliente.Telefono_WA : '') +
+  ' · DNI: ' + dni +
+  ' <button onclick="limpiarCliente()" ' +
+  'style="margin-left:8px;background:none;border:none;cursor:pointer;' +
+  'color:#C53030;font-size:14px;font-weight:700;">✕</button>';
+mostrarInfoCliente(htmlEnc, 'encontrado');
+      
+      mostrarToast('👤 Cliente: ' + cliente.Nombre, 'success', 2000);
 
     } else {
       POS.idClienteActual = '';
       POS.nombreCliente   = '';
       POS.dniActual       = dni;
 
-      mostrarInfoCliente(
-        `⚠️ DNI ${dni} no registrado —
-         <button onclick="registrarNuevoCliente('${dni}')"
-                 style="margin-left:8px;padding:2px 10px;background:#4A90D9;
-                        color:#fff;border:none;border-radius:6px;cursor:pointer;
-                        font-size:11px;font-weight:700;font-family:'Inter',sans-serif;">
-           ➕ Registrar
-         </button>
-         <button onclick="limpiarCliente()"
-                 style="margin-left:4px;background:none;border:none;cursor:pointer;
-                        color:#C53030;font-size:13px;font-weight:700;">✕</button>`,
-        'no-encontrado'
-      );
-    }
+    const dniEscapado = String(dni);
+    const htmlNoEnc = '<span>⚠️ DNI ' + dniEscapado + ' no registrado</span> ' +
+      '<button onclick="registrarNuevoCliente(\'' + dniEscapado + '\')" ' +
+      'style="margin-left:8px;padding:3px 12px;background:#4A90D9;' +
+      'color:#fff;border:none;border-radius:8px;cursor:pointer;' +
+      'font-size:11px;font-weight:700;">➕ Registrar</button> ' +
+      '<button onclick="limpiarCliente()" ' +
+      'style="margin-left:4px;background:none;border:none;cursor:pointer;' +
+      'color:#C53030;font-size:14px;font-weight:700;">✕</button>';
+    mostrarInfoCliente(htmlNoEnc, 'no-encontrado');
+        }
 
   } catch(e) {
     mostrarToast(`❌ ${e.message}`, 'error');
   }
 }
 
-function mostrarInfoCliente(html, tipo) {
+function mostrarInfoCliente(contenido, tipo) {
   const box = document.getElementById('clienteInfoBox');
   if (!box) return;
   box.style.display = 'block';
-  box.className     = `cliente-info-box ${tipo}`;
-  box.innerHTML     = html + (tipo === 'encontrado' ? `
-    <button onclick="limpiarCliente()"
-            style="margin-left:8px;background:none;border:none;cursor:pointer;
-                   color:#C53030;font-size:13px;font-weight:700;">✕</button>` : '');
+  box.className     = 'cliente-info-box ' + tipo;
+  box.innerHTML     = contenido;
 }
 
 async function registrarNuevoCliente(dni) {
@@ -285,11 +283,14 @@ async function registrarNuevoCliente(dni) {
       POS.idClienteActual = resultado.data.idCliente;
       POS.nombreCliente   = datos.Nombre;
 
-      mostrarInfoCliente(
-        `✅ ${datos.Nombre}${datos.Telefono_WA ? ` · 📱 ${datos.Telefono_WA}` : ''} · DNI: ${dni}`,
-        'encontrado'
-      );
-      mostrarToast(`✅ "${datos.Nombre}" registrado como cliente`, 'success', 3000);
+      const htmlReg = '✅ ' + datos.Nombre +
+  (datos.Telefono_WA ? ' · 📱 ' + datos.Telefono_WA : '') +
+  ' · DNI: ' + dni +
+  ' <button onclick="limpiarCliente()" ' +
+  'style="margin-left:8px;background:none;border:none;cursor:pointer;' +
+  'color:#C53030;font-size:14px;font-weight:700;">✕</button>';
+mostrarInfoCliente(htmlReg, 'encontrado');
+      mostrarToast('✅ "' + datos.Nombre + '" registrado como cliente', 'success', 3000);
     } else {
       mostrarToast(`⚠️ ${resultado.data?.mensaje || resultado.message || 'Error'}`, 'warning');
     }
