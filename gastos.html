@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <meta name="theme-color" content="#4A90D9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>CellCom Tecnology — Gastos, Compras y Campañas</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/cellcomtecnology/css/styles.css">
+
+  <style>
+    html, body { height:100%; overflow:hidden; }
+    @media (max-width:1024px) {
+      html, body { overflow:auto; overflow-x:hidden; height:auto; min-height:100vh; }
+    }
+
+    .gst-layout {
+      display:flex; flex-direction:column;
+      height:100vh; background:var(--fondo); overflow:hidden;
+    }
+    @media (max-width:1024px) { .gst-layout { height:auto; min-height:100vh; overflow:visible; } }
+
+    /* ── Header ──────────────────────────────── */
+    .gst-header {
+      background:linear-gradient(135deg,#0F2044 0%,#1A3A6B 40%,#2E6DB4 100%);
+      padding:0 20px; height:64px;
+      display:flex; align-items:center; gap:10px;
+      box-shadow:0 4px 24px rgba(0,0,0,0.18);
+      flex-shrink:0; z-index:100; position:relative;
+    }
+    .gst-header::after {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
+    }
+
+    .gst-back {
+      width:40px; height:40px;
+      background:rgba(255,255,255,0.12);
+      border:1px solid rgba(255,255,255,0.2);
+      border-radius:12px; color:#fff; font-size:20px;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:all 0.2s; flex-shrink:0;
+    }
+    .gst-back:hover { background:rgba(255,255,255,0.22); transform:scale(1.05); }
+
+    .gst-header-title { flex:1; min-width:0; }
+    .gst-header-title h1 { font-size:17px; font-weight:800; color:#fff; }
+    .gst-header-title p { font-size:11px; color:rgba(255,255,255,0.55); margin-top:1px; }
+
+    .gst-hdr-btn {
+      height:36px; padding:0 14px;
+      background:rgba(255,255,255,0.1);
+      border:1px solid rgba(255,255,255,0.2);
+      border-radius:10px; color:#fff;
+      font-family:'Inter',sans-serif; font-size:12px; font-weight:600;
+      cursor:pointer; display:flex; align-items:center; gap:6px;
+      transition:all 0.2s; white-space:nowrap; flex-shrink:0;
+    }
+    .gst-hdr-btn:hover { background:rgba(255,255,255,0.2); transform:translateY(-1px); }
+    .gst-hdr-btn:active { transform:scale(0.97); }
+
+    .gst-hdr-btn.rojo { background:rgba(252,129,129,0.22); border-color:rgba(252,129,129,0.4); }
+    .gst-hdr-btn.verde { background:rgba(72,187,120,0.22); border-color:rgba(72,187,120,0.4); }
+    .gst-hdr-btn.morado { background:rgba(159,122,234,0.22); border-color:rgba(159,122,234,0.4); }
+
+    /* ── KPIs ────────────────────────────────── */
+    .gst-kpis {
+      display:grid; grid-template-columns:repeat(5,1fr);
+      gap:0; border-bottom:2px solid var(--borde);
+      flex-shrink:0; background:var(--fondo-card);
+    }
+    .gst-kpi {
+      padding:12px 8px; text-align:center;
+      border-right:1px solid var(--borde);
+      transition:all 0.2s; cursor:default;
+    }
+    .gst-kpi:last-child { border-right:none; }
+    .gst-kpi:hover { background:var(--azul-soft); }
+    .gst-kpi-icon { font-size:16px; margin-bottom:2px; }
+    .gst-kpi-valor {
+      font-size:18px; font-weight:900; color:var(--texto-dark);
+      letter-spacing:-0.5px; line-height:1;
+    }
+    .gst-kpi-label {
+      font-size:9px; font-weight:600; color:var(--texto-light);
+      text-transform:uppercase; letter-spacing:0.5px; margin-top:3px;
+    }
+    .gst-kpi-valor.rojo { color:#C53030; }
+    .gst-kpi-valor.verde { color:#276749; }
+    .gst-kpi-valor.azul { color:#2E6DB4; }
+    .gst-kpi-valor.morado { color:#6B46C1; }
+    .gst-kpi-valor.naranja { color:#C05621; }
+
+    @media (max-width:768px) { .gst-kpis { grid-template-columns:repeat(3,1fr); } }
+    @media (max-width:480px) { .gst-kpis { grid-template-columns:repeat(2,1fr); } }
+
+    /* ── Contenido ───────────────────────────── */
+    .gst-content {
+      flex:1; overflow-y:auto; padding:14px 18px;
+      scrollbar-width:thin; scrollbar-color:var(--borde) transparent;
+    }
+    .gst-content::-webkit-scrollbar { width:4px; }
+    .gst-content::-webkit-scrollbar-thumb { background:var(--borde); border-radius:4px; }
+    @media (max-width:1024px) { .gst-content { overflow:visible; } }
+
+    /* ── Tabs ─────────────────────────────────── */
+    .gst-tabs {
+      display:flex; gap:4px;
+      background:var(--fondo-card);
+      border:1.5px solid var(--borde);
+      border-radius:16px; padding:4px;
+      margin-bottom:16px;
+      overflow-x:auto; scrollbar-width:none;
+    }
+    .gst-tabs::-webkit-scrollbar { display:none; }
+
+    .gst-tab {
+      flex:1; padding:10px 16px;
+      border:none; border-radius:12px;
+      background:transparent;
+      font-family:'Inter',sans-serif; font-size:13px; font-weight:600;
+      color:var(--texto-mid); cursor:pointer; transition:all 0.2s;
+      display:flex; align-items:center; justify-content:center;
+      gap:6px; white-space:nowrap; user-select:none;
+    }
+    .gst-tab:hover { color:#4A90D9; background:var(--azul-glass); }
+    .gst-tab.active {
+      background:linear-gradient(135deg,#4A90D9,#2E6DB4);
+      color:#fff; box-shadow:0 4px 14px rgba(74,144,217,0.3); font-weight:700;
+    }
+
+    .gst-tab-count {
+      padding:1px 7px; border-radius:50px; font-size:10px; font-weight:800;
+      background:rgba(255,255,255,0.25);
+    }
+    .gst-tab:not(.active) .gst-tab-count { background:var(--azul-soft); color:#4A90D9; }
+
+    .gst-panel { display:none; animation:fadeUp 0.3s ease both; }
+    .gst-panel.active { display:block; }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ── Toolbar de filtros ───────────────────── */
+    .gst-toolbar {
+      display:flex; gap:8px; align-items:center;
+      flex-wrap:wrap; margin-bottom:12px;
+    }
+
+    .gst-toolbar-search {
+      flex:1; min-width:180px; position:relative;
+    }
+
+    .gst-toolbar-icon {
+      position:absolute; left:12px; top:50%; transform:translateY(-50%);
+      font-size:14px; pointer-events:none; color:var(--texto-muted);
+    }
+
+    .gst-toolbar-input {
+      width:100%; padding:8px 14px 8px 38px;
+      border:1.5px solid var(--borde); border-radius:10px;
+      font-family:'Inter',sans-serif; font-size:13px; font-weight:500;
+      color:var(--texto-dark); background:var(--fondo-card);
+      outline:none; transition:all 0.2s;
+    }
+    .gst-toolbar-input:focus {
+      border-color:#4A90D9; box-shadow:0 0 0 3px rgba(74,144,217,0.1);
+    }
+    .gst-toolbar-input::placeholder { color:var(--texto-muted); }
+
+    .gst-toolbar-select {
+      padding:8px 14px;
+      border:1.5px solid var(--borde); border-radius:10px;
+      font-family:'Inter',sans-serif; font-size:12px; font-weight:600;
+      color:var(--texto-dark); background:var(--fondo-card);
+      cursor:pointer; outline:none; transition:all 0.2s;
+      appearance:none; -webkit-appearance:none; min-width:130px;
+    }
+    .gst-toolbar-select:focus { border-color:#4A90D9; }
+
+    /* ── Lista de items ──────────────────────── */
+    .gst-lista { display:flex; flex-direction:column; gap:8px; }
+
+    .gst-item {
+      background:var(--fondo-card); border-radius:14px;
+      border:1.5px solid var(--borde); padding:14px 16px;
+      display:flex; align-items:center; gap:12px;
+      transition:all 0.2s; animation:fadeUp 0.3s ease both;
+      cursor:pointer;
+    }
+    .gst-item:hover {
+      border-color:#7BB3E8; box-shadow:0 6px 20px rgba(74,144,217,0.1);
+      transform:translateX(3px);
+    }
+
+    .gst-item-icon {
+      width:42px; height:42px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px; flex-shrink:0;
+    }
+    .gst-item-icon.rojo   { background:#FFF5F5; }
+    .gst-item-icon.verde  { background:#F0FFF4; }
+    .gst-item-icon.azul   { background:#EBF4FF; }
+    .gst-item-icon.morado { background:#FAF5FF; }
+    .gst-item-icon.naranja{ background:#FFFAF0; }
+
+    .gst-item-info { flex:1; min-width:0; }
+
+    .gst-item-titulo {
+      font-size:14px; font-weight:700; color:var(--texto-dark);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+
+    .gst-item-meta {
+      font-size:11px; color:var(--texto-light); margin-top:2px;
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    }
+
+    .gst-item-meta-sep {
+      width:3px; height:3px; border-radius:50%;
+      background:var(--texto-muted); flex-shrink:0;
+    }
+
+    .gst-item-monto {
+      text-align:right; flex-shrink:0;
+    }
+
+    .gst-item-valor {
+      font-size:17px; font-weight:900; letter-spacing:-0.5px;
+    }
+    .gst-item-valor.rojo   { color:#C53030; }
+    .gst-item-valor.verde  { color:#276749; }
+    .gst-item-valor.azul   { color:#2E6DB4; }
+    .gst-item-valor.morado { color:#6B46C1; }
+
+    .gst-item-sub {
+      font-size:10px; color:var(--texto-light); margin-top:2px; text-align:right;
+    }
+
+    /* ── Top conceptos / proveedores ─────────── */
+    .gst-top-grid {
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:14px; margin-bottom:16px;
+    }
+    @media (max-width:768px) { .gst-top-grid { grid-template-columns:1fr; } }
+
+    .gst-top-card {
+      background:var(--fondo-card); border-radius:16px;
+      border:1.5px solid var(--borde); padding:16px;
+      box-shadow:0 4px 14px rgba(74,144,217,0.06);
+    }
+
+    .gst-top-title {
+      font-size:13px; font-weight:800; color:var(--texto-dark);
+      margin-bottom:12px; display:flex; align-items:center; gap:8px;
+    }
+
+    .gst-top-item {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:8px 0; border-bottom:1px solid var(--borde);
+    }
+    .gst-top-item:last-child { border-bottom:none; }
+
+    .gst-top-nombre { font-size:13px; font-weight:600; color:var(--texto-dark); }
+    .gst-top-monto { font-size:13px; font-weight:800; color:#2E6DB4; }
+    .gst-top-veces { font-size:10px; color:var(--texto-light); }
+
+    /* ── Resumen financiero ───────────────────── */
+    .gst-resumen-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
+      gap:12px; margin-bottom:16px;
+    }
+
+    .gst-resumen-card {
+      background:var(--fondo-card); border-radius:16px;
+      border:1.5px solid var(--borde); padding:18px;
+      text-align:center; transition:all 0.2s;
+      animation:fadeUp 0.35s ease both;
+    }
+    .gst-resumen-card:hover {
+      transform:translateY(-3px); box-shadow:0 8px 24px rgba(74,144,217,0.12);
+    }
+
+    .gst-resumen-icon { font-size:28px; margin-bottom:6px; }
+    .gst-resumen-valor { font-size:24px; font-weight:900; color:var(--texto-dark); letter-spacing:-0.5px; }
+    .gst-resumen-label { font-size:11px; font-weight:600; color:var(--texto-light); margin-top:4px; }
+
+    .gst-resumen-estado {
+      margin-top:12px; padding:10px; border-radius:12px;
+      font-size:14px; font-weight:800; text-align:center;
+    }
+    .gst-resumen-estado.rentable { background:#F0FFF4; color:#276749; }
+    .gst-resumen-estado.perdida  { background:#FFF5F5; color:#C53030; }
+    .gst-resumen-estado.equilibrio { background:#EBF4FF; color:#2E6DB4; }
+
+    /* ── Gráficos ────────────────────────────── */
+    .gst-chart-wrap {
+      background:var(--fondo-card); border-radius:16px;
+      border:1.5px solid var(--borde); padding:18px;
+      box-shadow:0 4px 14px rgba(74,144,217,0.06);
+      margin-bottom:16px;
+    }
+
+    .gst-chart-title {
+      font-size:14px; font-weight:800; color:var(--texto-dark);
+      margin-bottom:14px; display:flex; align-items:center; gap:8px;
+    }
+
+    /* ── Paginación ──────────────────────────── */
+    .gst-paginacion {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-top:14px; flex-wrap:wrap; gap:8px;
+    }
+    .pag-info { font-size:12px; color:var(--texto-light); font-weight:500; }
+    .pag-btns { display:flex; gap:4px; }
+    .pag-btn {
+      width:34px; height:34px; border:1.5px solid var(--borde);
+      border-radius:8px; background:var(--fondo-card);
+      font-family:'Inter',sans-serif; font-size:12px; font-weight:600;
+      color:var(--texto-mid); cursor:pointer;
+      display:flex; align-items:center; justify-content:center; transition:all 0.15s;
+    }
+    .pag-btn:hover { border-color:#4A90D9; color:#4A90D9; }
+    .pag-btn.active { background:#4A90D9; color:#fff; border-color:#4A90D9; }
+    .pag-btn:disabled { opacity:0.35; cursor:not-allowed; }
+
+    /* ── Empty / Spinner ─────────────────────── */
+    .gst-empty { text-align:center; padding:50px 20px; }
+    .gst-empty-icon { font-size:50px; margin-bottom:12px; opacity:0.5; display:block; }
+    .gst-empty-titulo { font-size:17px; font-weight:700; color:var(--texto-dark); margin-bottom:6px; }
+    .gst-empty-sub { font-size:13px; color:var(--texto-light); line-height:1.6; }
+
+    .gst-spinner { text-align:center; padding:60px 20px; }
+    .gst-spinner-ring {
+      width:44px; height:44px; border:4px solid rgba(74,144,217,0.2);
+      border-top-color:#4A90D9; border-radius:50%;
+      animation:spin 0.8s linear infinite; margin:0 auto 14px;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── Footer ──────────────────────────────── */
+    .gst-footer {
+      padding:8px 18px; border-top:2px solid var(--borde);
+      display:flex; gap:8px; flex-shrink:0; background:var(--fondo-card);
+    }
+    .gst-footer-btn {
+      flex:1; padding:9px; border-radius:10px;
+      border:1.5px solid var(--borde); background:var(--fondo);
+      font-family:'Inter',sans-serif; font-size:11px; font-weight:700;
+      color:var(--texto-mid); cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:5px;
+      transition:all 0.15s;
+    }
+    .gst-footer-btn:hover { border-color:#4A90D9; color:#4A90D9; background:#EBF4FF; transform:translateY(-1px); }
+    .gst-footer-btn.danger:hover { border-color:#FC8181; color:#C53030; background:#FFF5F5; }
+
+    @media (max-width:768px) {
+      .gst-header .gst-hdr-btn .hide-mob { display:none; }
+      .gst-toolbar { flex-direction:column; align-items:stretch; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="gst-layout">
+
+  <!-- Header -->
+  <header class="gst-header">
+    <button class="gst-back" onclick="volverAlPOS()">←</button>
+    <div class="gst-header-title">
+      <h1>💰 Gastos, Compras y Campañas</h1>
+      <p id="gstSubtitulo">Centro de control de egresos</p>
+    </div>
+    <button class="gst-hdr-btn rojo" onclick="modalNuevoGasto()">💸 <span class="hide-mob">Gasto</span></button>
+    <button class="gst-hdr-btn verde" onclick="modalNuevaCompra()">📦 <span class="hide-mob">Compra</span></button>
+    <button class="gst-hdr-btn morado" onclick="modalNuevaCampana()">📣 <span class="hide-mob">Campaña</span></button>
+    <button class="gst-hdr-btn" onclick="recargar()">🔄</button>
+    <button class="gst-hdr-btn" onclick="toggleTema()">🌙</button>
+  </header>
+
+  <!-- KPIs -->
+  <div class="gst-kpis">
+    <div class="gst-kpi">
+      <div class="gst-kpi-icon">💸</div>
+      <div class="gst-kpi-valor rojo" id="kpiGastos">S/0</div>
+      <div class="gst-kpi-label">Gastos mes</div>
+    </div>
+    <div class="gst-kpi">
+      <div class="gst-kpi-icon">📦</div>
+      <div class="gst-kpi-valor azul" id="kpiCompras">S/0</div>
+      <div class="gst-kpi-label">Compras mes</div>
+    </div>
+    <div class="gst-kpi">
+      <div class="gst-kpi-icon">📣</div>
+      <div class="gst-kpi-valor morado" id="kpiAds">S/0</div>
+      <div class="gst-kpi-label">Ads mes</div>
+    </div>
+    <div class="gst-kpi">
+      <div class="gst-kpi-icon">📊</div>
+      <div class="gst-kpi-valor naranja" id="kpiTotalEgresos">S/0</div>
+      <div class="gst-kpi-label">Total egresos</div>
+    </div>
+    <div class="gst-kpi">
+      <div class="gst-kpi-icon">💎</div>
+      <div class="gst-kpi-valor verde" id="kpiNeta">S/0</div>
+      <div class="gst-kpi-label">Ganancia neta</div>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="gst-content" id="gstContent">
+
+    <div class="gst-spinner" id="gstSpinner">
+      <div class="gst-spinner-ring"></div>
+      <div style="font-size:14px;font-weight:600;color:var(--texto-mid);">Cargando datos financieros...</div>
+    </div>
+
+    <div id="gstMain" style="display:none;">
+
+      <!-- Tabs -->
+      <div class="gst-tabs">
+        <button class="gst-tab active" id="tabGastos" onclick="cambiarTab('gastos')">
+          💸 Gastos <span class="gst-tab-count" id="tabGastosCount">0</span>
+        </button>
+        <button class="gst-tab" id="tabCompras" onclick="cambiarTab('compras')">
+          📦 Compras <span class="gst-tab-count" id="tabComprasCount">0</span>
+        </button>
+        <button class="gst-tab" id="tabCampanas" onclick="cambiarTab('campanas')">
+          📣 Campañas <span class="gst-tab-count" id="tabCampanasCount">0</span>
+        </button>
+        <button class="gst-tab" id="tabResumen" onclick="cambiarTab('resumen')">
+          📊 Resumen Financiero
+        </button>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           PANEL GASTOS
+      ═══════════════════════════════════════ -->
+      <div class="gst-panel active" id="panelGastos">
+        <div class="gst-toolbar">
+          <div class="gst-toolbar-search">
+            <span class="gst-toolbar-icon">🔍</span>
+            <input type="text" class="gst-toolbar-input" id="busqGastos"
+                   placeholder="Buscar por concepto..."
+                   oninput="filtrarGastos()" autocomplete="off">
+          </div>
+          <select class="gst-toolbar-select" id="mesGastos" onchange="filtrarGastos()"></select>
+        </div>
+
+        <div class="gst-top-grid" id="topGastosGrid"></div>
+        <div class="gst-lista" id="listaGastos"></div>
+        <div class="gst-paginacion" id="pagGastos"></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           PANEL COMPRAS
+      ═══════════════════════════════════════ -->
+      <div class="gst-panel" id="panelCompras">
+        <div class="gst-toolbar">
+          <div class="gst-toolbar-search">
+            <span class="gst-toolbar-icon">🔍</span>
+            <input type="text" class="gst-toolbar-input" id="busqCompras"
+                   placeholder="Buscar por producto o proveedor..."
+                   oninput="filtrarCompras()" autocomplete="off">
+          </div>
+          <select class="gst-toolbar-select" id="mesCompras" onchange="filtrarCompras()"></select>
+        </div>
+
+        <div class="gst-top-grid" id="topComprasGrid"></div>
+        <div class="gst-lista" id="listaCompras"></div>
+        <div class="gst-paginacion" id="pagCompras"></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           PANEL CAMPAÑAS
+      ═══════════════════════════════════════ -->
+      <div class="gst-panel" id="panelCampanas">
+        <div class="gst-toolbar">
+          <select class="gst-toolbar-select" id="filtPlataforma" onchange="filtrarCampanas()">
+            <option value="">📣 Todas las plataformas</option>
+            <option value="Facebook">📘 Facebook</option>
+            <option value="TikTok">🎵 TikTok</option>
+            <option value="Instagram">📸 Instagram</option>
+            <option value="Google">🔍 Google</option>
+          </select>
+          <select class="gst-toolbar-select" id="mesCampanas" onchange="filtrarCampanas()"></select>
+        </div>
+
+        <div class="gst-chart-wrap" id="chartCampanasWrap">
+          <div class="gst-chart-title">📊 Inversión por Plataforma</div>
+          <canvas id="chartCampanas" height="220"></canvas>
+        </div>
+
+        <div class="gst-lista" id="listaCampanas"></div>
+        <div class="gst-paginacion" id="pagCampanas"></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           PANEL RESUMEN FINANCIERO
+      ═══════════════════════════════════════ -->
+      <div class="gst-panel" id="panelResumen">
+        <div class="gst-toolbar">
+          <select class="gst-toolbar-select" id="mesResumen" onchange="cargarResumen()"></select>
+          <button class="gst-hdr-btn" onclick="cargarResumen()" style="height:38px;background:var(--azul-glass);border:1.5px solid var(--borde);color:var(--texto-dark);">
+            📊 Generar reporte
+          </button>
+        </div>
+
+        <div id="resumenContenido"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="gst-footer">
+    <button class="gst-footer-btn" onclick="volverAlPOS()">🛒 POS</button>
+    <button class="gst-footer-btn" onclick="exportarGastos()">📄 Exportar PDF</button>
+    <button class="gst-footer-btn danger" onclick="cerrarSesion()">🚪 Salir</button>
+  </div>
+
+</div>
+
+<!-- Scripts -->
+<script src="/cellcomtecnology/js/config.js"></script>
+<script src="/cellcomtecnology/js/api.js"></script>
+<script src="/cellcomtecnology/js/auth.js"></script>
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ════════════════════════════════════════════════════════════════
+
+const GST = {
+  gastos:[], compras:[], campanas:[],
+  gastosFilt:[], comprasFilt:[], campanasFilt:[],
+  resumen: null,
+  tabActiva: 'gastos',
+  pagGastos:1, pagCompras:1, pagCampanas:1,
+  porPagina: 15,
+  token:'', usuario:null, esAdmin:false,
+  chartCampanas: null
+};
+
+// ════════════════════════════════════════════════════════════════
+// INICIALIZACIÓN
+// ════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', async () => {
+  GST.token = localStorage.getItem(APP_CONFIG.STORAGE.TOKEN) || '';
+  const u   = localStorage.getItem(APP_CONFIG.STORAGE.USUARIO) || '';
+  if (!GST.token || !u) { window.location.href = '/cellcomtecnology/login.html'; return; }
+  GST.usuario = JSON.parse(u);
+  GST.esAdmin = GST.usuario.rol === 'Admin';
+
+  if (!GST.esAdmin) { window.location.href = '/cellcomtecnology/pos.html'; return; }
+
+  const tema = localStorage.getItem(APP_CONFIG.STORAGE.TEMA) || 'light';
+  document.documentElement.setAttribute('data-theme', tema);
+
+  generarSelectMeses();
+  await cargarTodo();
+  toast('✅ Centro financiero cargado', 'success', 2000);
+});
+
+function generarSelectMeses() {
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const ahora = new Date();
+  let ops = '<option value="">📅 Todos</option>';
+  for (let i = 0; i < 12; i++) {
+    let m = ahora.getMonth() - i;
+    let y = ahora.getFullYear();
+    if (m < 0) { m += 12; y--; }
+    const label = `${MESES[m]}-${y}`;
+    ops += `<option value="${label}" ${i===0?'selected':''}>${label}</option>`;
+  }
+  ['mesGastos','mesCompras','mesCampanas','mesResumen'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = ops;
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// CARGA DE DATOS
+// ════════════════════════════════════════════════════════════════
+
+async function cargarTodo() {
+  mostrarSpinner(true);
+  try {
+    const mesActual = document.getElementById('mesGastos')?.value || '';
+    const filtro = mesActual ? { mes: mesActual } : {};
+
+    const [rG, rC, rA] = await Promise.all([
+      apiGet('getGastos', filtro),
+      apiGet('getCompras', filtro),
+      apiGet('getCampanas', filtro)
+    ]);
+
+    if (rG.success) { GST.gastos = rG.data?.gastos || []; GST.gastosFilt = [...GST.gastos]; }
+    if (rC.success) { GST.compras = rC.data?.compras || []; GST.comprasFilt = [...GST.compras]; }
+    if (rA.success) { GST.campanas = rA.data?.campanas || []; GST.campanasFilt = [...GST.campanas]; }
+
+    actualizarKPIs(rG.data, rC.data, rA.data);
+    actualizarContadores();
+    renderizarTab();
+  } catch(e) {
+    toast(`❌ ${e.message}`, 'error');
+  }
+  mostrarSpinner(false);
+}
+
+async function recargar() { await cargarTodo(); toast('🔄 Datos actualizados', 'success', 2000); }
+
+function mostrarSpinner(s) {
+  document.getElementById('gstSpinner').style.display = s ? 'block' : 'none';
+  document.getElementById('gstMain').style.display    = s ? 'none'  : 'block';
+}
+
+function actualizarKPIs(g, c, a) {
+  const totalGastos  = g?.resumen?.totalMonto      || 0;
+  const totalCompras = c?.resumen?.totalInvertido   || 0;
+  const totalAds     = a?.resumen?.totalInvertido   || 0;
+  const totalEgresos = totalGastos + totalAds;
+
+  setEl('kpiGastos', fmtK(totalGastos));
+  setEl('kpiCompras', fmtK(totalCompras));
+  setEl('kpiAds', fmtK(totalAds));
+  setEl('kpiTotalEgresos', fmtK(totalEgresos));
+  setEl('kpiNeta', '—');
+}
+
+function actualizarContadores() {
+  setEl('tabGastosCount', GST.gastos.length);
+  setEl('tabComprasCount', GST.compras.length);
+  setEl('tabCampanasCount', GST.campanas.length);
+}
+
+// ════════════════════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════════════════════
+
+function cambiarTab(tab) {
+  GST.tabActiva = tab;
+  ['tabGastos','tabCompras','tabCampanas','tabResumen'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  ['panelGastos','panelCompras','panelCampanas','panelResumen'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+
+  document.getElementById(`tab${cap(tab)}`)?.classList.add('active');
+  document.getElementById(`panel${cap(tab)}`)?.classList.add('active');
+
+  renderizarTab();
+  if (tab === 'resumen') cargarResumen();
+  if (tab === 'campanas') renderizarChartCampanas();
+}
+
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function renderizarTab() {
+  if (GST.tabActiva === 'gastos')   renderizarGastos();
+  if (GST.tabActiva === 'compras')  renderizarCompras();
+  if (GST.tabActiva === 'campanas') renderizarCampanas();
+}
+
+// ════════════════════════════════════════════════════════════════
+// GASTOS
+// ════════════════════════════════════════════════════════════════
+
+function filtrarGastos() {
+  const busq = norm(document.getElementById('busqGastos')?.value || '');
+  const mes  = document.getElementById('mesGastos')?.value || '';
+
+  let r = [...GST.gastos];
+  if (busq) r = r.filter(g => norm(g.Concepto_Gasto||'').includes(busq) || norm(g.Responsable||'').includes(busq));
+  if (mes)  r = r.filter(g => esMes(g.Fecha, mes));
+
+  GST.gastosFilt = r;
+  GST.pagGastos = 1;
+  renderizarGastos();
+}
+
+function renderizarGastos() {
+  const lista = document.getElementById('listaGastos');
+  const topGrid = document.getElementById('topGastosGrid');
+  const items = GST.gastosFilt;
+  const pag = items.slice((GST.pagGastos-1)*GST.porPagina, GST.pagGastos*GST.porPagina);
+
+  // Top conceptos
+  const conceptos = {};
+  items.forEach(g => {
+    const c = g.Concepto_Gasto || 'Sin concepto';
+    if (!conceptos[c]) conceptos[c] = { nombre: c, total: 0, veces: 0 };
+    conceptos[c].total += Number(g.Monto) || 0;
+    conceptos[c].veces++;
+  });
+  const topConceptos = Object.values(conceptos).sort((a,b) => b.total - a.total).slice(0,5);
+  const totalGastos = items.reduce((s,g) => s + (Number(g.Monto)||0), 0);
+
+  topGrid.innerHTML = `
+    <div class="gst-top-card">
+      <div class="gst-top-title">🔥 Top Conceptos</div>
+      ${topConceptos.length > 0 ? topConceptos.map(c => `
+        <div class="gst-top-item">
+          <div>
+            <div class="gst-top-nombre">${c.nombre}</div>
+            <div class="gst-top-veces">${c.veces} vez${c.veces!==1?'es':''}</div>
+          </div>
+          <div class="gst-top-monto">S/${c.total.toFixed(2)}</div>
+        </div>
+      `).join('') : '<div style="text-align:center;padding:14px;color:var(--texto-light);font-size:13px;">Sin datos</div>'}
+    </div>
+    <div class="gst-top-card">
+      <div class="gst-top-title">📊 Resumen</div>
+      <div style="text-align:center;padding:10px;">
+        <div style="font-size:28px;font-weight:900;color:#C53030;">S/${totalGastos.toFixed(2)}</div>
+        <div style="font-size:11px;color:var(--texto-light);margin-top:4px;">${items.length} gasto${items.length!==1?'s':''} registrados</div>
+        ${items.length > 0 ? `<div style="font-size:11px;color:var(--texto-light);margin-top:2px;">Promedio: S/${(totalGastos/items.length).toFixed(2)}</div>` : ''}
+      </div>
+    </div>`;
+
+  if (pag.length === 0) {
+    lista.innerHTML = `<div class="gst-empty"><span class="gst-empty-icon">💸</span><div class="gst-empty-titulo">Sin gastos</div><div class="gst-empty-sub">Registra tu primer gasto del período</div></div>`;
+    document.getElementById('pagGastos').innerHTML = '';
+    return;
+  }
+
+  lista.innerHTML = pag.map((g, i) => `
+    <div class="gst-item" style="animation-delay:${Math.min(i*25,300)}ms" onclick="verDetalleGasto(${GST.gastos.indexOf(g)})">
+      <div class="gst-item-icon rojo">💸</div>
+      <div class="gst-item-info">
+        <div class="gst-item-titulo">${g.Concepto_Gasto || '—'}</div>
+        <div class="gst-item-meta">
+          <span>${g.ID_Gasto || ''}</span>
+          <span class="gst-item-meta-sep"></span>
+          <span>${g.Fecha || '—'}</span>
+          <span class="gst-item-meta-sep"></span>
+          <span>👤 ${g.Responsable || '—'}</span>
+        </div>
+      </div>
+      <div class="gst-item-monto">
+        <div class="gst-item-valor rojo">-S/${(Number(g.Monto)||0).toFixed(2)}</div>
+      </div>
+    </div>
+  `).join('');
+
+  renderPag('pagGastos', items.length, GST.pagGastos, n => { GST.pagGastos = n; renderizarGastos(); });
+}
+
+// ════════════════════════════════════════════════════════════════
+// COMPRAS
+// ════════════════════════════════════════════════════════════════
+
+function filtrarCompras() {
+  const busq = norm(document.getElementById('busqCompras')?.value || '');
+  const mes  = document.getElementById('mesCompras')?.value || '';
+
+  let r = [...GST.compras];
+  if (busq) r = r.filter(c => norm(c.ID_Producto||'').includes(busq) || norm(c.Proveedor||'').includes(busq));
+  if (mes)  r = r.filter(c => esMes(c.Fecha, mes));
+
+  GST.comprasFilt = r;
+  GST.pagCompras = 1;
+  renderizarCompras();
+}
+
+function renderizarCompras() {
+  const lista = document.getElementById('listaCompras');
+  const topGrid = document.getElementById('topComprasGrid');
+  const items = GST.comprasFilt;
+  const pag = items.slice((GST.pagCompras-1)*GST.porPagina, GST.pagCompras*GST.porPagina);
+
+  const proveedores = {};
+  items.forEach(c => {
+    const p = c.Proveedor || 'Sin proveedor';
+    if (!proveedores[p]) proveedores[p] = { nombre: p, total: 0, veces: 0 };
+    proveedores[p].total += (Number(c.Cantidad_Ingresada)||0) * (Number(c.Costo_Unitario)||0);
+    proveedores[p].veces++;
+  });
+  const topProvs = Object.values(proveedores).sort((a,b) => b.total - a.total).slice(0,5);
+  const totalInv = items.reduce((s,c) => s + ((Number(c.Cantidad_Ingresada)||0) * (Number(c.Costo_Unitario)||0)), 0);
+  const totalUnd = items.reduce((s,c) => s + (Number(c.Cantidad_Ingresada)||0), 0);
+
+  topGrid.innerHTML = `
+    <div class="gst-top-card">
+      <div class="gst-top-title">🏭 Top Proveedores</div>
+      ${topProvs.length > 0 ? topProvs.map(p => `
+        <div class="gst-top-item">
+          <div>
+            <div class="gst-top-nombre">${p.nombre}</div>
+            <div class="gst-top-veces">${p.veces} compra${p.veces!==1?'s':''}</div>
+          </div>
+          <div class="gst-top-monto">S/${p.total.toFixed(2)}</div>
+        </div>
+      `).join('') : '<div style="text-align:center;padding:14px;color:var(--texto-light);">Sin datos</div>'}
+    </div>
+    <div class="gst-top-card">
+      <div class="gst-top-title">📊 Inversión en mercadería</div>
+      <div style="text-align:center;padding:10px;">
+        <div style="font-size:28px;font-weight:900;color:#2E6DB4;">S/${totalInv.toFixed(2)}</div>
+        <div style="font-size:11px;color:var(--texto-light);margin-top:4px;">${items.length} compra${items.length!==1?'s':''} · ${totalUnd} unidades</div>
+      </div>
+    </div>`;
+
+  if (pag.length === 0) {
+    lista.innerHTML = `<div class="gst-empty"><span class="gst-empty-icon">📦</span><div class="gst-empty-titulo">Sin compras</div><div class="gst-empty-sub">Registra compras de mercadería</div></div>`;
+    document.getElementById('pagCompras').innerHTML = '';
+    return;
+  }
+
+  lista.innerHTML = pag.map((c, i) => {
+    const cant = Number(c.Cantidad_Ingresada)||0;
+    const costo = Number(c.Costo_Unitario)||0;
+    const total = cant * costo;
+    return `
+    <div class="gst-item" style="animation-delay:${Math.min(i*25,300)}ms">
+      <div class="gst-item-icon verde">📦</div>
+      <div class="gst-item-info">
+        <div class="gst-item-titulo">${c.ID_Producto || '—'}</div>
+        <div class="gst-item-meta">
+          <span>${c.ID_Compra || ''}</span>
+          <span class="gst-item-meta-sep"></span>
+          <span>${c.Fecha || '—'}</span>
+          <span class="gst-item-meta-sep"></span>
+          <span>🏭 ${c.Proveedor || '—'}</span>
+          <span class="gst-item-meta-sep"></span>
+          <span>${cant} und. × S/${costo.toFixed(2)}</span>
+        </div>
+      </div>
+      <div class="gst-item-monto">
+        <div class="gst-item-valor azul">S/${total.toFixed(2)}</div>
+        <div class="gst-item-sub">${c.Accion_Costo === 'Actualizado' ? '💰 Costo actualizado' : '🔒 Costo mantenido'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderPag('pagCompras', items.length, GST.pagCompras, n => { GST.pagCompras = n; renderizarCompras(); });
+}
+
+// ════════════════════════════════════════════════════════════════
+// CAMPAÑAS
+// ════════════════════════════════════════════════════════════════
+
+function filtrarCampanas() {
+  const plat = document.getElementById('filtPlataforma')?.value || '';
+  const mes  = document.getElementById('mesCampanas')?.value || '';
+
+  let r = [...GST.campanas];
+  if (plat) r = r.filter(c => c.Plataforma === plat);
+  if (mes)  r = r.filter(c => esMes(c.Fecha_Inicio, mes));
+
+  GST.campanasFilt = r;
+  GST.pagCampanas = 1;
+  renderizarCampanas();
+  renderizarChartCampanas();
+}
+
+function renderizarCampanas() {
+  const lista = document.getElementById('listaCampanas');
+  const items = GST.campanasFilt;
+  const pag = items.slice((GST.pagCampanas-1)*GST.porPagina, GST.pagCampanas*GST.porPagina);
+
+  const iconos = { Facebook:'📘', TikTok:'🎵', Instagram:'📸', Google:'🔍' };
+
+  if (pag.length === 0) {
+    lista.innerHTML = `<div class="gst-empty"><span class="gst-empty-icon">📣</span><div class="gst-empty-titulo">Sin campañas</div><div class="gst-empty-sub">Registra inversiones en publicidad</div></div>`;
+    document.getElementById('pagCampanas').innerHTML = '';
+    return;
+  }
+
+  lista.innerHTML = pag.map((c, i) => `
+    <div class="gst-item" style="animation-delay:${Math.min(i*25,300)}ms">
+      <div class="gst-item-icon morado">${iconos[c.Plataforma]||'📣'}</div>
+      <div class="gst-item-info">
+        <div class="gst-item-titulo">${c.Plataforma || '—'}</div>
+        <div class="gst-item-meta">
+          <span>${c.ID_Campaña || ''}</span>
+          <span class="gst-item-meta-sep"></span>
+          <span>📅 ${c.Fecha_Inicio || '—'}</span>
+        </div>
+      </div>
+      <div class="gst-item-monto">
+        <div class="gst-item-valor morado">S/${(Number(c.Presupuesto)||0).toFixed(2)}</div>
+      </div>
+    </div>
+  `).join('');
+
+  renderPag('pagCampanas', items.length, GST.pagCampanas, n => { GST.pagCampanas = n; renderizarCampanas(); });
+}
+
+function renderizarChartCampanas() {
+  if (GST.chartCampanas) GST.chartCampanas.destroy();
+  const ctx = document.getElementById('chartCampanas');
+  if (!ctx) return;
+
+  const por = {};
+  GST.campanasFilt.forEach(c => {
+    const p = c.Plataforma || 'Otro';
+    por[p] = (por[p] || 0) + (Number(c.Presupuesto) || 0);
+  });
+
+  const labels = Object.keys(por);
+  const data   = Object.values(por);
+  const colors = { Facebook:'rgba(59,89,152,0.8)', TikTok:'rgba(0,0,0,0.7)', Instagram:'rgba(225,48,108,0.8)', Google:'rgba(66,133,244,0.8)', Otro:'rgba(160,174,192,0.8)' };
+
+  GST.chartCampanas = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{ data, backgroundColor: labels.map(l => colors[l]||colors.Otro), borderWidth: 0, hoverOffset: 8 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '60%',
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: "'Inter',sans-serif", size: 12, weight: '600' }, padding: 14, usePointStyle: true } }
+      }
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// RESUMEN FINANCIERO
+// ════════════════════════════════════════════════════════════════
+
+async function cargarResumen() {
+  const mes = document.getElementById('mesResumen')?.value || '';
+  const cont = document.getElementById('resumenContenido');
+  cont.innerHTML = '<div class="gst-spinner"><div class="gst-spinner-ring"></div><div style="font-size:13px;color:var(--texto-mid);">Generando resumen financiero...</div></div>';
+
+  try {
+    const r = await apiGet('getResumenFinanciero', mes ? { mes } : {});
+    if (!r.success || !r.data) { cont.innerHTML = '<div class="gst-empty"><span class="gst-empty-icon">📊</span><div class="gst-empty-titulo">Sin datos</div></div>'; return; }
+
+    const d = r.data;
+    const ing = d.ingresos || {};
+    const egr = d.egresos  || {};
+    const res = d.resultado|| {};
+
+    const estadoCls = res.gananciaNeta > 0 ? 'rentable' : res.gananciaNeta < 0 ? 'perdida' : 'equilibrio';
+
+    setEl('kpiNeta', fmtK(res.gananciaNeta || 0));
+
+    cont.innerHTML = `
+      <div class="gst-resumen-estado ${estadoCls}">
+        ${res.estado || '—'} — Ganancia neta: ${res.gananciaNeta_Formato || 'S/0.00'}
+      </div>
+
+      <div class="gst-resumen-grid" style="margin-top:16px;">
+        <div class="gst-resumen-card" style="animation-delay:0ms">
+          <div class="gst-resumen-icon">💰</div>
+          <div class="gst-resumen-valor" style="color:#2E6DB4;">${ing.totalVentasFormato || 'S/0'}</div>
+          <div class="gst-resumen-label">Ventas del mes (${ing.cantidadVentas || 0})</div>
+        </div>
+        <div class="gst-resumen-card" style="animation-delay:60ms">
+          <div class="gst-resumen-icon">📈</div>
+          <div class="gst-resumen-valor" style="color:#276749;">${ing.gananciasBrutasFormato || 'S/0'}</div>
+          <div class="gst-resumen-label">Ganancia bruta · Margen ${ing.margenBruto || '0%'}</div>
+        </div>
+        <div class="gst-resumen-card" style="animation-delay:120ms">
+          <div class="gst-resumen-icon">💸</div>
+          <div class="gst-resumen-valor" style="color:#C53030;">${egr.totalGastosFormato || 'S/0'}</div>
+          <div class="gst-resumen-label">Gastos operativos</div>
+        </div>
+        <div class="gst-resumen-card" style="animation-delay:180ms">
+          <div class="gst-resumen-icon">📦</div>
+          <div class="gst-resumen-valor" style="color:#2E6DB4;">${egr.totalComprasFormato || 'S/0'}</div>
+          <div class="gst-resumen-label">Compras mercadería</div>
+        </div>
+        <div class="gst-resumen-card" style="animation-delay:240ms">
+          <div class="gst-resumen-icon">📣</div>
+          <div class="gst-resumen-valor" style="color:#6B46C1;">${egr.totalAdsFormato || 'S/0'}</div>
+          <div class="gst-resumen-label">Inversión en Ads · ROI ${res.roiAds || '0x'}</div>
+        </div>
+        <div class="gst-resumen-card" style="animation-delay:300ms">
+          <div class="gst-resumen-icon">💎</div>
+          <div class="gst-resumen-valor" style="color:${res.gananciaNeta >= 0 ? '#276749' : '#C53030'};">
+            ${res.gananciaNeta_Formato || 'S/0'}
+          </div>
+          <div class="gst-resumen-label">Ganancia neta · Margen ${res.margenNeto || '0%'}</div>
+        </div>
+      </div>
+
+      ${d.detalleGastos?.length > 0 ? `
+        <div class="gst-top-card" style="margin-top:16px;">
+          <div class="gst-top-title">🔥 Conceptos de gasto más frecuentes</div>
+          ${d.detalleGastos.map(c => `
+            <div class="gst-top-item">
+              <div class="gst-top-nombre">${c.concepto}</div>
+              <div class="gst-top-monto">${c.totalFormateado || 'S/0'}</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      ${d.detalleCampanas?.length > 0 ? `
+        <div class="gst-top-card" style="margin-top:12px;">
+          <div class="gst-top-title">📣 Inversión por plataforma</div>
+          ${d.detalleCampanas.map(c => `
+            <div class="gst-top-item">
+              <div class="gst-top-nombre">${c.plataforma}</div>
+              <div class="gst-top-monto">${c.totalFormateado || 'S/0'}</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    `;
+
+  } catch(e) {
+    cont.innerHTML = `<div class="gst-empty"><span class="gst-empty-icon">❌</span><div class="gst-empty-titulo">${e.message}</div></div>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODALES — NUEVO GASTO
+// ════════════════════════════════════════════════════════════════
+
+async function modalNuevoGasto() {
+  const { value: d } = await Swal.fire({
+    title: '💸 Registrar Gasto', width: 480,
+    html: `
+      <div style="font-family:'Inter',sans-serif;text-align:left;">
+        <div>
+          <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Concepto *</label>
+          <input id="gConcepto" class="swal2-input" placeholder="Ej: Almuerzo, pasajes, limpieza..." style="margin:4px 0 12px;">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Monto (S/) *</label>
+            <input id="gMonto" class="swal2-input" type="number" placeholder="0.00" step="0.01" inputmode="decimal" style="margin:4px 0 0;font-size:18px;font-weight:800;">
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Responsable</label>
+            <input id="gResp" class="swal2-input" value="${GST.usuario?.nombre||''}" style="margin:4px 0 0;">
+          </div>
+        </div>
+      </div>`,
+    showCancelButton: true, confirmButtonText: '💸 Registrar gasto', cancelButtonText: 'Cancelar', confirmButtonColor: '#C53030',
+    preConfirm: () => {
+      const c = document.getElementById('gConcepto').value.trim();
+      const m = parseFloat(document.getElementById('gMonto').value);
+      if (!c) return Swal.showValidationMessage('Concepto requerido');
+      if (!m || m <= 0) return Swal.showValidationMessage('Monto debe ser mayor a 0');
+      return { Concepto_Gasto: c, Monto: m, Responsable: document.getElementById('gResp').value.trim() || GST.usuario?.nombre };
+    }
+  });
+
+  if (!d) return;
+  try {
+    const r = await apiPost('crearGasto', d);
+    if (r.success) { toast(`✅ Gasto registrado: S/${d.Monto.toFixed(2)}`, 'success', 3000); await cargarTodo(); }
+    else toast(`⚠️ ${r.data?.mensaje || r.message}`, 'warning');
+  } catch(e) { toast(`❌ ${e.message}`, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODAL — NUEVA COMPRA
+// ════════════════════════════════════════════════════════════════
+
+async function modalNuevaCompra() {
+  const { value: d } = await Swal.fire({
+    title: '📦 Registrar Compra de Mercadería', width: 520,
+    html: `
+      <div style="font-family:'Inter',sans-serif;text-align:left;">
+        <div>
+          <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">ID del producto *</label>
+          <input id="cProd" class="swal2-input" placeholder="ID o código del producto" style="margin:4px 0 12px;">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Cantidad *</label>
+            <input id="cCant" class="swal2-input" type="number" placeholder="0" min="1" inputmode="numeric" style="margin:4px 0 0;">
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Costo unitario *</label>
+            <input id="cCosto" class="swal2-input" type="number" placeholder="0.00" step="0.01" inputmode="decimal" style="margin:4px 0 0;">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Proveedor</label>
+            <input id="cProv" class="swal2-input" placeholder="Nombre del proveedor" style="margin:4px 0 0;">
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Acción sobre costo</label>
+            <select id="cAccion" class="swal2-select" style="margin:4px 0 0;">
+              <option value="Actualizado">💰 Actualizar costo</option>
+              <option value="Mantenido">🔒 Mantener actual</option>
+            </select>
+          </div>
+        </div>
+      </div>`,
+    showCancelButton: true, confirmButtonText: '📦 Registrar compra', cancelButtonText: 'Cancelar', confirmButtonColor: '#48BB78',
+    preConfirm: () => {
+      const prod  = document.getElementById('cProd').value.trim();
+      const cant  = parseInt(document.getElementById('cCant').value);
+      const costo = parseFloat(document.getElementById('cCosto').value);
+      if (!prod) return Swal.showValidationMessage('ID de producto requerido');
+      if (!cant || cant <= 0) return Swal.showValidationMessage('Cantidad requerida');
+      if (isNaN(costo) || costo < 0) return Swal.showValidationMessage('Costo inválido');
+      return {
+        ID_Producto: prod, Cantidad_Ingresada: cant, Costo_Unitario: costo,
+        Proveedor: document.getElementById('cProv').value.trim(),
+        Accion_Costo: document.getElementById('cAccion').value
+      };
+    }
+  });
+
+  if (!d) return;
+  try {
+    const r = await apiPost('crearCompra', d);
+    if (r.success) {
+      toast(`✅ Compra registrada: ${d.Cantidad_Ingresada} und.`, 'success', 3000);
+      await cargarTodo();
+    } else toast(`⚠️ ${r.data?.mensaje || r.message}`, 'warning');
+  } catch(e) { toast(`❌ ${e.message}`, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODAL — NUEVA CAMPAÑA
+// ════════════════════════════════════════════════════════════════
+
+async function modalNuevaCampana() {
+  const { value: d } = await Swal.fire({
+    title: '📣 Registrar Campaña Publicitaria', width: 450,
+    html: `
+      <div style="font-family:'Inter',sans-serif;text-align:left;">
+        <div>
+          <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Plataforma *</label>
+          <select id="aPlataf" class="swal2-select" style="margin:4px 0 12px;">
+            <option value="">Seleccionar...</option>
+            <option value="Facebook">📘 Facebook</option>
+            <option value="TikTok">🎵 TikTok</option>
+            <option value="Instagram">📸 Instagram</option>
+            <option value="Google">🔍 Google</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Presupuesto (S/) *</label>
+          <input id="aPresu" class="swal2-input" type="number" placeholder="0.00" step="0.01" inputmode="decimal" style="margin:4px 0 0;font-size:18px;font-weight:800;">
+        </div>
+      </div>`,
+    showCancelButton: true, confirmButtonText: '📣 Registrar campaña', cancelButtonText: 'Cancelar', confirmButtonColor: '#6B46C1',
+    preConfirm: () => {
+      const p = document.getElementById('aPlataf').value;
+      const m = parseFloat(document.getElementById('aPresu').value);
+      if (!p) return Swal.showValidationMessage('Selecciona una plataforma');
+      if (!m || m <= 0) return Swal.showValidationMessage('Presupuesto debe ser mayor a 0');
+      return { Plataforma: p, Presupuesto: m };
+    }
+  });
+
+  if (!d) return;
+  try {
+    const r = await apiPost('crearCampana', d);
+    if (r.success) { toast(`✅ Campaña en ${d.Plataforma}: S/${d.Presupuesto.toFixed(2)}`, 'success', 3000); await cargarTodo(); }
+    else toast(`⚠️ ${r.data?.mensaje || r.message}`, 'warning');
+  } catch(e) { toast(`❌ ${e.message}`, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════════════
+// VER DETALLE GASTO
+// ════════════════════════════════════════════════════════════════
+
+function verDetalleGasto(idx) {
+  const g = GST.gastos[idx];
+  if (!g) return;
+  Swal.fire({
+    title: `💸 ${g.Concepto_Gasto || 'Gasto'}`,
+    html: `
+      <div style="font-family:'Inter',sans-serif;text-align:left;">
+        <div style="background:#FFF5F5;border-radius:12px;padding:14px;text-align:center;margin-bottom:14px;">
+          <div style="font-size:28px;font-weight:900;color:#C53030;">S/${(Number(g.Monto)||0).toFixed(2)}</div>
+        </div>
+        <div style="background:var(--fondo);border-radius:12px;padding:12px;font-size:13px;color:var(--texto-mid);line-height:1.8;">
+          <div style="display:flex;justify-content:space-between;"><span>🔢 ID:</span><span style="font-weight:700;">${g.ID_Gasto||'—'}</span></div>
+          <div style="display:flex;justify-content:space-between;"><span>📅 Fecha:</span><span style="font-weight:700;">${g.Fecha||'—'}</span></div>
+          <div style="display:flex;justify-content:space-between;"><span>👤 Responsable:</span><span style="font-weight:700;">${g.Responsable||'—'}</span></div>
+        </div>
+      </div>`,
+    confirmButtonText: 'Cerrar', confirmButtonColor: '#4A90D9'
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// EXPORTAR PDF
+// ════════════════════════════════════════════════════════════════
+
+function exportarGastos() {
+  const fecha = new Date().toLocaleDateString('es-PE');
+  const hora  = new Date().toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit' });
+
+  const gastos  = GST.gastosFilt;
+  const compras = GST.comprasFilt;
+  const campanas= GST.campanasFilt;
+
+  const totalG = gastos.reduce((s,g) => s + (Number(g.Monto)||0), 0);
+  const totalC = compras.reduce((s,c) => s + ((Number(c.Cantidad_Ingresada)||0) * (Number(c.Costo_Unitario)||0)), 0);
+  const totalA = campanas.reduce((s,c) => s + (Number(c.Presupuesto)||0), 0);
+
+  let filasG = gastos.map(g => `<tr><td style="padding:6px 8px;border-bottom:1px solid #EBF4FF;font-size:11px;">${g.ID_Gasto||''}</td><td style="padding:6px 8px;border-bottom:1px solid #EBF4FF;font-size:11px;">${g.Fecha||''}</td><td style="padding:6px 8px;border-bottom:1px solid #EBF4FF;font-size:11px;font-weight:600;">${g.Concepto_Gasto||''}</td><td style="padding:6px 8px;border-bottom:1px solid #EBF4FF;font-size:11px;text-align:right;font-weight:700;color:#C53030;">S/${(Number(g.Monto)||0).toFixed(2)}</td><td style="padding:6px 8px;border-bottom:1px solid #EBF4FF;font-size:11px;">${g.Responsable||''}</td></tr>`).join('');
+
+  let filasC = compras.map(c => {
+    const t = (Number(c.Cantidad_Ingresada)||0) * (Number(c.Costo_Unitario)||0);
+    return `<tr><td style="padding:6px 8px;border-bottom:1px solid #EBF4FF;font-size:11px;">${c.ID_Compra||''}</td><td style="padding:6px 8px;border-bottom:1px solid #EBF4FF;font-size:11px;">${c.Fecha||''}</td><td style="padding:6px 8px;border-bottom:1px solid #EBF4FF;font-size:11px;">${c.ID_Producto||''}</td><td style="padding:6px 8px;border-bottom:1px solid #EBF4FF;font-size:11px;">${c.Proveedor||''}</td><td style="padding:6px 8px;border-bottom:1px solid #EBF4FF;font-size:11px;text-align:center;">${c.Cantidad_Ingresada||0}</td><td style="padding:6px 8px;border-bottom:1px solid #EBF4FF;font-size:11px;text-align:right;font-weight:700;color:#2E6DB4;">S/${t.toFixed(2)}</td></tr>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Egresos — CellCom</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',sans-serif;padding:24px;color:#1A1A2E;font-size:12px}.h{display:flex;justify-content:space-between;margin-bottom:18px;padding-bottom:12px;border-bottom:3px solid #4A90D9}.h h1{font-size:20px;font-weight:900;color:#2E6DB4}.h p{font-size:11px;color:#718096}.k{display:flex;gap:10px;margin-bottom:16px}.ki{flex:1;border-radius:10px;padding:10px;text-align:center}.ki-v{font-size:18px;font-weight:900}.ki-l{font-size:9px;color:#718096;font-weight:600;text-transform:uppercase}.sec{font-size:14px;font-weight:800;margin:18px 0 10px;padding-bottom:6px;border-bottom:2px solid #EBF4FF}table{width:100%;border-collapse:collapse}thead{background:linear-gradient(135deg,#EBF4FF,#D4E9FF)}th{padding:8px;font-size:9px;font-weight:800;color:#2E6DB4;text-transform:uppercase;text-align:left}.ft{text-align:center;margin-top:18px;padding-top:12px;border-top:2px solid #EBF4FF;font-size:10px;color:#A0AEC0}.np{text-align:center;margin-top:16px}.bp{padding:10px 28px;background:linear-gradient(135deg,#4A90D9,#2E6DB4);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}@media print{.np{display:none}}</style></head><body>
+<div class="h"><div><h1>💰 Reporte de Egresos</h1><p>CellCom Tecnology · ${fecha}</p></div><div style="text-align:right;font-size:11px;color:#718096;"><strong style="color:#1A1A2E;">${fecha}</strong><br>${hora}<br>${GST.usuario?.nombre||''}</div></div>
+<div class="k"><div class="ki" style="background:#FFF5F5;"><div class="ki-v" style="color:#C53030;">S/${totalG.toFixed(2)}</div><div class="ki-l">💸 Gastos</div></div><div class="ki" style="background:#EBF4FF;"><div class="ki-v" style="color:#2E6DB4;">S/${totalC.toFixed(2)}</div><div class="ki-l">📦 Compras</div></div><div class="ki" style="background:#FAF5FF;"><div class="ki-v" style="color:#6B46C1;">S/${totalA.toFixed(2)}</div><div class="ki-l">📣 Ads</div></div></div>
+<div class="sec">💸 Gastos Operativos (${gastos.length})</div><table><thead><tr><th>ID</th><th>Fecha</th><th>Concepto</th><th style="text-align:right;">Monto</th><th>Responsable</th></tr></thead><tbody>${filasG||'<tr><td colspan="5" style="text-align:center;padding:16px;">Sin datos</td></tr>'}</tbody></table>
+<div class="sec">📦 Compras de Mercadería (${compras.length})</div><table><thead><tr><th>ID</th><th>Fecha</th><th>Producto</th><th>Proveedor</th><th style="text-align:center;">Cant</th><th style="text-align:right;">Total</th></tr></thead><tbody>${filasC||'<tr><td colspan="6" style="text-align:center;padding:16px;">Sin datos</td></tr>'}</tbody></table>
+<div class="ft"><p>CellCom Tecnology POS v1.0.0 — ${fecha}</p></div><div class="np"><button class="bp" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button></div></body></html>`;
+
+  const w = window.open('','_blank','width=900,height=700,scrollbars=yes');
+  if (w) { w.document.write(html); w.document.close(); w.focus(); toast('📄 PDF generado','success'); }
+  else toast('⚠️ Permite ventanas emergentes','warning');
+}
+
+// ════════════════════════════════════════════════════════════════
+// PAGINACIÓN REUTILIZABLE
+// ════════════════════════════════════════════════════════════════
+
+function renderPag(elId, total, actual, callback) {
+  const pags = Math.ceil(total / GST.porPagina);
+  const el   = document.getElementById(elId);
+  if (pags <= 1) { el.innerHTML = ''; return; }
+
+  const ini = (actual-1)*GST.porPagina+1;
+  const fin = Math.min(actual*GST.porPagina, total);
+  let btns = `<button class="pag-btn" onclick="void(0)" ${actual===1?'disabled':''}>←</button>`;
+  let s = Math.max(1,actual-2), e = Math.min(pags,s+4);
+  if (e-s<4) s = Math.max(1,e-4);
+  for (let i=s;i<=e;i++) btns += `<button class="pag-btn ${i===actual?'active':''}" onclick="void(0)">${i}</button>`;
+  btns += `<button class="pag-btn" onclick="void(0)" ${actual===pags?'disabled':''}>→</button>`;
+  el.innerHTML = `<span class="pag-info">${ini}-${fin} de ${total}</span><div class="pag-btns">${btns}</div>`;
+
+  el.querySelectorAll('.pag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = btn.textContent.trim();
+      if (t === '←') callback(actual-1);
+      else if (t === '→') callback(actual+1);
+      else callback(parseInt(t));
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// API
+// ════════════════════════════════════════════════════════════════
+
+async function apiGet(action, params={}) {
+  const qs = new URLSearchParams({action, token:GST.token, ...params});
+  const r = await fetch(`${APP_CONFIG.API_URL}?${qs}`, {method:'GET',redirect:'follow'});
+  const ct = r.headers.get('content-type')||'';
+  return ct.includes('json') ? await r.json() : JSON.parse(await r.text());
+}
+
+async function apiPost(action, data={}) {
+  const r = await fetch(APP_CONFIG.API_URL, {
+    method:'POST', redirect:'follow',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action,data,token:GST.token})
+  });
+  const ct = r.headers.get('content-type')||'';
+  return ct.includes('json') ? await r.json() : JSON.parse(await r.text());
+}
+
+// ════════════════════════════════════════════════════════════════
+// UTILIDADES
+// ════════════════════════════════════════════════════════════════
+
+function norm(t) { return String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
+function setEl(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
+function fmtK(n) { n=Number(n)||0; if(Math.abs(n)>=10000) return `S/${(n/1000).toFixed(1)}k`; if(Math.abs(n)>=1000) return `S/${(n/1000).toFixed(2)}k`; return `S/${n.toFixed(0)}`; }
+
+function esMes(fechaStr, mesAnio) {
+  try {
+    const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const [m,y] = mesAnio.split('-');
+    const mN = MESES.indexOf(m);
+    if (mN === -1) return false;
+    const s = String(fechaStr||'').split(' ')[0];
+    const p = s.split('/');
+    if (p.length !== 3) return false;
+    return parseInt(p[1])-1 === mN && parseInt(p[2]) === parseInt(y);
+  } catch(e) { return false; }
+}
+
+function volverAlPOS() { window.location.href = '/cellcomtecnology/pos.html'; }
+
+function toggleTema() {
+  const a = document.documentElement.getAttribute('data-theme') || 'light';
+  const n = a === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', n);
+  localStorage.setItem(APP_CONFIG.STORAGE.TEMA, n);
+}
+
+function cerrarSesion() {
+  Swal.fire({
+    title:'🚪 ¿Cerrar sesión?', text:'Se cerrará tu sesión',
+    icon:'question', showCancelButton:true,
+    confirmButtonText:'Sí, cerrar', cancelButtonText:'Cancelar', confirmButtonColor:'#C53030'
+  }).then(r => { if (r.isConfirmed) AUTH.cerrarSesion(); });
+}
+
+function toast(msg,tipo='info',dur=3000) {
+  const bg = {
+    success:'linear-gradient(135deg,#276749,#48BB78)',
+    error:'linear-gradient(135deg,#C53030,#FC8181)',
+    warning:'linear-gradient(135deg,#C05621,#F6AD55)',
+    info:'linear-gradient(135deg,#1A4F8A,#4A90D9)'
+  };
+  if (typeof Toastify === 'function') {
+    Toastify({
+      text:msg, duration:dur, gravity:'bottom', position:'center',
+      style:{background:bg[tipo]||bg.info, borderRadius:'14px',
+        fontFamily:"'Inter',sans-serif", fontSize:'13px',
+        fontWeight:'600', padding:'12px 20px',
+        boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
+        border:'1px solid rgba(255,255,255,0.15)'}
+    }).showToast();
+  } else console.log(`[${tipo}] ${msg}`);
+}
+</script>
+</body>
+</html>
+
