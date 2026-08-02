@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <meta name="theme-color" content="#4A90D9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>CellCom Tecnology — Dashboard & Reportes</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/cellcomtecnology/css/styles.css">
+
+  <style>
+    html,body{height:100%;overflow:hidden}
+    @media(max-width:1024px){html,body{overflow:auto;overflow-x:hidden;height:auto;min-height:100vh}}
+
+    .rpt-layout{display:flex;flex-direction:column;height:100vh;background:var(--fondo);overflow:hidden}
+    @media(max-width:1024px){.rpt-layout{height:auto;min-height:100vh;overflow:visible}}
+
+    .rpt-header{background:linear-gradient(135deg,#0F2044 0%,#1A3A6B 40%,#2E6DB4 100%);padding:0 20px;height:64px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 24px rgba(0,0,0,0.18);flex-shrink:0;z-index:100;position:relative}
+    .rpt-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent)}
+
+    .rpt-back{width:40px;height:40px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:12px;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
+    .rpt-back:hover{background:rgba(255,255,255,0.22);transform:scale(1.05)}
+
+    .rpt-header-title{flex:1;min-width:0}
+    .rpt-header-title h1{font-size:17px;font-weight:800;color:#fff}
+    .rpt-header-title p{font-size:11px;color:rgba(255,255,255,0.55);margin-top:1px}
+
+    .rpt-hdr-btn{height:36px;padding:0 14px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;white-space:nowrap;flex-shrink:0}
+    .rpt-hdr-btn:hover{background:rgba(255,255,255,0.2);transform:translateY(-1px)}
+    .rpt-hdr-btn:active{transform:scale(0.97)}
+
+    .rpt-content{flex:1;overflow-y:auto;padding:16px 18px;scrollbar-width:thin;scrollbar-color:var(--borde) transparent}
+    .rpt-content::-webkit-scrollbar{width:4px}
+    .rpt-content::-webkit-scrollbar-thumb{background:var(--borde);border-radius:4px}
+    @media(max-width:1024px){.rpt-content{overflow:visible}}
+
+    /* Tabs */
+    .rpt-tabs{display:flex;gap:4px;background:var(--fondo-card);border:1.5px solid var(--borde);border-radius:16px;padding:4px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none}
+    .rpt-tabs::-webkit-scrollbar{display:none}
+    .rpt-tab{flex:1;padding:10px 14px;border:none;border-radius:12px;background:transparent;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--texto-mid);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;user-select:none}
+    .rpt-tab:hover{color:#4A90D9;background:var(--azul-glass)}
+    .rpt-tab.active{background:linear-gradient(135deg,#4A90D9,#2E6DB4);color:#fff;box-shadow:0 4px 14px rgba(74,144,217,0.3);font-weight:700}
+
+    .rpt-panel{display:none;animation:fadeUp 0.3s ease both}
+    .rpt-panel.active{display:block}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+    /* KPI grid */
+    .rpt-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px}
+
+    .rpt-kpi{background:var(--fondo-card);border-radius:16px;border:1.5px solid var(--borde);padding:16px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(74,144,217,0.06);transition:all 0.25s;animation:fadeUp 0.35s ease both;cursor:default;position:relative;overflow:hidden}
+    .rpt-kpi:hover{border-color:var(--borde-hover);transform:translateY(-3px);box-shadow:0 8px 24px rgba(74,144,217,0.13)}
+    .rpt-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:opacity 0.25s}
+    .rpt-kpi:hover::before{opacity:1}
+    .rpt-kpi.azul::before{background:linear-gradient(90deg,#2E6DB4,#7BB3E8)}
+    .rpt-kpi.verde::before{background:linear-gradient(90deg,#276749,#68D391)}
+    .rpt-kpi.rojo::before{background:linear-gradient(90deg,#C53030,#FCA5A5)}
+    .rpt-kpi.naranja::before{background:linear-gradient(90deg,#C05621,#FCD38B)}
+    .rpt-kpi.morado::before{background:linear-gradient(90deg,#6B46C1,#B794F4)}
+    .rpt-kpi.cyan::before{background:linear-gradient(90deg,#2C7A7B,#4FD1C5)}
+
+    .rpt-kpi-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+    .rpt-kpi-icon.azul{background:#EBF4FF}
+    .rpt-kpi-icon.verde{background:#F0FFF4}
+    .rpt-kpi-icon.rojo{background:#FFF5F5}
+    .rpt-kpi-icon.naranja{background:#FFFAF0}
+    .rpt-kpi-icon.morado{background:#FAF5FF}
+    .rpt-kpi-icon.cyan{background:#E6FFFA}
+
+    .rpt-kpi-info{flex:1;min-width:0}
+    .rpt-kpi-valor{font-size:22px;font-weight:900;color:var(--texto-dark);letter-spacing:-0.5px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .rpt-kpi-label{font-size:10px;color:var(--texto-light);font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:0.4px}
+    .rpt-kpi-compare{font-size:10px;font-weight:700;margin-top:3px;display:flex;align-items:center;gap:3px}
+    .rpt-kpi-compare.up{color:#276749}
+    .rpt-kpi-compare.down{color:#C53030}
+
+    /* Charts */
+    .rpt-chart-card{background:var(--fondo-card);border-radius:16px;border:1.5px solid var(--borde);padding:18px;box-shadow:0 4px 14px rgba(74,144,217,0.06);margin-bottom:14px}
+    .rpt-chart-title{font-size:14px;font-weight:800;color:var(--texto-dark);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+    .rpt-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+    .rpt-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+    @media(max-width:768px){.rpt-grid-2,.rpt-grid-3{grid-template-columns:1fr}}
+
+    /* Ranking */
+    .rpt-ranking{display:flex;flex-direction:column;gap:6px}
+    .rpt-rank-item{background:var(--fondo-card);border-radius:12px;border:1.5px solid var(--borde);padding:12px 14px;display:flex;align-items:center;gap:10px;transition:all 0.2s;animation:fadeUp 0.3s ease both}
+    .rpt-rank-item:hover{border-color:#7BB3E8;transform:translateX(3px)}
+    .rpt-rank-pos{font-size:20px;font-weight:900;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .rpt-rank-pos.gold{background:#FFFAF0;color:#C05621}
+    .rpt-rank-pos.silver{background:#EBF4FF;color:#2E6DB4}
+    .rpt-rank-pos.bronze{background:#F0FFF4;color:#276749}
+    .rpt-rank-pos.normal{background:var(--gris-100);color:var(--gris-500);font-size:14px}
+    .rpt-rank-info{flex:1;min-width:0}
+    .rpt-rank-nombre{font-size:13px;font-weight:700;color:var(--texto-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .rpt-rank-meta{font-size:10px;color:var(--texto-light);margin-top:2px}
+    .rpt-rank-valor{font-size:15px;font-weight:900;color:#2E6DB4;flex-shrink:0}
+
+    /* Alertas */
+    .rpt-alerta{padding:10px 14px;border-radius:12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:10px;margin-bottom:6px;border:1.5px solid}
+    .rpt-alerta.alta{background:#FFF5F5;border-color:rgba(252,129,129,0.4);color:#C53030}
+    .rpt-alerta.media{background:#FFFAF0;border-color:rgba(246,173,85,0.4);color:#C05621}
+    .rpt-alerta.baja{background:#EBF4FF;border-color:rgba(74,144,217,0.3);color:#2E6DB4}
+
+    /* Toolbar */
+    .rpt-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+    .rpt-select{padding:8px 14px;border:1.5px solid var(--borde);border-radius:10px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--texto-dark);background:var(--fondo-card);cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;min-width:130px}
+    .rpt-select:focus{border-color:#4A90D9}
+    .rpt-toolbar-btn{padding:8px 18px;background:linear-gradient(135deg,#4A90D9,#2E6DB4);color:#fff;border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;box-shadow:0 3px 10px rgba(74,144,217,0.3)}
+    .rpt-toolbar-btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(74,144,217,0.4)}
+
+    /* Resumen card */
+    .rpt-resumen-card{background:var(--fondo-card);border-radius:16px;border:1.5px solid var(--borde);padding:16px;text-align:center;transition:all 0.2s;animation:fadeUp 0.35s ease both}
+    .rpt-resumen-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(74,144,217,0.12)}
+    .rpt-resumen-icon{font-size:26px;margin-bottom:6px}
+    .rpt-resumen-valor{font-size:22px;font-weight:900;color:var(--texto-dark);letter-spacing:-0.5px}
+    .rpt-resumen-label{font-size:10px;font-weight:600;color:var(--texto-light);margin-top:4px;text-transform:uppercase}
+
+    .rpt-estado-badge{display:inline-block;padding:8px 20px;border-radius:12px;font-size:15px;font-weight:800;margin:14px 0}
+    .rpt-estado-badge.rentable{background:#F0FFF4;color:#276749}
+    .rpt-estado-badge.perdida{background:#FFF5F5;color:#C53030}
+    .rpt-estado-badge.equilibrio{background:#EBF4FF;color:#2E6DB4}
+
+    /* Evolución anual */
+    .rpt-mes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+    .rpt-mes-card{background:var(--fondo-card);border-radius:12px;border:1.5px solid var(--borde);padding:10px;text-align:center;transition:all 0.2s;cursor:pointer;animation:fadeUp 0.3s ease both}
+    .rpt-mes-card:hover{border-color:#7BB3E8;transform:translateY(-2px)}
+    .rpt-mes-nombre{font-size:11px;font-weight:700;color:var(--texto-mid);text-transform:uppercase;letter-spacing:0.3px}
+    .rpt-mes-monto{font-size:16px;font-weight:900;color:#2E6DB4;margin-top:4px}
+    .rpt-mes-ventas{font-size:10px;color:var(--texto-light);margin-top:2px}
+
+    /* Spinner/Empty */
+    .rpt-spinner{text-align:center;padding:60px 20px}
+    .rpt-spinner-ring{width:44px;height:44px;border:4px solid rgba(74,144,217,0.2);border-top-color:#4A90D9;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .rpt-empty{text-align:center;padding:50px 20px}
+    .rpt-empty-icon{font-size:50px;margin-bottom:12px;opacity:0.5;display:block}
+
+    /* Footer */
+    .rpt-footer{padding:8px 18px;border-top:2px solid var(--borde);display:flex;gap:8px;flex-shrink:0;background:var(--fondo-card)}
+    .rpt-footer-btn{flex:1;padding:9px;border-radius:10px;border:1.5px solid var(--borde);background:var(--fondo);font-family:'Inter',sans-serif;font-size:11px;font-weight:700;color:var(--texto-mid);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.15s}
+    .rpt-footer-btn:hover{border-color:#4A90D9;color:#4A90D9;background:#EBF4FF;transform:translateY(-1px)}
+    .rpt-footer-btn.danger:hover{border-color:#FC8181;color:#C53030;background:#FFF5F5}
+
+    @media(max-width:768px){.rpt-header .rpt-hdr-btn .hide-mob{display:none}.rpt-kpi-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:480px){.rpt-kpi-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+
+<body>
+<div class="rpt-layout">
+
+  <header class="rpt-header">
+    <button class="rpt-back" onclick="volverAlPOS()">←</button>
+    <div class="rpt-header-title">
+      <h1>📈 Dashboard — Reportes</h1>
+      <p id="rptSubtitulo">Panel de administración</p>
+    </div>
+    <button class="rpt-hdr-btn" onclick="recargar()">🔄 <span class="hide-mob">Actualizar</span></button>
+    <button class="rpt-hdr-btn" onclick="exportarDashboard()">📄 <span class="hide-mob">Exportar</span></button>
+    <button class="rpt-hdr-btn" onclick="toggleTema()">🌙</button>
+  </header>
+
+  <div class="rpt-content" id="rptContent">
+    <div class="rpt-spinner" id="rptSpinner">
+      <div class="rpt-spinner-ring"></div>
+      <div style="font-size:14px;font-weight:600;color:var(--texto-mid);">Generando dashboard...</div>
+    </div>
+
+    <div id="rptMain" style="display:none;">
+
+      <div class="rpt-tabs">
+        <button class="rpt-tab active" id="tabHoy" onclick="cambiarTab('hoy')">☀️ Hoy</button>
+        <button class="rpt-tab" id="tabMes" onclick="cambiarTab('mes')">🗓️ Mes Actual</button>
+        <button class="rpt-tab" id="tabReporte" onclick="cambiarTab('reporte')">📊 Reporte Período</button>
+        <button class="rpt-tab" id="tabAnual" onclick="cambiarTab('anual')">📅 Evolución Anual</button>
+        <button class="rpt-tab" id="tabRentabilidad" onclick="cambiarTab('rentabilidad')">💎 Rentabilidad</button>
+        <button class="rpt-tab" id="tabDemanda" onclick="cambiarTab('demanda')">📝 Demanda</button>
+      </div>
+
+      <!-- ═══ Panel Hoy ══════════════════════ -->
+      <div class="rpt-panel active" id="panelHoy">
+        <div id="alertasHoy"></div>
+        <div class="rpt-kpi-grid" id="kpisHoy"></div>
+        <div class="rpt-grid-2">
+          <div class="rpt-chart-card"><div class="rpt-chart-title">📈 Tendencia 7 días</div><canvas id="chartTendencia" height="220"></canvas></div>
+          <div class="rpt-chart-card"><div class="rpt-chart-title">💳 Ventas por método</div><canvas id="chartMetodos" height="220"></canvas></div>
+        </div>
+        <div class="rpt-grid-2">
+          <div class="rpt-chart-card"><div class="rpt-chart-title">🏆 Top 5 Productos Hoy</div><div id="topProductosHoy"></div></div>
+          <div class="rpt-chart-card"><div class="rpt-chart-title">👥 Top 5 Clientes Hoy</div><div id="topClientesHoy"></div></div>
+        </div>
+        <div class="rpt-grid-2">
+          <div class="rpt-chart-card"><div class="rpt-chart-title">🧑‍💼 Ventas por vendedor</div><div id="vendedoresHoy"></div></div>
+          <div class="rpt-chart-card"><div class="rpt-chart-title">📦 Alertas de inventario</div><div id="alertasInvHoy"></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ Panel Mes ═════════════════════ -->
+      <div class="rpt-panel" id="panelMes">
+        <div class="rpt-kpi-grid" id="kpisMes"></div>
+        <div class="rpt-grid-2">
+          <div class="rpt-chart-card"><div class="rpt-chart-title">📊 Ventas del mes por día</div><canvas id="chartVentasMes" height="220"></canvas></div>
+          <div class="rpt-chart-card"><div class="rpt-chart-title">💳 Métodos de pago del mes</div><canvas id="chartMetodosMes" height="220"></canvas></div>
+        </div>
+        <div class="rpt-grid-2">
+          <div class="rpt-chart-card"><div class="rpt-chart-title">🏆 Top 10 Productos del mes</div><div id="topProductosMes"></div></div>
+          <div class="rpt-chart-card"><div class="rpt-chart-title">👥 Top 10 Clientes del mes</div><div id="topClientesMes"></div></div>
+        </div>
+        <div class="rpt-grid-2">
+          <div class="rpt-chart-card"><div class="rpt-chart-title">🧑‍💼 Vendedores del mes</div><div id="vendedoresMes"></div></div>
+          <div class="rpt-chart-card"><div class="rpt-chart-title">📂 Ventas por categoría</div><canvas id="chartCategorias" height="220"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ═══ Panel Reporte ══════════════════ -->
+      <div class="rpt-panel" id="panelReporte">
+        <div class="rpt-toolbar">
+          <select class="rpt-select" id="tipoReporte">
+            <option value="hoy">☀️ Hoy</option>
+            <option value="semana">📅 Esta semana</option>
+            <option value="mes" selected>🗓️ Este mes</option>
+            <option value="rango">📆 Rango personalizado</option>
+          </select>
+          <input type="text" class="rpt-select" id="fechaDesde" placeholder="Desde dd/mm/aaaa" style="display:none">
+          <input type="text" class="rpt-select" id="fechaHasta" placeholder="Hasta dd/mm/aaaa" style="display:none">
+          <button class="rpt-toolbar-btn" onclick="generarReporte()">📊 Generar reporte</button>
+        </div>
+        <div id="reporteContenido"></div>
+      </div>
+
+      <!-- ═══ Panel Anual ════════════════════ -->
+      <div class="rpt-panel" id="panelAnual">
+        <div class="rpt-toolbar">
+          <select class="rpt-select" id="anioSelect"></select>
+          <button class="rpt-toolbar-btn" onclick="cargarAnual()">📅 Ver evolución</button>
+        </div>
+        <div id="anualContenido"></div>
+      </div>
+
+      <!-- ═══ Panel Rentabilidad ═════════════ -->
+      <div class="rpt-panel" id="panelRentabilidad">
+        <div class="rpt-toolbar">
+          <select class="rpt-select" id="mesRentabilidad"></select>
+          <button class="rpt-toolbar-btn" onclick="cargarRentabilidad()">💎 Analizar</button>
+        </div>
+        <div id="rentabilidadContenido"></div>
+      </div>
+
+      <!-- ═══ Panel Demanda ══════════════════ -->
+      <div class="rpt-panel" id="panelDemanda">
+        <div id="demandaContenido"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="rpt-footer">
+    <button class="rpt-footer-btn" onclick="volverAlPOS()">🛒 POS</button>
+    <button class="rpt-footer-btn" onclick="window.location.href='/cellcomtecnology/inventario.html'">📦 Inventario</button>
+    <button class="rpt-footer-btn" onclick="window.location.href='/cellcomtecnology/gastos.html'">💰 Gastos</button>
+    <button class="rpt-footer-btn" onclick="window.location.href='/cellcomtecnology/tesoreria.html'">🏦 Tesorería</button>
+    <button class="rpt-footer-btn danger" onclick="cerrarSesion()">🚪 Salir</button>
+  </div>
+</div>
+
+<script src="/cellcomtecnology/js/config.js"></script>
+<script src="/cellcomtecnology/js/api.js"></script>
+<script src="/cellcomtecnology/js/auth.js"></script>
+
+<script>
+'use strict';
+
+const RPT={dashboard:null,tabActiva:'hoy',charts:{},token:'',usuario:null};
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  RPT.token=localStorage.getItem(APP_CONFIG.STORAGE.TOKEN)||'';
+  const u=localStorage.getItem(APP_CONFIG.STORAGE.USUARIO)||'';
+  if(!RPT.token||!u){window.location.href='/cellcomtecnology/login.html';return;}
+  RPT.usuario=JSON.parse(u);
+  if(RPT.usuario.rol!=='Admin'){window.location.href='/cellcomtecnology/pos.html';return;}
+
+  document.documentElement.setAttribute('data-theme',localStorage.getItem(APP_CONFIG.STORAGE.TEMA)||'light');
+  generarSelects();
+  document.getElementById('tipoReporte').addEventListener('change',function(){
+    const r=this.value==='rango';
+    document.getElementById('fechaDesde').style.display=r?'block':'none';
+    document.getElementById('fechaHasta').style.display=r?'block':'none';
+  });
+
+  await cargarDashboard();
+  toast('✅ Dashboard cargado','success',2000);
+});
+
+function generarSelects(){
+  const M=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const n=new Date();
+  let ops='';for(let i=0;i<12;i++){let m=n.getMonth()-i,y=n.getFullYear();if(m<0){m+=12;y--}ops+=`<option value="${M[m]}-${y}" ${i===0?'selected':''}>${M[m]}-${y}</option>`;}
+  const el=document.getElementById('mesRentabilidad');if(el)el.innerHTML=ops;
+
+  let opsA='';for(let y=n.getFullYear();y>=n.getFullYear()-3;y--)opsA+=`<option value="${y}">${y}</option>`;
+  const elA=document.getElementById('anioSelect');if(elA)elA.innerHTML=opsA;
+}
+
+// ═══════════════════════════════════════
+// CARGA PRINCIPAL
+// ═══════════════════════════════════════
+
+async function cargarDashboard(){
+  mostrarSpinner(true);
+  try{
+    const r=await apiGet('getDashboardAdmin',{});
+    if(r.success&&r.data){RPT.dashboard=r.data;renderizarHoy();renderizarMes();}
+    else toast('❌ Error cargando dashboard','error');
+  }catch(e){toast(`❌ ${e.message}`,'error');}
+  mostrarSpinner(false);
+  setEl('rptSubtitulo',`${RPT.usuario?.nombre||''} · ${new Date().toLocaleDateString('es-PE')}`);
+}
+
+async function recargar(){await cargarDashboard();toast('🔄 Actualizado','success',2000);}
+function mostrarSpinner(s){document.getElementById('rptSpinner').style.display=s?'block':'none';document.getElementById('rptMain').style.display=s?'none':'block';}
+
+// ═══════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════
+
+function cambiarTab(tab){
+  RPT.tabActiva=tab;
+  ['tabHoy','tabMes','tabReporte','tabAnual','tabRentabilidad','tabDemanda'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  ['panelHoy','panelMes','panelReporte','panelAnual','panelRentabilidad','panelDemanda'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  document.getElementById(`tab${cap(tab)}`)?.classList.add('active');
+  document.getElementById(`panel${cap(tab)}`)?.classList.add('active');
+  if(tab==='demanda')cargarDemanda();
+}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+// ═══════════════════════════════════════
+// HOY
+// ═══════════════════════════════════════
+
+function renderizarHoy(){
+  const d=RPT.dashboard;if(!d)return;
+  const h=d.hoy||{};
+  const comp=d.comparativa||{};
+
+  // KPIs
+  document.getElementById('kpisHoy').innerHTML=`
+    <div class="rpt-kpi azul" style="animation-delay:0ms"><div class="rpt-kpi-icon azul">💰</div><div class="rpt-kpi-info"><div class="rpt-kpi-valor">${h.montoFormateado||'S/0'}</div><div class="rpt-kpi-label">Ventas hoy</div></div></div>
+    <div class="rpt-kpi verde" style="animation-delay:50ms"><div class="rpt-kpi-icon verde">📈</div><div class="rpt-kpi-info"><div class="rpt-kpi-valor">${h.gananciaFormateada||'S/0'}</div><div class="rpt-kpi-label">Ganancia hoy</div></div></div>
+    <div class="rpt-kpi naranja" style="animation-delay:100ms"><div class="rpt-kpi-icon naranja">🛒</div><div class="rpt-kpi-info"><div class="rpt-kpi-valor">${h.ventasCompletadas||0}</div><div class="rpt-kpi-label">Transacciones</div></div></div>
+    <div class="rpt-kpi cyan" style="animation-delay:150ms"><div class="rpt-kpi-icon cyan">🎯</div><div class="rpt-kpi-info"><div class="rpt-kpi-valor">${h.ticketFormato||'S/0'}</div><div class="rpt-kpi-label">Ticket promedio</div></div></div>
+    <div class="rpt-kpi rojo" style="animation-delay:200ms"><div class="rpt-kpi-icon rojo">💸</div><div class="rpt-kpi-info"><div class="rpt-kpi-valor">${h.gastosFormato||'S/0'}</div><div class="rpt-kpi-label">Gastos hoy</div></div></div>
+    <div class="rpt-kpi morado" style="animation-delay:250ms"><div class="rpt-kpi-icon morado">💎</div><div class="rpt-kpi-info"><div class="rpt-kpi-valor">${h.gananciaNetaFormato||'S/0'}</div><div class="rpt-kpi-label">Ganancia neta</div><div class="rpt-kpi-compare ${h.esRentable?'up':'down'}">${h.esRentable?'📈':'📉'} ${h.margenNeto||'0%'}</div></div></div>`;
+
+  // Alertas
+  const alertas=d.alertas||[];
+  document.getElementById('alertasHoy').innerHTML=alertas.map(a=>{
+    const cls=a.prioridad==='ALTA'?'alta':a.prioridad==='MEDIA'?'media':'baja';
+    return`<div class="rpt-alerta ${cls}">${a.icono||'⚠️'} <span style="flex:1">${a.mensaje}</span></div>`;
+  }).join('');
+
+  // Charts
+  renderizarChartTendencia(d.tendencia7dias||[]);
+  renderizarChartMetodos(d.analisisPago||[]);
+  renderizarRanking('topProductosHoy',d.topProductos||[],'cantidad','und.');
+  renderizarRanking('topClientesHoy',d.topClientes||[],'montoFormato','');
+  renderizarVendedores('vendedoresHoy',d.analisisVendedor||[]);
+  renderizarAlertasInv(d.inventario||{});
+}
+
+function renderizarChartTendencia(data){
+  destroyChart('chartTendencia');
+  const ctx=document.getElementById('chartTendencia');if(!ctx||!data.length)return;
+  RPT.charts.chartTendencia=new Chart(ctx,{
+    type:'line',
+    data:{labels:data.map(d=>d.fecha?.split('/').slice(0,2).join('/')),datasets:[{label:'Ventas',data:data.map(d=>d.monto||0),borderColor:'#4A90D9',backgroundColor:'rgba(74,144,217,0.1)',fill:true,tension:0.4,borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#4A90D9'},{label:'Transacciones',data:data.map(d=>d.ventas||0),borderColor:'#48BB78',backgroundColor:'rgba(72,187,120,0.1)',fill:false,tension:0.4,borderWidth:2,pointRadius:3,yAxisID:'y1'}]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},scales:{y:{beginAtZero:true,ticks:{font:{family:"'Inter'",size:10},callback:v=>`S/${v}`}},y1:{display:false}},plugins:{legend:{labels:{font:{family:"'Inter'",size:11,weight:'600'},usePointStyle:true,padding:12}}}}
+  });
+}
+
+function renderizarChartMetodos(data){
+  destroyChart('chartMetodos');
+  const ctx=document.getElementById('chartMetodos');if(!ctx||!data.length)return;
+  const colors={Efectivo:'rgba(72,187,120,0.8)',Yape:'rgba(107,33,168,0.8)',Plin:'rgba(14,165,233,0.8)',Tarjeta:'rgba(26,26,46,0.7)',BCP:'rgba(30,58,95,0.8)'};
+  RPT.charts.chartMetodos=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:data.map(d=>d.metodo),datasets:[{data:data.map(d=>d.total||0),backgroundColor:data.map(d=>colors[d.metodo]||'rgba(160,174,192,0.8)'),borderWidth:0,hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{family:"'Inter'",size:11,weight:'600'},padding:12,usePointStyle:true}}}}
+  });
+}
+
+function renderizarRanking(elId,data,campoValor,sufijo){
+  const el=document.getElementById(elId);if(!el)return;
+  if(!data.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--texto-light);font-size:13px;">Sin datos</div>';return;}
+  el.innerHTML=`<div class="rpt-ranking">${data.map((item,i)=>{
+    const posCls=i===0?'gold':i===1?'silver':i===2?'bronze':'normal';
+    const val=item[campoValor]!==undefined?item[campoValor]:'—';
+    return`<div class="rpt-rank-item" style="animation-delay:${i*40}ms"><div class="rpt-rank-pos ${posCls}">${item.medalla||'#'+(i+1)}</div><div class="rpt-rank-info"><div class="rpt-rank-nombre">${item.nombre||'—'}</div><div class="rpt-rank-meta">${item.vecesVendido||item.compras||''} ${item.vecesVendido?'veces':'compras'}</div></div><div class="rpt-rank-valor">${typeof val==='number'?val+' '+sufijo:val}</div></div>`;
+  }).join('')}</div>`;
+}
+
+function renderizarVendedores(elId,data){
+  const el=document.getElementById(elId);if(!el)return;
+  if(!data.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--texto-light);">Sin datos</div>';return;}
+  el.innerHTML=data.map((v,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--borde);${i===data.length-1?'border:none':''}">
+      <div><div style="font-size:13px;font-weight:700;color:var(--texto-dark);">${v.vendedor}</div><div style="font-size:10px;color:var(--texto-light);">${v.ventas} venta${v.ventas!==1?'s':''} · Ticket: ${v.ticketPromedio||'—'}</div></div>
+      <div style="text-align:right;"><div style="font-size:15px;font-weight:900;color:#2E6DB4;">${v.montoFormato||'S/0'}</div><div style="font-size:10px;color:#276749;font-weight:700;">${v.gananciaFormato||'S/0'}</div></div>
+    </div>`).join('');
+}
+
+function renderizarAlertasInv(inv){
+  const el=document.getElementById('alertasInvHoy');if(!el)return;
+  const sinStock=inv.sinStock||[];const critico=inv.critico||[];const bajo=inv.bajo||[];
+  const total=(sinStock.length||0)+(critico.length||0)+(bajo.length||0);
+
+  if(!total){el.innerHTML='<div style="text-align:center;padding:20px;color:#276749;font-size:14px;font-weight:700;">✅ Todo el inventario en orden</div>';return;}
+
+  let html='';
+  if(sinStock.length) html+=`<div class="rpt-alerta alta">⛔ ${sinStock.length} producto${sinStock.length!==1?'s':''} sin stock: ${sinStock.slice(0,3).map(p=>p.Nombre).join(', ')}${sinStock.length>3?'...':''}</div>`;
+  if(critico.length) html+=`<div class="rpt-alerta media">🔴 ${critico.length} en stock crítico: ${critico.slice(0,3).map(p=>p.Nombre+' ('+p.Stock_Disponible+')').join(', ')}</div>`;
+  if(bajo.length) html+=`<div class="rpt-alerta baja">🟡 ${bajo.length} con stock bajo</div>`;
+  el.innerHTML=html;
+}
+
+// ═══════════════════════════════════════
+// MES ACTUAL
+// ═══════════════════════════════════════
+
+function renderizarMes(){
+  const d=RPT.dashboard;if(!d)return;
+  const m=d.mes||{};const comp=d.comparativa||{};
+
+  document.getElementById('kpisMes').innerHTML=`
+    <div class="rpt-kpi azul" style="animation-delay:0ms"><div class="rpt-kpi-icon azul">💰</div><div class="rpt-kpi-info"><div class="rpt-kpi-valor">${m.montoFormateado||'S/0'}</div><div class="rpt-kpi-label">Ventas ${m.nombre||''}</div>${comp.crecimientoMonto?`<div class="rpt-kpi-compare ${Number(comp.crecimientoMonto)>=0?'up':'down'}">${Number(comp.crecimientoMonto)>=0?'📈':'📉'} ${comp.crecimientoMonto}% vs mes ant.</div>`:''}</div></div>
+    <div class="rpt-kpi verde" style="animation-delay:50ms"><div class="rpt-kpi-icon verde">📈</div><div class="rpt-kpi-info"><div class="rpt-kpi-valor">${m.gananciaFormateada||'S/0'}</div><div class="rpt-kpi-label">Ganancia bruta</div><div class="rpt-kpi-compare up">${m.margenBruto||'0%'} margen</div></div></div>
+    <div class="rpt-kpi rojo" style="animation-delay:100ms"><div class="rpt-kpi-icon rojo">💸</div><div class="rpt-kpi-info"><div class="rpt-kpi-valor">${m.gastosFormato||'S/0'}</div><div class="rpt-kpi-label">Gastos operativos</div></div></div>
+    <div class="rpt-kpi morado" style="animation-delay:150ms"><div class="rpt-kpi-icon morado">📣</div><div class="rpt-kpi-info"><div class="rpt-kpi-valor">${m.adsFormato||'S/0'}</div><div class="rpt-kpi-label">Inversión Ads</div></div></div>
+    <div class="rpt-kpi ${m.esRentable?'verde':'rojo'}" style="animation-delay:200ms"><div class="rpt-kpi-icon ${m.esRentable?'verde':'rojo'}">${m.esRentable?'💎':'📉'}</div><div class="rpt-kpi-info"><div class="rpt-kpi-valor">${m.gananciaNetaFormato||'S/0'}</div><div class="rpt-kpi-label">Ganancia neta</div><div class="rpt-kpi-compare ${m.esRentable?'up':'down'}">${m.margenNeto||'0%'} margen neto</div></div></div>`;
+
+  // Charts del mes
+  renderizarChartVentasDia(d.tendencia7dias||[]);
+  renderizarChartMetodosMes(d.analisisPago||[]);
+  renderizarRanking('topProductosMes',d.topProductos||[],'cantidad','und.');
+  renderizarRanking('topClientesMes',d.topClientes||[],'montoFormato','');
+  renderizarVendedores('vendedoresMes',d.analisisVendedor||[]);
+  renderizarChartCategorias();
+}
+
+function renderizarChartVentasDia(data){
+  destroyChart('chartVentasMes');
+  const ctx=document.getElementById('chartVentasMes');if(!ctx||!data.length)return;
+  RPT.charts.chartVentasMes=new Chart(ctx,{
+    type:'bar',
+    data:{labels:data.map(d=>d.fecha?.split('/').slice(0,2).join('/')),datasets:[{label:'Monto',data:data.map(d=>d.monto||0),backgroundColor:'rgba(74,144,217,0.7)',borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{font:{size:10},callback:v=>`S/${v}`}}},plugins:{legend:{display:false}}}
+  });
+}
+
+function renderizarChartMetodosMes(data){
+  destroyChart('chartMetodosMes');
+  const ctx=document.getElementById('chartMetodosMes');if(!ctx||!data.length)return;
+  const colors={Efectivo:'rgba(72,187,120,0.8)',Yape:'rgba(107,33,168,0.8)',Plin:'rgba(14,165,233,0.8)',Tarjeta:'rgba(26,26,46,0.7)',BCP:'rgba(30,58,95,0.8)'};
+  RPT.charts.chartMetodosMes=new Chart(ctx,{type:'doughnut',data:{labels:data.map(d=>d.metodo),datasets:[{data:data.map(d=>d.total||0),backgroundColor:data.map(d=>colors[d.metodo]||'rgba(160,174,192,0.8)'),borderWidth:0,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{family:"'Inter'",size:11,weight:'600'},padding:12,usePointStyle:true}}}}});
+}
+
+function renderizarChartCategorias(){
+  destroyChart('chartCategorias');
+  const ctx=document.getElementById('chartCategorias');if(!ctx)return;
+  // Datos de categorías no vienen directamente del dashboard, usamos analisisPago como placeholder
+  const d=RPT.dashboard;if(!d)return;
+  // Si tuviéramos analisisCategoria lo usaríamos aquí
+}
+
+// ═══════════════════════════════════════
+// REPORTE POR PERÍODO
+// ═══════════════════════════════════════
+
+async function generarReporte(){
+  const tipo=document.getElementById('tipoReporte')?.value||'mes';
+  const cont=document.getElementById('reporteContenido');
+  cont.innerHTML='<div class="rpt-spinner"><div class="rpt-spinner-ring"></div><div style="font-size:13px;color:var(--texto-mid)">Generando reporte...</div></div>';
+
+  const params={tipo};
+  if(tipo==='rango'){
+    params.fechaDesde=document.getElementById('fechaDesde')?.value||'';
+    params.fechaHasta=document.getElementById('fechaHasta')?.value||'';
+    if(!params.fechaDesde||!params.fechaHasta){toast('📅 Ingresa ambas fechas','warning');return;}
+  }
+
+  try{
+    const r=await apiGet('getReportePeriodo',params);
+    if(!r.success||!r.data){cont.innerHTML='<div class="rpt-empty"><span class="rpt-empty-icon">📊</span><div>Sin datos</div></div>';return;}
+
+    const d=r.data;const fin=d.financiero||{};const res=d.resumen||{};
+    const estadoCls=fin.esRentable?'rentable':fin.gananciaNeta===0?'equilibrio':'perdida';
+
+    cont.innerHTML=`
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:18px;font-weight:900;color:var(--texto-dark);">${d.titulo||'Reporte'}</div>
+        <div class="rpt-estado-badge ${estadoCls}">${fin.esRentable?'✅ Rentable':'🔴 En pérdida'} — Neta: ${fin.gananciaNetaFormato||'S/0'}</div>
+      </div>
+
+      <div class="rpt-kpi-grid">
+        <div class="rpt-resumen-card" style="animation-delay:0ms"><div class="rpt-resumen-icon">🛒</div><div class="rpt-resumen-valor">${res.completadas||0}</div><div class="rpt-resumen-label">Ventas completadas</div></div>
+        <div class="rpt-resumen-card" style="animation-delay:50ms"><div class="rpt-resumen-icon">💰</div><div class="rpt-resumen-valor" style="color:#2E6DB4">${fin.montoFormateado||'S/0'}</div><div class="rpt-resumen-label">Monto total</div></div>
+        <div class="rpt-resumen-card" style="animation-delay:100ms"><div class="rpt-resumen-icon">📈</div><div class="rpt-resumen-valor" style="color:#276749">${fin.gananciaFormateada||'S/0'}</div><div class="rpt-resumen-label">Ganancia bruta · ${fin.margenBruto||'0%'}</div></div>
+        <div class="rpt-resumen-card" style="animation-delay:150ms"><div class="rpt-resumen-icon">💸</div><div class="rpt-resumen-valor" style="color:#C53030">${fin.gastosFormato||'S/0'}</div><div class="rpt-resumen-label">Gastos operativos</div></div>
+        <div class="rpt-resumen-card" style="animation-delay:200ms"><div class="rpt-resumen-icon">📣</div><div class="rpt-resumen-valor" style="color:#6B46C1">${fin.adsFormato||'S/0'}</div><div class="rpt-resumen-label">Inversión Ads</div></div>
+        <div class="rpt-resumen-card" style="animation-delay:250ms"><div class="rpt-resumen-icon">💎</div><div class="rpt-resumen-valor" style="color:${fin.esRentable?'#276749':'#C53030'}">${fin.gananciaNetaFormato||'S/0'}</div><div class="rpt-resumen-label">Ganancia neta · ${fin.margenNeto||'0%'}</div></div>
+      </div>
+
+      ${d.topProductos?.length?`<div class="rpt-chart-card"><div class="rpt-chart-title">🏆 Top Productos</div><div class="rpt-ranking">${d.topProductos.map((p,i)=>{const pc=i===0?'gold':i===1?'silver':i===2?'bronze':'normal';return`<div class="rpt-rank-item" style="animation-delay:${i*30}ms"><div class="rpt-rank-pos ${pc}">${p.medalla||'#'+(i+1)}</div><div class="rpt-rank-info"><div class="rpt-rank-nombre">${p.nombre}</div><div class="rpt-rank-meta">${p.cantidad} und. · ${p.vecesVendido} ventas</div></div><div class="rpt-rank-valor">${p.ingresosFormato||'S/0'}</div></div>`;}).join('')}</div></div>`:''}
+
+      ${res.separadas?`<div class="rpt-alerta media">🕐 ${res.separadas} separado${res.separadas!==1?'s':''} — Saldo pendiente: ${res.saldosPendFormato||'S/0'}</div>`:''}
+      ${res.proformas?`<div class="rpt-alerta baja">📋 ${res.proformas} proforma${res.proformas!==1?'s':''}</div>`:''}
+    `;
+  }catch(e){cont.innerHTML=`<div class="rpt-empty"><span class="rpt-empty-icon">❌</span><div>${e.message}</div></div>`;}
+}
+
+// ═══════════════════════════════════════
+// ANUAL
+// ═══════════════════════════════════════
+
+async function cargarAnual(){
+  const anio=document.getElementById('anioSelect')?.value||new Date().getFullYear();
+  const cont=document.getElementById('anualContenido');
+  cont.innerHTML='<div class="rpt-spinner"><div class="rpt-spinner-ring"></div><div style="font-size:13px;color:var(--texto-mid)">Cargando año ${anio}...</div></div>';
+
+  try{
+    const r=await apiGet('getReporteAnual',{anio});
+    if(!r.success||!r.data){cont.innerHTML='<div class="rpt-empty"><span class="rpt-empty-icon">📅</span><div>Sin datos</div></div>';return;}
+
+    const d=r.data;const res=d.resumenAnio||{};const evol=d.evolucionMensual||[];
+
+    cont.innerHTML=`
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:20px;font-weight:900;color:var(--texto-dark);">📅 Año ${d.anio}</div>
+      </div>
+
+      <div class="rpt-kpi-grid">
+        <div class="rpt-resumen-card"><div class="rpt-resumen-icon">🛒</div><div class="rpt-resumen-valor">${res.totalVentas||0}</div><div class="rpt-resumen-label">Ventas totales</div></div>
+        <div class="rpt-resumen-card"><div class="rpt-resumen-icon">💰</div><div class="rpt-resumen-valor" style="color:#2E6DB4">${res.montoFormato||'S/0'}</div><div class="rpt-resumen-label">Facturado</div></div>
+        <div class="rpt-resumen-card"><div class="rpt-resumen-icon">📈</div><div class="rpt-resumen-valor" style="color:#276749">${res.gananciaFormato||'S/0'}</div><div class="rpt-resumen-label">Ganancia total</div></div>
+        <div class="rpt-resumen-card"><div class="rpt-resumen-icon">⭐</div><div class="rpt-resumen-valor" style="color:#C05621">${res.mejorMes||'—'}</div><div class="rpt-resumen-label">Mejor mes · ${res.mejorMesMonto||''}</div></div>
+      </div>
+
+      <div class="rpt-chart-card" style="margin-top:14px;">
+        <div class="rpt-chart-title">📊 Evolución Mensual ${d.anio}</div>
+        <canvas id="chartAnual" height="260"></canvas>
+      </div>
+
+      <div style="margin-top:14px;">
+        <div style="font-size:14px;font-weight:800;color:var(--texto-dark);margin-bottom:10px;">📅 Detalle por Mes</div>
+        <div class="rpt-mes-grid">${evol.map((m,i)=>`
+          <div class="rpt-mes-card" style="animation-delay:${i*30}ms">
+            <div class="rpt-mes-nombre">${m.mes}</div>
+            <div class="rpt-mes-monto">${m.montoFormato||'S/0'}</div>
+            <div class="rpt-mes-ventas">${m.totalVentas} ventas</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    `;
+
+    // Chart anual
+    destroyChart('chartAnual');
+    const ctx=document.getElementById('chartAnual');
+    if(ctx&&evol.length){
+      RPT.charts.chartAnual=new Chart(ctx,{
+        type:'bar',
+        data:{labels:evol.map(m=>m.mes?.substring(0,3)),datasets:[
+          {label:'Ventas',data:evol.map(m=>m.montoTotal||0),backgroundColor:'rgba(74,144,217,0.7)',borderRadius:6},
+          {label:'Ganancia',data:evol.map(m=>m.gananciaTotal||0),backgroundColor:'rgba(72,187,120,0.7)',borderRadius:6}
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{font:{size:10},callback:v=>`S/${(v/1000).toFixed(0)}k`}}},plugins:{legend:{labels:{font:{family:"'Inter'",size:11,weight:'600'},usePointStyle:true,padding:12}}}}
+      });
+    }
+  }catch(e){cont.innerHTML=`<div class="rpt-empty"><span class="rpt-empty-icon">❌</span><div>${e.message}</div></div>`;}
+}
+
+// ═══════════════════════════════════════
+// RENTABILIDAD
+// ═══════════════════════════════════════
+
+async function cargarRentabilidad(){
+  const mes=document.getElementById('mesRentabilidad')?.value||'';
+  const cont=document.getElementById('rentabilidadContenido');
+  cont.innerHTML='<div class="rpt-spinner"><div class="rpt-spinner-ring"></div><div style="font-size:13px;color:var(--texto-mid)">Analizando rentabilidad...</div></div>';
+
+  try{
+    const r=await apiGet('getReporteRentabilidad',mes?{mes}:{});
+    if(!r.success||!r.data){cont.innerHTML='<div class="rpt-empty"><span class="rpt-empty-icon">💎</span><div>Sin datos</div></div>';return;}
+
+    const d=r.data;const res=d.resumen||{};const ranking=d.ranking||[];
+
+    cont.innerHTML=`
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:18px;font-weight:900;color:var(--texto-dark);">💎 Rentabilidad — ${d.mes||''}</div>
+        <div class="rpt-estado-badge ${res.gananciaTotal>=0?'rentable':'perdida'}">
+          Ganancia total: ${res.gananciaFormato||'S/0'} · ${res.productosRentables||0} rentables · ${res.productosPerdida||0} con pérdida
+        </div>
+      </div>
+
+      ${res.alertas?.length?`<div style="margin-bottom:14px;">${res.alertas.map(a=>`<div class="rpt-alerta alta">📉 ${a.nombre}: pérdida de ${a.perdida}</div>`).join('')}</div>`:''}
+
+      <div class="rpt-chart-card">
+        <div class="rpt-chart-title">📊 Ranking de Rentabilidad por Producto</div>
+        <div class="rpt-ranking">${ranking.slice(0,15).map((p,i)=>{
+          const color=p.gananciaTotal>=0?'#276749':'#C53030';
+          return`<div class="rpt-rank-item" style="animation-delay:${i*25}ms">
+            <div style="width:38px;height:38px;border-radius:10px;background:${p.gananciaTotal>=0?'#F0FFF4':'#FFF5F5'};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:${color};flex-shrink:0">#${i+1}</div>
+            <div class="rpt-rank-info"><div class="rpt-rank-nombre">${p.nombre||'—'}</div><div class="rpt-rank-meta">${p.cantidadVendida} und. · ${p.vecesVendido} ventas · Margen: ${p.margenPorcentaje}%</div></div>
+            <div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:900;color:${color}">S/${Math.abs(p.gananciaTotal||0).toFixed(2)}</div><div style="font-size:10px;color:var(--texto-light)">${p.alerta}</div></div>
+          </div>`;
+        }).join('')}</div>
+      </div>
+    `;
+  }catch(e){cont.innerHTML=`<div class="rpt-empty"><span class="rpt-empty-icon">❌</span><div>${e.message}</div></div>`;}
+}
+
+// ═══════════════════════════════════════
+// DEMANDA (VENTAS PERDIDAS)
+// ═══════════════════════════════════════
+
+async function cargarDemanda(){
+  const cont=document.getElementById('demandaContenido');
+  cont.innerHTML='<div class="rpt-spinner"><div class="rpt-spinner-ring"></div><div style="font-size:13px;color:var(--texto-mid)">Analizando demanda...</div></div>';
+
+  try{
+    const r=await apiGet('getReporteVentasPerdidas',{});
+    if(!r.success||!r.data){cont.innerHTML='<div class="rpt-empty"><span class="rpt-empty-icon">📝</span><div>Sin ventas perdidas registradas</div></div>';return;}
+
+    const d=r.data;const ranking=d.rankingDemanda||[];const res=d.resumen||{};
+
+    cont.innerHTML=`
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:18px;font-weight:900;color:var(--texto-dark);">📝 Análisis de Demanda Insatisfecha</div>
+        <div style="font-size:13px;color:var(--texto-light);margin-top:4px;">${res.totalRegistros||0} registros · ${res.productosUnicos||0} productos únicos</div>
+      </div>
+
+      ${res.productosPrioritarios?`<div class="rpt-alerta media">⭐ ${res.productosPrioritarios} producto${res.productosPrioritarios!==1?'s':''} prioritario${res.productosPrioritarios!==1?'s':''} para agregar al inventario</div>`:''}
+
+      <div class="rpt-chart-card">
+        <div class="rpt-chart-title">📊 Productos más solicitados</div>
+        <div class="rpt-ranking">${ranking.map((p,i)=>`
+          <div class="rpt-rank-item" style="animation-delay:${i*30}ms">
+            <div style="width:38px;height:38px;border-radius:10px;background:${p.prioridad?.includes('Alta')?'#FFF5F5':p.prioridad?.includes('Media')?'#FFFAF0':'#EBF4FF'};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0">#${p.posicion||i+1}</div>
+            <div class="rpt-rank-info">
+              <div class="rpt-rank-nombre">${p.producto||'—'}</div>
+              <div class="rpt-rank-meta">${p.vecessolicitado} vez${p.vecessolicitado!==1?'es':''} · ${p.cantidadTotal} und. total</div>
+              <div style="font-size:10px;margin-top:2px;">${p.recomendacion||''}</div>
+            </div>
+            <div style="flex-shrink:0;font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;${p.prioridad?.includes('Alta')?'background:#FFF5F5;color:#C53030':p.prioridad?.includes('Media')?'background:#FFFAF0;color:#C05621':'background:#EBF4FF;color:#2E6DB4'}">${p.prioridad||''}</div>
+          </div>
+        `).join('')}</div>
+      </div>
+    `;
+  }catch(e){cont.innerHTML=`<div class="rpt-empty"><span class="rpt-empty-icon">❌</span><div>${e.message}</div></div>`;}
+}
+
+// ═══════════════════════════════════════
+// EXPORTAR
+// ═══════════════════════════════════════
+
+function exportarDashboard(){
+  const d=RPT.dashboard;if(!d){toast('⚠️ Carga el dashboard primero','warning');return;}
+  const fecha=new Date().toLocaleDateString('es-PE');
+  const hora=new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'});
+  const h=d.hoy||{};const m=d.mes||{};
+
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Dashboard — CellCom</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',sans-serif;padding:24px;color:#1A1A2E;font-size:12px}.hd{display:flex;justify-content:space-between;margin-bottom:18px;padding-bottom:12px;border-bottom:3px solid #4A90D9}.hd h1{font-size:20px;font-weight:900;color:#2E6DB4}.hd p{font-size:11px;color:#718096}.kpis{display:flex;gap:10px;margin-bottom:16px}.kp{flex:1;border-radius:10px;padding:10px;text-align:center;border:1.5px solid}.kp-v{font-size:18px;font-weight:900}.kp-l{font-size:9px;color:#718096;font-weight:600;text-transform:uppercase;margin-top:3px}.sec{font-size:14px;font-weight:800;margin:16px 0 8px;padding-bottom:6px;border-bottom:2px solid #EBF4FF}.ft{text-align:center;margin-top:18px;padding-top:12px;border-top:2px solid #EBF4FF;font-size:10px;color:#A0AEC0}.np{text-align:center;margin-top:16px}.bp{padding:10px 28px;background:linear-gradient(135deg,#4A90D9,#2E6DB4);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}@media print{.np{display:none}}</style></head><body>
+<div class="hd"><div><h1>📈 Dashboard — CellCom Tecnology</h1><p>Reporte generado el ${fecha} a las ${hora}</p></div><div style="text-align:right;font-size:11px;color:#718096;"><strong style="color:#1A1A2E;">${fecha}</strong><br>${hora}<br>${RPT.usuario?.nombre||''}</div></div>
+<div class="sec">☀️ Resumen del Día</div>
+<div class="kpis"><div class="kp" style="background:#EBF4FF;border-color:#D4E9FF"><div class="kp-v" style="color:#2E6DB4">${h.montoFormateado||'S/0'}</div><div class="kp-l">Ventas hoy</div></div><div class="kp" style="background:#F0FFF4;border-color:#C6F6D5"><div class="kp-v" style="color:#276749">${h.gananciaFormateada||'S/0'}</div><div class="kp-l">Ganancia</div></div><div class="kp" style="background:#FFF5F5;border-color:#FED7D7"><div class="kp-v" style="color:#C53030">${h.gastosFormato||'S/0'}</div><div class="kp-l">Gastos</div></div><div class="kp" style="background:#FAF5FF;border-color:#E9D8FD"><div class="kp-v" style="color:#6B46C1">${h.gananciaNetaFormato||'S/0'}</div><div class="kp-l">Neta</div></div></div>
+<div class="sec">🗓️ Resumen del Mes — ${m.nombre||''}</div>
+<div class="kpis"><div class="kp" style="background:#EBF4FF;border-color:#D4E9FF"><div class="kp-v" style="color:#2E6DB4">${m.montoFormateado||'S/0'}</div><div class="kp-l">Ventas mes</div></div><div class="kp" style="background:#F0FFF4;border-color:#C6F6D5"><div class="kp-v" style="color:#276749">${m.gananciaFormateada||'S/0'}</div><div class="kp-l">Ganancia bruta</div></div><div class="kp" style="background:#FFF5F5;border-color:#FED7D7"><div class="kp-v" style="color:#C53030">${m.gastosFormato||'S/0'}</div><div class="kp-l">Gastos</div></div><div class="kp" style="background:${m.esRentable?'#F0FFF4':'#FFF5F5'};border-color:${m.esRentable?'#C6F6D5':'#FED7D7'}"><div class="kp-v" style="color:${m.esRentable?'#276749':'#C53030'}">${m.gananciaNetaFormato||'S/0'}</div><div class="kp-l">Neta · ${m.margenNeto||'0%'}</div></div></div>
+<div class="ft"><p>CellCom Tecnology POS v1.0.0 — ${fecha}</p></div><div class="np"><button class="bp" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button></div></body></html>`;
+
+  const w=window.open('','_blank','width=900,height=700,scrollbars=yes');
+  if(w){w.document.write(html);w.document.close();w.focus();toast('📄 PDF generado','success');}
+  else toast('⚠️ Permite ventanas emergentes','warning');
+}
+
+// ═══════════════════════════════════════
+// UTILIDADES
+// ═══════════════════════════════════════
+
+function destroyChart(id){if(RPT.charts[id]){RPT.charts[id].destroy();delete RPT.charts[id];}}
+function setEl(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
+function fmtK(n){n=Number(n)||0;if(Math.abs(n)>=10000)return`S/${(n/1000).toFixed(1)}k`;if(Math.abs(n)>=1000)return`S/${(n/1000).toFixed(2)}k`;return`S/${n.toFixed(0)}`;}
+function volverAlPOS(){window.location.href='/cellcomtecnology/pos.html';}
+function toggleTema(){const a=document.documentElement.getAttribute('data-theme')||'light';const n=a==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem(APP_CONFIG.STORAGE.TEMA,n);}
+function cerrarSesion(){Swal.fire({title:'🚪 ¿Cerrar sesión?',text:'Se cerrará tu sesión',icon:'question',showCancelButton:true,confirmButtonText:'Sí, cerrar',cancelButtonText:'Cancelar',confirmButtonColor:'#C53030'}).then(r=>{if(r.isConfirmed)AUTH.cerrarSesion();});}
+
+async function apiGet(action,params={}){const qs=new URLSearchParams({action,token:RPT.token,...params});const r=await fetch(`${APP_CONFIG.API_URL}?${qs}`,{method:'GET',redirect:'follow'});const ct=r.headers.get('content-type')||'';return ct.includes('json')?await r.json():JSON.parse(await r.text());}
+
+function toast(msg,tipo='info',dur=3000){const bg={success:'linear-gradient(135deg,#276749,#48BB78)',error:'linear-gradient(135deg,#C53030,#FC8181)',warning:'linear-gradient(135deg,#C05621,#F6AD55)',info:'linear-gradient(135deg,#1A4F8A,#4A90D9)'};if(typeof Toastify==='function'){Toastify({text:msg,duration:dur,gravity:'bottom',position:'center',style:{background:bg[tipo]||bg.info,borderRadius:'14px',fontFamily:"'Inter',sans-serif",fontSize:'13px',fontWeight:'600',padding:'12px 20px',boxShadow:'0 8px 32px rgba(0,0,0,0.25)',border:'1px solid rgba(255,255,255,0.15)'}}).showToast();}else console.log(`[${tipo}] ${msg}`);}
+</script>
+</body>
+</html>
