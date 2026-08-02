@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <meta name="theme-color" content="#4A90D9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>CellCom Tecnology — Clientes CRM</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/cellcomtecnology/css/styles.css">
+
+  <style>
+    /* ══════════════════════════════════════════════════════════
+       CLIENTES CRM — ESTILOS PREMIUM COMPLETOS
+    ══════════════════════════════════════════════════════════ */
+
+    html, body { height: 100%; overflow: hidden; }
+
+    @media (max-width: 1024px) {
+      html, body { overflow: auto; overflow-x: hidden; height: auto; min-height: 100vh; }
+    }
+
+    /* ── Layout ───────────────────────────────────────── */
+    .cli-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: var(--fondo);
+      overflow: hidden;
+    }
+
+    @media (max-width: 1024px) {
+      .cli-layout { height: auto; min-height: 100vh; overflow: visible; }
+    }
+
+    /* ── Header ───────────────────────────────────────── */
+    .cli-header {
+      background: linear-gradient(135deg, #0F2044 0%, #1A3A6B 40%, #2E6DB4 100%);
+      padding: 0 20px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+      flex-shrink: 0;
+      z-index: 100;
+      position: relative;
+    }
+
+    .cli-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    }
+
+    .cli-back {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .cli-back:hover { background: rgba(255,255,255,0.22); transform: scale(1.05); }
+
+    .cli-header-title { flex: 1; min-width: 0; }
+    .cli-header-title h1 { font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+    .cli-header-title p { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 1px; }
+
+    .cli-hdr-btn {
+      height: 36px; padding: 0 14px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .cli-hdr-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-1px); }
+    .cli-hdr-btn:active { transform: scale(0.97); }
+
+    .cli-hdr-btn.verde {
+      background: rgba(72,187,120,0.22);
+      border-color: rgba(72,187,120,0.4);
+    }
+    .cli-hdr-btn.verde:hover { background: rgba(72,187,120,0.35); }
+
+    .cli-hdr-btn.morado {
+      background: rgba(159,122,234,0.22);
+      border-color: rgba(159,122,234,0.4);
+    }
+
+    /* ── KPIs ─────────────────────────────────────────── */
+    .cli-kpis {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      border-bottom: 2px solid var(--borde);
+      flex-shrink: 0;
+      background: var(--fondo-card);
+    }
+
+    .cli-kpi {
+      padding: 12px 8px;
+      text-align: center;
+      border-right: 1px solid var(--borde);
+      transition: all 0.2s;
+      cursor: default;
+    }
+
+    .cli-kpi:last-child { border-right: none; }
+    .cli-kpi:hover { background: var(--azul-soft); }
+
+    .cli-kpi-icon { font-size: 16px; margin-bottom: 2px; }
+
+    .cli-kpi-valor {
+      font-size: 18px; font-weight: 900;
+      color: var(--texto-dark);
+      letter-spacing: -0.5px; line-height: 1;
+    }
+
+    .cli-kpi-label {
+      font-size: 9px; font-weight: 600;
+      color: var(--texto-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 3px;
+    }
+
+    .cli-kpi-valor.azul   { color: #2E6DB4; }
+    .cli-kpi-valor.verde  { color: #276749; }
+    .cli-kpi-valor.naranja{ color: #C05621; }
+    .cli-kpi-valor.morado { color: #6B46C1; }
+
+    @media (max-width: 768px) {
+      .cli-kpis { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .cli-kpis { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ── Toolbar ──────────────────────────────────────── */
+    .cli-toolbar {
+      padding: 10px 18px;
+      background: var(--fondo-card);
+      border-bottom: 1.5px solid var(--borde);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .cli-search-wrap {
+      flex: 1; min-width: 200px;
+      position: relative;
+    }
+
+    .cli-search-icon {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px; pointer-events: none;
+      color: var(--texto-muted);
+    }
+
+    .cli-search {
+      width: 100%;
+      padding: 9px 14px 9px 40px;
+      border: 1.5px solid var(--borde);
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 500;
+      color: var(--texto-dark);
+      background: var(--fondo);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .cli-search:focus {
+      border-color: #4A90D9;
+      box-shadow: 0 0 0 3px rgba(74,144,217,0.1);
+      background: var(--fondo-card);
+    }
+
+    .cli-search::placeholder { color: var(--texto-muted); }
+
+    .cli-select {
+      padding: 9px 14px;
+      border: 1.5px solid var(--borde);
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 600;
+      color: var(--texto-dark);
+      background: var(--fondo-card);
+      cursor: pointer; outline: none;
+      transition: all 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+      min-width: 140px;
+    }
+
+    .cli-select:focus { border-color: #4A90D9; }
+
+    /* ── Contenido ────────────────────────────────────── */
+    .cli-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 18px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--borde) transparent;
+    }
+
+    .cli-content::-webkit-scrollbar { width: 4px; }
+    .cli-content::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 4px; }
+
+    @media (max-width: 1024px) { .cli-content { overflow: visible; } }
+
+    /* ── Tabs ─────────────────────────────────────────── */
+    .cli-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--fondo-card);
+      border: 1.5px solid var(--borde);
+      border-radius: 16px;
+      padding: 4px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .cli-tabs::-webkit-scrollbar { display: none; }
+
+    .cli-tab {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px; font-weight: 600;
+      color: var(--texto-mid);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .cli-tab:hover { color: #4A90D9; background: var(--azul-glass); }
+
+    .cli-tab.active {
+      background: linear-gradient(135deg, #4A90D9, #2E6DB4);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(74,144,217,0.3);
+      font-weight: 700;
+    }
+
+    .tab-count {
+      padding: 1px 7px;
+      border-radius: 50px;
+      font-size: 10px; font-weight: 800;
+      background: rgba(255,255,255,0.25);
+    }
+
+    .cli-tab:not(.active) .tab-count {
+      background: var(--azul-soft);
+      color: #4A90D9;
+    }
+
+    /* ── Panel ────────────────────────────────────────── */
+    .cli-panel { display: none; animation: fadeUp 0.3s ease both; }
+    .cli-panel.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Resultados ───────────────────────────────────── */
+    .cli-results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cli-results-text {
+      font-size: 13px; color: var(--texto-mid); font-weight: 600;
+    }
+
+    .cli-results-text strong { color: #4A90D9; }
+
+    /* ── Grid de clientes ─────────────────────────────── */
+    .cli-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .cli-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Tarjeta de cliente ────────────────────────────── */
+    .cli-card {
+      background: var(--fondo-card);
+      border-radius: 16px;
+      border: 1.5px solid var(--borde);
+      overflow: hidden;
+      transition: all 0.25s;
+      animation: fadeUp 0.35s ease both;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .cli-card:hover {
+      border-color: #7BB3E8;
+      box-shadow: 0 8px 28px rgba(74,144,217,0.13);
+      transform: translateY(-3px);
+    }
+
+    .cli-card-top {
+      height: 4px;
+      background: linear-gradient(90deg, #4A90D9, #7BB3E8);
+    }
+
+    .cli-card-body { padding: 14px; }
+
+    .cli-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .cli-avatar {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .cli-avatar.azul   { background: linear-gradient(135deg, #4A90D9, #2E6DB4); }
+    .cli-avatar.verde  { background: linear-gradient(135deg, #48BB78, #276749); }
+    .cli-avatar.morado { background: linear-gradient(135deg, #9F7AEA, #6B46C1); }
+    .cli-avatar.naranja{ background: linear-gradient(135deg, #F6AD55, #C05621); }
+    .cli-avatar.cyan   { background: linear-gradient(135deg, #38B2AC, #2C7A7B); }
+    .cli-avatar.rosa   { background: linear-gradient(135deg, #F687B3, #B83280); }
+
+    .cli-avatar-badge {
+      position: absolute;
+      bottom: -2px; right: -2px;
+      font-size: 12px;
+      background: var(--fondo-card);
+      border-radius: 50%;
+      width: 20px; height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .cli-nombre {
+      font-size: 15px; font-weight: 800;
+      color: var(--texto-dark);
+      line-height: 1.2;
+    }
+
+    .cli-id {
+      font-size: 10px; font-weight: 600;
+      color: var(--texto-muted);
+      margin-top: 2px;
+    }
+
+    .cli-clasificacion {
+      font-size: 10px; font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 50px;
+      margin-top: 3px;
+      display: inline-block;
+    }
+
+    .clasif-vip       { background: #FFFAF0; color: #C05621; }
+    .clasif-frecuente { background: #F0FFF4; color: #276749; }
+    .clasif-recurrente{ background: #EBF4FF; color: #2E6DB4; }
+    .clasif-primera   { background: #FAF5FF; color: #6B46C1; }
+    .clasif-nuevo     { background: var(--gris-100); color: var(--gris-600); }
+
+    .cli-datos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .cli-dato {
+      font-size: 11px;
+      color: var(--texto-light);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .cli-dato-val { font-weight: 700; color: var(--texto-mid); }
+
+    .cli-stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .cli-stat-box {
+      background: var(--fondo);
+      border-radius: 10px;
+      padding: 8px 6px;
+      text-align: center;
+      border: 1px solid var(--borde);
+    }
+
+    .cli-stat-valor {
+      font-size: 14px; font-weight: 900;
+      color: var(--texto-dark);
+      line-height: 1;
+    }
+
+    .cli-stat-label {
+      font-size: 8px; font-weight: 700;
+      color: var(--texto-light);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-top: 3px;
+    }
+
+    .cli-stat-valor.azul  { color: #2E6DB4; }
+    .cli-stat-valor.verde { color: #276749; }
+
+    .cli-card-acciones {
+      display: flex;
+      gap: 6px;
+    }
+
+    .cli-btn {
+      flex: 1;
+      padding: 8px 6px;
+      border-radius: 10px;
+      border: 1.5px solid var(--borde);
+      background: var(--fondo);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px; font-weight: 700;
+      color: var(--texto-mid);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .cli-btn:hover { border-color: #4A90D9; color: #4A90D9; background: #EBF4FF; transform: translateY(-1px); }
+    .cli-btn:active { transform: scale(0.97); }
+
+    .cli-btn.azul { background: linear-gradient(135deg, #4A90D9, #2E6DB4); color: #fff; border-color: transparent; box-shadow: 0 3px 10px rgba(74,144,217,0.3); }
+    .cli-btn.azul:hover { color: #fff; }
+
+    .cli-btn.verde { background: linear-gradient(135deg, #48BB78, #276749); color: #fff; border-color: transparent; }
+    .cli-btn.verde:hover { color: #fff; }
+
+    .cli-btn.wa { background: linear-gradient(135deg, #25D366, #128C7E); color: #fff; border-color: transparent; }
+    .cli-btn.wa:hover { color: #fff; }
+
+    /* ── Ranking ──────────────────────────────────────── */
+    .ranking-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .ranking-item {
+      background: var(--fondo-card);
+      border-radius: 14px;
+      border: 1.5px solid var(--borde);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.2s;
+      animation: fadeUp 0.3s ease both;
+    }
+
+    .ranking-item:hover {
+      border-color: #7BB3E8;
+      box-shadow: 0 6px 20px rgba(74,144,217,0.1);
+      transform: translateX(4px);
+    }
+
+    .ranking-pos {
+      font-size: 24px; font-weight: 900;
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .ranking-pos.gold   { background: #FFFAF0; color: #C05621; }
+    .ranking-pos.silver { background: #EBF4FF; color: #2E6DB4; }
+    .ranking-pos.bronze { background: #F0FFF4; color: #276749; }
+    .ranking-pos.normal { background: var(--gris-100); color: var(--gris-500); font-size: 16px; }
+
+    .ranking-info { flex: 1; min-width: 0; }
+
+    .ranking-nombre {
+      font-size: 14px; font-weight: 800;
+      color: var(--texto-dark);
+    }
+
+    .ranking-tel {
+      font-size: 11px; color: var(--texto-light);
+      margin-top: 2px;
+    }
+
+    .ranking-stats {
+      display: flex; gap: 16px;
+      text-align: right;
+    }
+
+    .ranking-stat-val {
+      font-size: 16px; font-weight: 900;
+      color: #2E6DB4;
+    }
+
+    .ranking-stat-label {
+      font-size: 9px; font-weight: 600;
+      color: var(--texto-light);
+      text-transform: uppercase;
+    }
+
+    /* ── Estadísticas CRM ─────────────────────────────── */
+    .crm-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .crm-stat-card {
+      background: var(--fondo-card);
+      border-radius: 16px;
+      border: 1.5px solid var(--borde);
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(74,144,217,0.06);
+      transition: all 0.2s;
+      animation: fadeUp 0.35s ease both;
+    }
+
+    .crm-stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(74,144,217,0.12);
+    }
+
+    .crm-stat-icon { font-size: 28px; margin-bottom: 6px; }
+
+    .crm-stat-valor {
+      font-size: 28px; font-weight: 900;
+      color: var(--texto-dark);
+      letter-spacing: -1px;
+    }
+
+    .crm-stat-label {
+      font-size: 11px; font-weight: 600;
+      color: var(--texto-light);
+      margin-top: 4px;
+    }
+
+    /* ── Gráfico ──────────────────────────────────────── */
+    .chart-wrap {
+      background: var(--fondo-card);
+      border-radius: 16px;
+      border: 1.5px solid var(--borde);
+      padding: 18px;
+      box-shadow: 0 4px 14px rgba(74,144,217,0.06);
+    }
+
+    .chart-title {
+      font-size: 14px; font-weight: 800;
+      color: var(--texto-dark);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Empty / Spinner ──────────────────────────────── */
+    .cli-empty {
+      text-align: center; padding: 60px 20px;
+    }
+
+    .cli-empty-icon { font-size: 60px; margin-bottom: 14px; opacity: 0.5; display: block; }
+    .cli-empty-titulo { font-size: 18px; font-weight: 700; color: var(--texto-dark); margin-bottom: 6px; }
+    .cli-empty-sub { font-size: 14px; color: var(--texto-light); line-height: 1.6; }
+
+    .cli-spinner {
+      text-align: center; padding: 60px 20px;
+    }
+
+    .cli-spinner-ring {
+      width: 44px; height: 44px;
+      border: 4px solid rgba(74,144,217,0.2);
+      border-top-color: #4A90D9;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 14px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Paginación ───────────────────────────────────── */
+    .cli-paginacion {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pag-info { font-size: 12px; color: var(--texto-light); font-weight: 500; }
+    .pag-btns { display: flex; gap: 4px; }
+
+    .pag-btn {
+      width: 34px; height: 34px;
+      border: 1.5px solid var(--borde);
+      border-radius: 8px;
+      background: var(--fondo-card);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 600;
+      color: var(--texto-mid);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .pag-btn:hover { border-color: #4A90D9; color: #4A90D9; }
+    .pag-btn.active { background: #4A90D9; color: #fff; border-color: #4A90D9; }
+    .pag-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* ── Footer ───────────────────────────────────────── */
+    .cli-footer {
+      padding: 8px 18px;
+      border-top: 2px solid var(--borde);
+      display: flex; gap: 8px;
+      flex-shrink: 0;
+      background: var(--fondo-card);
+    }
+
+    .cli-footer-btn {
+      flex: 1; padding: 9px;
+      border-radius: 10px;
+      border: 1.5px solid var(--borde);
+      background: var(--fondo);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px; font-weight: 700;
+      color: var(--texto-mid);
+      cursor: pointer;
+      display: flex; align-items: center;
+      justify-content: center; gap: 5px;
+      transition: all 0.15s;
+    }
+
+    .cli-footer-btn:hover { border-color: #4A90D9; color: #4A90D9; background: #EBF4FF; transform: translateY(-1px); }
+    .cli-footer-btn.danger:hover { border-color: #FC8181; color: #C53030; background: #FFF5F5; }
+
+    /* ── Responsive ───────────────────────────────────── */
+    @media (max-width: 768px) {
+      .cli-toolbar { flex-direction: column; align-items: stretch; }
+      .cli-grid { grid-template-columns: 1fr; }
+      .cli-header .cli-hdr-btn .hide-mob { display: none; }
+      .ranking-stats { flex-direction: column; gap: 4px; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="cli-layout">
+
+  <!-- Header -->
+  <header class="cli-header">
+    <button class="cli-back" onclick="volverAlPOS()" title="Volver al POS">←</button>
+    <div class="cli-header-title">
+      <h1>👥 Clientes — CRM</h1>
+      <p id="cliSubtitulo">Cargando clientes...</p>
+    </div>
+    <button class="cli-hdr-btn verde" onclick="modalNuevoCliente()">
+      ➕ <span class="hide-mob">Nuevo cliente</span>
+    </button>
+    <button class="cli-hdr-btn morado" onclick="cambiarTab('ranking')" id="btnRanking">
+      🏆 <span class="hide-mob">Ranking</span>
+    </button>
+    <button class="cli-hdr-btn" onclick="cambiarTab('estadisticas')" id="btnEstadisticas">
+      📊 <span class="hide-mob">Estadísticas</span>
+    </button>
+    <button class="cli-hdr-btn" onclick="recargar()">🔄</button>
+    <button class="cli-hdr-btn" onclick="toggleTema()">🌙</button>
+  </header>
+
+  <!-- KPIs -->
+  <div class="cli-kpis">
+    <div class="cli-kpi">
+      <div class="cli-kpi-icon">👥</div>
+      <div class="cli-kpi-valor azul" id="kpiTotal">0</div>
+      <div class="cli-kpi-label">Total</div>
+    </div>
+    <div class="cli-kpi">
+      <div class="cli-kpi-icon">🛒</div>
+      <div class="cli-kpi-valor verde" id="kpiConCompras">0</div>
+      <div class="cli-kpi-label">Con compras</div>
+    </div>
+    <div class="cli-kpi">
+      <div class="cli-kpi-icon">🆕</div>
+      <div class="cli-kpi-valor naranja" id="kpiNuevosMes">0</div>
+      <div class="cli-kpi-label">Nuevos este mes</div>
+    </div>
+    <div class="cli-kpi">
+      <div class="cli-kpi-icon">🔄</div>
+      <div class="cli-kpi-valor morado" id="kpiTasaRetorno">0%</div>
+      <div class="cli-kpi-label">Tasa retorno</div>
+    </div>
+    <div class="cli-kpi">
+      <div class="cli-kpi-icon">👤</div>
+      <div class="cli-kpi-valor" id="kpiSinCliente">0</div>
+      <div class="cli-kpi-label">Ventas sin reg.</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="cli-toolbar">
+    <div class="cli-search-wrap">
+      <span class="cli-search-icon">🔍</span>
+      <input type="text" class="cli-search" id="inputBusqueda"
+             placeholder="Buscar por nombre, teléfono, ID, DNI..."
+             oninput="filtrar()" autocomplete="off" spellcheck="false">
+    </div>
+    <select class="cli-select" id="selOrden" onchange="filtrar()">
+      <option value="nombre">🔤 Nombre A-Z</option>
+      <option value="nombre_desc">🔤 Nombre Z-A</option>
+      <option value="compras_desc">🛒 Más compras</option>
+      <option value="monto_desc">💰 Mayor monto</option>
+      <option value="reciente">⏰ Última compra</option>
+    </select>
+  </div>
+
+  <!-- Contenido -->
+  <div class="cli-content" id="cliContent">
+
+    <div class="cli-spinner" id="cliSpinner">
+      <div class="cli-spinner-ring"></div>
+      <div style="font-size:14px;font-weight:600;color:var(--texto-mid);">Cargando clientes...</div>
+    </div>
+
+    <div id="cliMain" style="display:none;">
+
+      <!-- Tabs -->
+      <div class="cli-tabs">
+        <button class="cli-tab active" id="tabLista" onclick="cambiarTab('lista')">
+          👥 Lista <span class="tab-count" id="tabListaCount">0</span>
+        </button>
+        <button class="cli-tab" id="tabRanking" onclick="cambiarTab('ranking')">
+          🏆 Ranking Top 10
+        </button>
+        <button class="cli-tab" id="tabEstadisticas" onclick="cambiarTab('estadisticas')">
+          📊 Estadísticas CRM
+        </button>
+      </div>
+
+      <!-- Panel Lista -->
+      <div class="cli-panel active" id="panelLista">
+        <div class="cli-results-bar">
+          <div class="cli-results-text" id="resultsText">Mostrando <strong>0</strong> clientes</div>
+        </div>
+        <div class="cli-grid" id="gridClientes"></div>
+        <div class="cli-paginacion" id="paginacion"></div>
+      </div>
+
+      <!-- Panel Ranking -->
+      <div class="cli-panel" id="panelRanking">
+        <div class="ranking-list" id="rankingList"></div>
+      </div>
+
+      <!-- Panel Estadísticas -->
+      <div class="cli-panel" id="panelEstadisticas">
+        <div class="crm-stats-grid" id="statsGrid"></div>
+        <div class="chart-wrap" id="chartWrap" style="margin-top:16px;">
+          <div class="chart-title">📊 Distribución de Clientes por Compras</div>
+          <canvas id="chartClientes" height="250"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="cli-footer">
+    <button class="cli-footer-btn" onclick="volverAlPOS()">🛒 POS</button>
+    <button class="cli-footer-btn" onclick="exportarClientes()">📄 Exportar PDF</button>
+    <button class="cli-footer-btn danger" onclick="cerrarSesion()">🚪 Salir</button>
+  </div>
+
+</div>
+
+<!-- Scripts -->
+<script src="/cellcomtecnology/js/config.js"></script>
+<script src="/cellcomtecnology/js/api.js"></script>
+<script src="/cellcomtecnology/js/auth.js"></script>
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ════════════════════════════════════════════════════════════════
+
+const CLI = {
+  clientes:       [],
+  filtrados:      [],
+  historiales:    {},
+  tabActiva:      'lista',
+  paginaActual:   1,
+  porPagina:      18,
+  esAdmin:        false,
+  usuario:        null,
+  token:          '',
+  ranking:        [],
+  estadisticas:   null,
+  chartInstance:  null
+};
+
+// ════════════════════════════════════════════════════════════════
+// INICIALIZACIÓN
+// ════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', async () => {
+  CLI.token = localStorage.getItem(APP_CONFIG.STORAGE.TOKEN) || '';
+  const u   = localStorage.getItem(APP_CONFIG.STORAGE.USUARIO) || '';
+  if (!CLI.token || !u) { window.location.href = '/cellcomtecnology/login.html'; return; }
+  CLI.usuario = JSON.parse(u);
+  CLI.esAdmin = CLI.usuario.rol === 'Admin';
+
+  const tema = localStorage.getItem(APP_CONFIG.STORAGE.TEMA) || 'light';
+  document.documentElement.setAttribute('data-theme', tema);
+
+  await cargarClientes();
+  toast('✅ CRM cargado', 'success', 2000);
+});
+
+// ════════════════════════════════════════════════════════════════
+// CARGA DE DATOS
+// ════════════════════════════════════════════════════════════════
+
+async function cargarClientes() {
+  mostrarSpinner(true);
+  try {
+    const r = await apiGet('getClientes', {});
+    if (r.success && r.data) {
+      CLI.clientes = r.data.clientes || [];
+      CLI.filtrados = [...CLI.clientes];
+      setEl('tabListaCount', CLI.clientes.length);
+      filtrar();
+    }
+
+    if (CLI.esAdmin) await cargarEstadisticas();
+
+    actualizarSubtitulo();
+  } catch(e) {
+    toast(`❌ ${e.message}`, 'error');
+  }
+  mostrarSpinner(false);
+}
+
+async function cargarEstadisticas() {
+  try {
+    const r = await apiGet('getEstadisticasClientes', {});
+    if (r.success && r.data) {
+      CLI.estadisticas = r.data;
+      setEl('kpiTotal',       r.data.totalClientes || 0);
+      setEl('kpiConCompras',  r.data.clientesConCompras || 0);
+      setEl('kpiNuevosMes',   r.data.clientesNuevosMes || 0);
+      setEl('kpiTasaRetorno', r.data.tasaRetorno || '0%');
+      setEl('kpiSinCliente',  r.data.ventasSinCliente || 0);
+    }
+  } catch(e) { console.warn('Stats error:', e.message); }
+}
+
+async function recargar() {
+  await cargarClientes();
+  toast('🔄 CRM actualizado', 'success', 2000);
+}
+
+function mostrarSpinner(s) {
+  document.getElementById('cliSpinner').style.display = s ? 'block' : 'none';
+  document.getElementById('cliMain').style.display    = s ? 'none'  : 'block';
+}
+
+function actualizarSubtitulo() {
+  setEl('cliSubtitulo', `${CLI.clientes.length} clientes registrados`);
+}
+
+// ════════════════════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════════════════════
+
+async function cambiarTab(tab) {
+  CLI.tabActiva = tab;
+  ['tabLista','tabRanking','tabEstadisticas'].forEach(id => {
+    document.getElementById(id)?.classList.remove('active');
+  });
+  ['panelLista','panelRanking','panelEstadisticas'].forEach(id => {
+    document.getElementById(id)?.classList.remove('active');
+  });
+
+  if (tab === 'lista') {
+    document.getElementById('tabLista').classList.add('active');
+    document.getElementById('panelLista').classList.add('active');
+  } else if (tab === 'ranking') {
+    document.getElementById('tabRanking').classList.add('active');
+    document.getElementById('panelRanking').classList.add('active');
+    await cargarRanking();
+  } else if (tab === 'estadisticas') {
+    document.getElementById('tabEstadisticas').classList.add('active');
+    document.getElementById('panelEstadisticas').classList.add('active');
+    await renderizarEstadisticas();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// FILTROS
+// ════════════════════════════════════════════════════════════════
+
+function filtrar() {
+  const busq  = (document.getElementById('inputBusqueda')?.value || '').trim();
+  const orden = document.getElementById('selOrden')?.value || 'nombre';
+
+  let r = [...CLI.clientes];
+
+  if (busq) {
+    const t = norm(busq);
+    r = r.filter(c =>
+      norm(c.Nombre).includes(t) ||
+      norm(c.Telefono_WA).includes(t) ||
+      norm(c.ID_Cliente).includes(t) ||
+      norm(c.DNI).includes(t)
+    );
+  }
+
+  r = ordenarClientes(r, orden);
+
+  CLI.filtrados = r;
+  CLI.paginaActual = 1;
+  renderizarGrid();
+  setEl('resultsText', `Mostrando <strong>${r.length}</strong> de <strong>${CLI.clientes.length}</strong> clientes`);
+  document.getElementById('resultsText').innerHTML = `Mostrando <strong>${r.length}</strong> de <strong>${CLI.clientes.length}</strong> clientes`;
+}
+
+function ordenarClientes(arr, tipo) {
+  const c = [...arr];
+  switch(tipo) {
+    case 'nombre':       c.sort((a,b) => (a.Nombre||'').localeCompare(b.Nombre||'')); break;
+    case 'nombre_desc':  c.sort((a,b) => (b.Nombre||'').localeCompare(a.Nombre||'')); break;
+    case 'compras_desc': c.sort((a,b) => (b._compras||0) - (a._compras||0)); break;
+    case 'monto_desc':   c.sort((a,b) => (b._monto||0) - (a._monto||0)); break;
+    case 'reciente':     c.sort((a,b) => (b._ultimaFecha||0) - (a._ultimaFecha||0)); break;
+  }
+  return c;
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDERIZAR GRID
+// ════════════════════════════════════════════════════════════════
+
+function renderizarGrid() {
+  const grid   = document.getElementById('gridClientes');
+  const pagina = getPagina();
+
+  if (pagina.length === 0) {
+    grid.innerHTML = `
+      <div class="cli-empty" style="grid-column:1/-1;">
+        <span class="cli-empty-icon">👥</span>
+        <div class="cli-empty-titulo">Sin clientes encontrados</div>
+        <div class="cli-empty-sub">Ajusta la búsqueda o registra un cliente nuevo</div>
+      </div>`;
+    document.getElementById('paginacion').innerHTML = '';
+    return;
+  }
+
+  const colores  = ['azul','verde','morado','naranja','cyan','rosa'];
+
+  grid.innerHTML = pagina.map((c, i) => {
+    const nombre  = c.Nombre || 'Sin nombre';
+    const inicial = nombre.charAt(0).toUpperCase();
+    const color   = colores[nombre.charCodeAt(0) % colores.length];
+    const tel     = c.Telefono_WA || '';
+    const dni     = c.DNI || '';
+    const id      = c.ID_Cliente || '';
+
+    return `
+      <div class="cli-card" style="animation-delay:${Math.min(i*20,400)}ms"
+           onclick="verHistorial('${id}')">
+        <div class="cli-card-top"></div>
+        <div class="cli-card-body">
+          <div class="cli-card-header">
+            <div class="cli-avatar ${color}">
+              ${inicial}
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div class="cli-nombre">${nombre}</div>
+              <div class="cli-id">${id}</div>
+            </div>
+          </div>
+
+          <div class="cli-datos">
+            <div class="cli-dato">📱 <span class="cli-dato-val">${tel || '—'}</span></div>
+            <div class="cli-dato">🪪 <span class="cli-dato-val">${dni || '—'}</span></div>
+          </div>
+
+          <div class="cli-card-acciones">
+            <button class="cli-btn azul" onclick="event.stopPropagation();verHistorial('${id}')">📋 Historial</button>
+            <button class="cli-btn" onclick="event.stopPropagation();modalEditar('${id}')">✏️ Editar</button>
+            ${tel ? `<button class="cli-btn wa" onclick="event.stopPropagation();abrirWA('${tel}')">📱</button>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  renderizarPaginacion();
+}
+
+function getPagina() {
+  const ini = (CLI.paginaActual - 1) * CLI.porPagina;
+  return CLI.filtrados.slice(ini, ini + CLI.porPagina);
+}
+
+// ════════════════════════════════════════════════════════════════
+// PAGINACIÓN
+// ════════════════════════════════════════════════════════════════
+
+function renderizarPaginacion() {
+  const total = CLI.filtrados.length;
+  const pags  = Math.ceil(total / CLI.porPagina);
+  const el    = document.getElementById('paginacion');
+  if (pags <= 1) { el.innerHTML = ''; return; }
+
+  const ini = (CLI.paginaActual - 1) * CLI.porPagina + 1;
+  const fin = Math.min(CLI.paginaActual * CLI.porPagina, total);
+
+  let btns = `<button class="pag-btn" onclick="irPag(${CLI.paginaActual-1})" ${CLI.paginaActual===1?'disabled':''}>←</button>`;
+  let s = Math.max(1, CLI.paginaActual - 2);
+  let e = Math.min(pags, s + 4);
+  if (e - s < 4) s = Math.max(1, e - 4);
+
+  for (let i = s; i <= e; i++) {
+    btns += `<button class="pag-btn ${i===CLI.paginaActual?'active':''}" onclick="irPag(${i})">${i}</button>`;
+  }
+  btns += `<button class="pag-btn" onclick="irPag(${CLI.paginaActual+1})" ${CLI.paginaActual===pags?'disabled':''}>→</button>`;
+
+  el.innerHTML = `<span class="pag-info">${ini}-${fin} de ${total}</span><div class="pag-btns">${btns}</div>`;
+}
+
+function irPag(n) {
+  const pags = Math.ceil(CLI.filtrados.length / CLI.porPagina);
+  if (n < 1 || n > pags) return;
+  CLI.paginaActual = n;
+  renderizarGrid();
+  document.getElementById('cliContent')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ════════════════════════════════════════════════════════════════
+// VER HISTORIAL DE UN CLIENTE
+// ════════════════════════════════════════════════════════════════
+
+async function verHistorial(id) {
+  toast('⏳ Cargando historial...', 'info', 1500);
+
+  try {
+    const r = await apiGet('getHistorialCliente', { id });
+    if (!r.success || !r.data) { toast('❌ Error cargando historial', 'error'); return; }
+
+    const d = r.data;
+    const est = d.estadisticas || {};
+    const ventas = d.ventas || [];
+    const favs = d.productosFavoritos || [];
+    const seps = d.separadosPendientes || [];
+
+    let histHtml = '';
+    ventas.slice(0, 15).forEach(v => {
+      const total = Number(v.Total_Venta) || 0;
+      histHtml += `
+        <div style="background:var(--fondo);border-radius:10px;padding:10px 12px;margin-bottom:6px;border:1.5px solid var(--borde);display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--texto-dark);">${v.Numero_Nota || v.ID_Venta}</div>
+            <div style="font-size:10px;color:var(--texto-light);">${v.Fecha_Hora || '—'} · ${v.Estado_Venta}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:15px;font-weight:900;color:#2E6DB4;">S/${total.toFixed(2)}</div>
+            <div style="font-size:10px;color:var(--texto-light);">${v.Metodo_1 || ''}</div>
+          </div>
+        </div>`;
+    });
+
+    let favsHtml = '';
+    favs.forEach((f, i) => {
+      favsHtml += `
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;${i < favs.length-1 ? 'border-bottom:1px solid var(--borde);' : ''}">
+          <div style="font-size:13px;font-weight:600;flex:1;">${f.nombre || f.idProducto}</div>
+          <div style="font-size:12px;font-weight:800;color:#2E6DB4;">${f.cantidad} und.</div>
+        </div>`;
+    });
+
+    let sepsHtml = '';
+    seps.forEach(s => {
+      sepsHtml += `
+        <div style="background:#FFFAF0;border:1.5px solid rgba(246,173,85,0.3);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;">
+          <div style="font-size:12px;font-weight:700;color:#C05621;">${s.Numero_Nota || s.ID_Venta}</div>
+          <div style="font-size:14px;font-weight:900;color:#C05621;">S/${Number(s.Saldo_Pendiente||0).toFixed(2)}</div>
+        </div>`;
+    });
+
+    const clasifCls = est.clasificacion?.includes('VIP') ? 'clasif-vip'
+      : est.clasificacion?.includes('Frecuente') ? 'clasif-frecuente'
+      : est.clasificacion?.includes('Recurrente') ? 'clasif-recurrente'
+      : est.clasificacion?.includes('Primera') ? 'clasif-primera'
+      : 'clasif-nuevo';
+
+    const cliente = CLI.clientes.find(c => c.ID_Cliente === id) || {};
+
+    Swal.fire({
+      title: `👤 ${cliente.Nombre || 'Cliente'}`,
+      width: 620,
+      html: `
+        <div style="font-family:'Inter',sans-serif;text-align:left;max-height:70vh;overflow-y:auto;">
+
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+            <div style="flex:1;">
+              <div style="font-size:11px;color:var(--texto-light);">ID: ${id} ${cliente.DNI ? '· DNI: '+cliente.DNI : ''}</div>
+              <div style="font-size:11px;color:var(--texto-light);">${cliente.Telefono_WA ? '📱 '+cliente.Telefono_WA : 'Sin teléfono'}</div>
+            </div>
+            <span class="cli-clasificacion ${clasifCls}">${est.clasificacion || 'Nuevo'}</span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
+            <div style="background:#EBF4FF;border-radius:12px;padding:10px;text-align:center;">
+              <div style="font-size:18px;font-weight:900;color:#2E6DB4;">${est.totalCompras || 0}</div>
+              <div style="font-size:9px;color:#4A5568;font-weight:700;text-transform:uppercase;">Compras</div>
+            </div>
+            <div style="background:#F0FFF4;border-radius:12px;padding:10px;text-align:center;">
+              <div style="font-size:18px;font-weight:900;color:#276749;">${est.montoFormateado || 'S/0'}</div>
+              <div style="font-size:9px;color:#4A5568;font-weight:700;text-transform:uppercase;">Total gastado</div>
+            </div>
+            <div style="background:#FAF5FF;border-radius:12px;padding:10px;text-align:center;">
+              <div style="font-size:18px;font-weight:900;color:#6B46C1;">${est.ticketPromedioFormato || 'S/0'}</div>
+              <div style="font-size:9px;color:#4A5568;font-weight:700;text-transform:uppercase;">Ticket prom.</div>
+            </div>
+            <div style="background:#FFFAF0;border-radius:12px;padding:10px;text-align:center;">
+              <div style="font-size:18px;font-weight:900;color:#C05621;">${est.diasDesdeUltimaCompra !== null ? est.diasDesdeUltimaCompra + 'd' : '—'}</div>
+              <div style="font-size:9px;color:#4A5568;font-weight:700;text-transform:uppercase;">Últ. compra</div>
+            </div>
+          </div>
+
+          ${seps.length > 0 ? `
+            <div style="margin-bottom:14px;">
+              <div style="font-size:12px;font-weight:800;color:#C05621;margin-bottom:6px;">🕐 Separados pendientes (${seps.length})</div>
+              ${sepsHtml}
+            </div>
+          ` : ''}
+
+          ${favs.length > 0 ? `
+            <div style="margin-bottom:14px;">
+              <div style="font-size:12px;font-weight:800;color:var(--texto-dark);margin-bottom:6px;">⭐ Productos favoritos</div>
+              <div style="background:var(--fondo);border-radius:10px;padding:10px 12px;border:1.5px solid var(--borde);">
+                ${favsHtml}
+              </div>
+            </div>
+          ` : ''}
+
+          <div>
+            <div style="font-size:12px;font-weight:800;color:var(--texto-dark);margin-bottom:6px;">
+              📋 Historial de compras (${ventas.length})
+            </div>
+            ${histHtml || '<div style="text-align:center;padding:20px;color:var(--texto-light);">Sin compras registradas</div>'}
+            ${ventas.length > 15 ? '<div style="text-align:center;font-size:11px;color:var(--texto-light);margin-top:8px;">Mostrando las últimas 15 compras</div>' : ''}
+          </div>
+
+          <div style="margin-top:10px;text-align:center;font-size:10px;color:var(--texto-muted);">
+            Método favorito: ${est.metodoPagoFavorito || 'N/A'}
+          </div>
+        </div>`,
+      confirmButtonText: 'Cerrar',
+      confirmButtonColor: '#4A90D9'
+    });
+
+  } catch(e) {
+    toast(`❌ ${e.message}`, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// RANKING TOP 10
+// ════════════════════════════════════════════════════════════════
+
+async function cargarRanking() {
+  const list = document.getElementById('rankingList');
+  list.innerHTML = '<div class="cli-spinner"><div class="cli-spinner-ring"></div><div style="font-size:13px;color:var(--texto-mid);">Cargando ranking...</div></div>';
+
+  try {
+    const r = await apiGet('getRankingClientes', { limite: 10 });
+    if (!r.success || !r.data) { list.innerHTML = '<div class="cli-empty"><span class="cli-empty-icon">🏆</span><div class="cli-empty-titulo">Sin datos de ranking</div></div>'; return; }
+
+    const ranking = r.data.ranking || [];
+    if (ranking.length === 0) { list.innerHTML = '<div class="cli-empty"><span class="cli-empty-icon">🏆</span><div class="cli-empty-titulo">Sin clientes con compras aún</div></div>'; return; }
+
+    list.innerHTML = ranking.map((c, i) => {
+      const posCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'normal';
+      return `
+        <div class="ranking-item" style="animation-delay:${i*50}ms"
+             onclick="verHistorial('${c.idCliente}')">
+          <div class="ranking-pos ${posCls}">${c.medalla}</div>
+          <div class="ranking-info">
+            <div class="ranking-nombre">${c.nombre}</div>
+            <div class="ranking-tel">${c.telefono || '—'} · ${c.totalCompras} compra${c.totalCompras!==1?'s':''}</div>
+          </div>
+          <div class="ranking-stats">
+            <div>
+              <div class="ranking-stat-val">${c.totalFormateado}</div>
+              <div class="ranking-stat-label">Total gastado</div>
+            </div>
+            <div>
+              <div class="ranking-stat-val" style="color:#276749;">${c.ticketPromedioFormato}</div>
+              <div class="ranking-stat-label">Ticket prom.</div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = `<div class="cli-empty"><span class="cli-empty-icon">❌</span><div class="cli-empty-titulo">${e.message}</div></div>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// ESTADÍSTICAS CRM
+// ════════════════════════════════════════════════════════════════
+
+async function renderizarEstadisticas() {
+  const grid = document.getElementById('statsGrid');
+
+  if (!CLI.estadisticas) await cargarEstadisticas();
+  const s = CLI.estadisticas;
+  if (!s) { grid.innerHTML = '<div class="cli-empty"><span class="cli-empty-icon">📊</span><div class="cli-empty-titulo">Sin datos disponibles</div></div>'; return; }
+
+  grid.innerHTML = `
+    <div class="crm-stat-card" style="animation-delay:0ms">
+      <div class="crm-stat-icon">👥</div>
+      <div class="crm-stat-valor">${s.totalClientes || 0}</div>
+      <div class="crm-stat-label">Total clientes registrados</div>
+    </div>
+    <div class="crm-stat-card" style="animation-delay:60ms">
+      <div class="crm-stat-icon">🛒</div>
+      <div class="crm-stat-valor" style="color:#276749;">${s.clientesConCompras || 0}</div>
+      <div class="crm-stat-label">Con al menos 1 compra</div>
+    </div>
+    <div class="crm-stat-card" style="animation-delay:120ms">
+      <div class="crm-stat-icon">😴</div>
+      <div class="crm-stat-valor" style="color:#C05621;">${s.clientesSinCompras || 0}</div>
+      <div class="crm-stat-label">Sin compras (inactivos)</div>
+    </div>
+    <div class="crm-stat-card" style="animation-delay:180ms">
+      <div class="crm-stat-icon">🆕</div>
+      <div class="crm-stat-valor" style="color:#6B46C1;">${s.clientesNuevosMes || 0}</div>
+      <div class="crm-stat-label">Nuevos este mes</div>
+    </div>
+    <div class="crm-stat-card" style="animation-delay:240ms">
+      <div class="crm-stat-icon">🔄</div>
+      <div class="crm-stat-valor" style="color:#2E6DB4;">${s.tasaRetorno || '0%'}</div>
+      <div class="crm-stat-label">Tasa de retorno</div>
+    </div>
+    <div class="crm-stat-card" style="animation-delay:300ms">
+      <div class="crm-stat-icon">👤</div>
+      <div class="crm-stat-valor" style="color:#C53030;">${s.ventasSinCliente || 0}</div>
+      <div class="crm-stat-label">Ventas sin cliente registrado</div>
+    </div>`;
+
+  renderizarGrafico(s);
+}
+
+function renderizarGrafico(s) {
+  if (CLI.chartInstance) CLI.chartInstance.destroy();
+
+  const ctx = document.getElementById('chartClientes');
+  if (!ctx) return;
+
+  CLI.chartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Con compras', 'Sin compras', 'Nuevos este mes'],
+      datasets: [{
+        data: [
+          s.clientesConCompras || 0,
+          s.clientesSinCompras || 0,
+          s.clientesNuevosMes  || 0
+        ],
+        backgroundColor: [
+          'rgba(72,187,120,0.8)',
+          'rgba(246,173,85,0.8)',
+          'rgba(159,122,234,0.8)'
+        ],
+        borderWidth: 0,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: { family: "'Inter', sans-serif", size: 12, weight: '600' },
+            padding: 16,
+            usePointStyle: true,
+            pointStyleWidth: 10
+          }
+        }
+      }
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODAL — NUEVO CLIENTE
+// ════════════════════════════════════════════════════════════════
+
+async function modalNuevoCliente() {
+  const { value: d } = await Swal.fire({
+    title: '➕ Nuevo Cliente', width: 480,
+    html: `
+      <div style="font-family:'Inter',sans-serif;text-align:left;">
+        <div>
+          <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Nombre completo *</label>
+          <input id="cN" class="swal2-input" placeholder="Nombre del cliente" style="margin:4px 0 12px;">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Teléfono / WhatsApp</label>
+            <input id="cT" class="swal2-input" type="tel" placeholder="987654321" inputmode="tel" style="margin:4px 0 0;">
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">DNI (opcional)</label>
+            <input id="cD" class="swal2-input" placeholder="12345678" maxlength="8" inputmode="numeric" style="margin:4px 0 0;">
+          </div>
+        </div>
+      </div>`,
+    showCancelButton: true, confirmButtonText: '✅ Registrar', cancelButtonText: 'Cancelar', confirmButtonColor: '#4A90D9',
+    preConfirm: () => {
+      const n = document.getElementById('cN').value.trim();
+      if (!n) return Swal.showValidationMessage('El nombre es obligatorio');
+      const datos = { Nombre: n, Telefono_WA: document.getElementById('cT').value.trim() };
+      const dni = document.getElementById('cD').value.trim();
+      if (dni) datos.DNI = dni;
+      return datos;
+    }
+  });
+
+  if (!d) return;
+
+  try {
+    const action = d.DNI ? 'registrarClienteConDNI' : 'crearCliente';
+    const r = await apiPost(action, d);
+
+    if (r.success && (r.data?.success !== false)) {
+      toast(`✅ "${d.Nombre}" registrado`, 'success', 3000);
+      await cargarClientes();
+    } else if (r.data?.yaExiste) {
+      const { isConfirmed } = await Swal.fire({
+        title: '⚠️ Cliente similar encontrado',
+        html: `<p style="font-family:'Inter',sans-serif;font-size:13px;color:#718096;">${r.data.mensaje}</p>`,
+        showCancelButton: true, confirmButtonText: 'Crear de todas formas', cancelButtonText: 'Usar el existente', confirmButtonColor: '#4A90D9'
+      });
+      if (isConfirmed) {
+        d.forzarCreacion = true;
+        const r2 = await apiPost('crearCliente', d);
+        if (r2.success) { toast(`✅ "${d.Nombre}" creado`, 'success'); await cargarClientes(); }
+      }
+    } else {
+      toast(`⚠️ ${r.data?.mensaje || r.message || 'Error'}`, 'warning');
+    }
+  } catch(e) { toast(`❌ ${e.message}`, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODAL — EDITAR CLIENTE
+// ════════════════════════════════════════════════════════════════
+
+async function modalEditar(id) {
+  const c = CLI.clientes.find(x => x.ID_Cliente === id);
+  if (!c) { toast('❌ Cliente no encontrado', 'error'); return; }
+
+  const { value: d } = await Swal.fire({
+    title: `✏️ Editar — ${c.Nombre}`,
+    html: `
+      <div style="font-family:'Inter',sans-serif;text-align:left;">
+        <div style="background:#EBF4FF;border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#2E6DB4;font-weight:700;">
+          ID: ${c.ID_Cliente}
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Nombre</label>
+          <input id="eN" class="swal2-input" value="${c.Nombre||''}" style="margin:4px 0 12px;">
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;">Teléfono / WhatsApp</label>
+          <input id="eT" class="swal2-input" type="tel" value="${c.Telefono_WA||''}" style="margin:4px 0 0;">
+        </div>
+      </div>`,
+    showCancelButton: true, confirmButtonText: '✅ Guardar', cancelButtonText: 'Cancelar', confirmButtonColor: '#4A90D9',
+    preConfirm: () => ({
+      idCliente: id,
+      Nombre: document.getElementById('eN').value.trim(),
+      Telefono_WA: document.getElementById('eT').value.trim()
+    })
+  });
+
+  if (!d) return;
+  try {
+    const r = await apiPost('editarCliente', d);
+    if (r.success) { toast('✅ Cliente actualizado', 'success'); await cargarClientes(); }
+    else toast(`⚠️ ${r.message}`, 'warning');
+  } catch(e) { toast(`❌ ${e.message}`, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════════════
+// WHATSAPP
+// ════════════════════════════════════════════════════════════════
+
+function abrirWA(tel) {
+  const limpio = String(tel).replace(/\D/g, '');
+  const conCod = limpio.startsWith('51') ? limpio : '51' + limpio;
+  window.open(`https://wa.me/${conCod}`, '_blank');
+}
+
+// ════════════════════════════════════════════════════════════════
+// EXPORTAR PDF
+// ════════════════════════════════════════════════════════════════
+
+function exportarClientes() {
+  const cls   = CLI.filtrados;
+  const fecha = new Date().toLocaleDateString('es-PE');
+  const hora  = new Date().toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit' });
+
+  let filas = '';
+  cls.forEach(c => {
+    filas += `
+      <tr>
+        <td style="padding:7px 10px;border-bottom:1px solid #EBF4FF;font-size:11px;">${c.ID_Cliente||''}</td>
+        <td style="padding:7px 10px;border-bottom:1px solid #EBF4FF;font-size:11px;font-weight:700;">${c.Nombre||'—'}</td>
+        <td style="padding:7px 10px;border-bottom:1px solid #EBF4FF;font-size:11px;">${c.Telefono_WA||'—'}</td>
+        <td style="padding:7px 10px;border-bottom:1px solid #EBF4FF;font-size:11px;">${c.DNI||'—'}</td>
+      </tr>`;
+  });
+
+  const html = `
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<title>Clientes — CellCom</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; padding:24px; color:#1A1A2E; }
+  .hdr { display:flex; justify-content:space-between; margin-bottom:18px; padding-bottom:12px; border-bottom:3px solid #4A90D9; }
+  .hdr h1 { font-size:20px; font-weight:900; color:#2E6DB4; }
+  .hdr p { font-size:11px; color:#718096; }
+  table { width:100%; border-collapse:collapse; }
+  thead { background:linear-gradient(135deg,#EBF4FF,#D4E9FF); }
+  th { padding:8px 10px; font-size:9px; font-weight:800; color:#2E6DB4; text-transform:uppercase; text-align:left; }
+  .ftr { text-align:center; margin-top:18px; padding-top:12px; border-top:2px solid #EBF4FF; font-size:10px; color:#A0AEC0; }
+  .np { text-align:center; margin-top:16px; }
+  .bp { padding:10px 28px; background:linear-gradient(135deg,#4A90D9,#2E6DB4); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; }
+  @media print { .np { display:none; } }
+</style></head><body>
+  <div class="hdr">
+    <div><h1>👥 Clientes — CellCom Tecnology</h1><p>${cls.length} clientes · ${fecha}</p></div>
+    <div style="text-align:right;font-size:11px;color:#718096;"><strong style="color:#1A1A2E;">${fecha}</strong><br>${hora}<br>${CLI.usuario?.nombre||'—'}</div>
+  </div>
+  <table>
+    <thead><tr><th>ID</th><th>Nombre</th><th>Teléfono</th><th>DNI</th></tr></thead>
+    <tbody>${filas||'<tr><td colspan="4" style="text-align:center;padding:20px;">Sin datos</td></tr>'}</tbody>
+  </table>
+  <div class="ftr"><p>CellCom Tecnology POS v1.0.0 — ${fecha}</p></div>
+  <div class="np"><button class="bp" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button></div>
+</body></html>`;
+
+  const w = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
+  if (w) { w.document.write(html); w.document.close(); w.focus(); toast('📄 PDF generado', 'success'); }
+  else toast('⚠️ Permite ventanas emergentes', 'warning');
+}
+
+// ════════════════════════════════════════════════════════════════
+// API DIRECTA
+// ════════════════════════════════════════════════════════════════
+
+async function apiGet(action, params = {}) {
+  const qs = new URLSearchParams({ action, token: CLI.token, ...params });
+  const r  = await fetch(`${APP_CONFIG.API_URL}?${qs}`, { method:'GET', redirect:'follow' });
+  const ct = r.headers.get('content-type') || '';
+  if (ct.includes('json')) return await r.json();
+  return JSON.parse(await r.text());
+}
+
+async function apiPost(action, data = {}) {
+  const r = await fetch(APP_CONFIG.API_URL, {
+    method:'POST', redirect:'follow',
+    headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action, data, token: CLI.token })
+  });
+  const ct = r.headers.get('content-type') || '';
+  if (ct.includes('json')) return await r.json();
+  return JSON.parse(await r.text());
+}
+
+// ════════════════════════════════════════════════════════════════
+// UTILIDADES
+// ════════════════════════════════════════════════════════════════
+
+function norm(t) { return String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
+function setEl(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
+function volverAlPOS() { window.location.href = '/cellcomtecnology/pos.html'; }
+
+function toggleTema() {
+  const a = document.documentElement.getAttribute('data-theme') || 'light';
+  const n = a === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', n);
+  localStorage.setItem(APP_CONFIG.STORAGE.TEMA, n);
+}
+
+function cerrarSesion() {
+  Swal.fire({
+    title: '🚪 ¿Cerrar sesión?', text: 'Se cerrará tu sesión',
+    icon: 'question', showCancelButton: true,
+    confirmButtonText: 'Sí, cerrar', cancelButtonText: 'Cancelar', confirmButtonColor: '#C53030'
+  }).then(r => { if (r.isConfirmed) AUTH.cerrarSesion(); });
+}
+
+function toast(msg, tipo = 'info', dur = 3000) {
+  const bg = {
+    success:'linear-gradient(135deg,#276749,#48BB78)',
+    error:'linear-gradient(135deg,#C53030,#FC8181)',
+    warning:'linear-gradient(135deg,#C05621,#F6AD55)',
+    info:'linear-gradient(135deg,#1A4F8A,#4A90D9)'
+  };
+  if (typeof Toastify === 'function') {
+    Toastify({
+      text: msg, duration: dur, gravity:'bottom', position:'center',
+      style: {
+        background: bg[tipo]||bg.info, borderRadius:'14px',
+        fontFamily:"'Inter',sans-serif", fontSize:'13px',
+        fontWeight:'600', padding:'12px 20px',
+        boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
+        border:'1px solid rgba(255,255,255,0.15)'
+      }
+    }).showToast();
+  } else console.log(`[${tipo}] ${msg}`);
+}
+</script>
+</body>
+</html>
+
