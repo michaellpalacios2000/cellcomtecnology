@@ -16,9 +16,9 @@ class CellComAPI {
 
   constructor() {
     this.baseURL     = APP_CONFIG.API_URL;
-    this.timeout     = 30000;
-    this.maxRetries  = 2;
-    this.retryDelay  = 1000;
+    this.timeout     = 60000;
+    this.maxRetries  = 3;
+    this.retryDelay  = 3000;
     this._cache      = new Map();
     this._cacheTime  = new Map();
     this.CACHE_TTL   = 60000;
@@ -306,7 +306,7 @@ class CellComAPI {
       const url = `${this.baseURL}?action=ping`;
 
       const controller = new AbortController();
-      const timeoutId  = setTimeout(() => controller.abort(), 10000);
+      const timeoutId  = setTimeout(() => controller.abort(), 55000);
 
       // ✅ SIN mode:'cors' — evita preflight
       const response = await fetch(url, {
