@@ -101,26 +101,105 @@ function toggleTema() {
 async function verificarConexion() {
   actualizarStatus('conectando');
 
-  try {
-    const online = await API.ping();
+  const MAX_INTENTOS = 4;
+  const DELAYS = [0, 3000, 6000, 10000]; // esperas entre intentos
 
-    if (online) {
-      actualizarStatus('online');
-      console.log('✅ Servidor online');
-    } else {
-      actualizarStatus('error');
-      mostrarAlerta(
-        'Sin conexión con el servidor. Verifica tu internet.',
-        'warning'
-      );
+  for (let intento = 0; intento < MAX_INTENTOS; intento++) {
+
+    // Esperar antes del siguiente intento
+    if (intento > 0) {
+      const espera = DELAYS[intento];
+      const restante = Math.ceil((espera + (55000)) / 1000);
+      actualizarStatus('conectando');
+
+      const statusEl = document.getElementById('statusText');
+      if (statusEl) {
+        let cuenta = Math.ceil(espera / 1000);
+        statusEl.textContent = `🔄 Reconectando (${intento + 1}/${MAX_INTENTOS})...`;
+
+        if (espera > 0) {
+          await new Promise(r => setTimeout(r, espera));
+        }
+      }
     }
-  } catch(e) {
-    actualizarStatus('error');
-    console.warn('⚠️ Sin conexión:', e.message);
-    mostrarAlerta(
-      'No se pudo conectar con el servidor. Intenta nuevamente.',
-      'warning'
-    );
+
+    try {
+      // Actualizar mensaje según el intento
+      const mensajes = [
+        '⏳ Conectando con el servidor...',
+        '🔄 Reintentando conexión (puede tardar)...',
+        '⏳ El servidor está despertando, espera...',
+        '🔄 Último intento de conexión...'
+      ];
+
+      const statusEl = document.getElementById('statusText');
+      if (statusEl) statusEl.textContent = mensajes[intento] || mensajes[0];
+
+      console.log(`📡 Intento de conexión ${intento + 1}/${MAX_INTENTOS}...`);
+
+      const online = await API.ping();
+
+      if (online) {
+        actualizarStatus('online');
+        console.log(`✅ Conectado en intento ${intento + 1}`);
+        return true;
+      }
+
+    } catch(e) {
+      console.warn(`⚠️ Intento ${intento + 1} falló:`, e.message);
+    }
+  }
+
+  // Todos los intentos fallaron
+  actualizarStatus('error');
+  const statusEl = document.getElementById('statusText');
+  if (statusEl) {
+    statusEl.innerHTML = `
+      ❌ Sin conexión al servidor &nbsp;
+      <button
+        onclick="reintentarConexion()"
+        style="
+          padding:4px 12px;
+          background:#4A90D9;
+          color:#fff;
+          border:none;
+          border-radius:8px;
+          cursor:pointer;
+          font-size:11px;
+          font-weight:700;
+          font-family:'Inter',sans-serif;
+          transition:all 0.2s;
+        "
+        onmouseover="this.style.background='#2E6DB4'"
+        onmouseout="this.style.background='#4A90D9'">
+        🔄 Reintentar
+      </button>`;
+  }
+
+  return false;
+}
+
+// Botón de reintento manual
+async function reintentarConexion() {
+  const btn = document.querySelector('button[onclick="reintentarConexion()"]');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Conectando...';
+  }
+
+  const resultado = await verificarConexion();
+
+  if (!resultado) {
+    // Si aún falla, restaurar botón
+    const statusEl = document.getElementById('statusText');
+    if (statusEl && !statusEl.querySelector('button')) {
+      statusEl.innerHTML += `
+        <button
+          onclick="reintentarConexion()"
+          style="margin-left:8px;padding:4px 12px;background:#4A90D9;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;">
+          🔄 Reintentar
+        </button>`;
+    }
   }
 }
 
