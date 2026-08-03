@@ -535,23 +535,30 @@
   }
 
   // ── Verificar conexión con el servidor ────────────────────────
-  async function verificarConexion() {
-    try {
-      const url = APP_CONFIG.API_URL + '?action=ping';
-      const response = await fetch(url, {
-        method:   'GET',
-        redirect: 'follow'
-      });
+async function verificarConexion() {
+  try {
+    const url = APP_CONFIG.API_URL + '?action=ping';
 
-      const texto = await response.text();
-      const data  = JSON.parse(texto);
-      return !!(data && data.success);
+    const controller = new AbortController();
+    // 55 segundos para que el servidor despierte
+    const timeoutId  = setTimeout(() => controller.abort(), 55000);
 
-    } catch(e) {
-      console.warn('Sin conexión:', e.message);
-      return false;
-    }
+    const response = await fetch(url, {
+      method:   'GET',
+      redirect: 'follow',
+      signal:   controller.signal
+    });
+
+    clearTimeout(timeoutId);
+    const texto = await response.text();
+    const data  = JSON.parse(texto);
+    return !!(data && data.success);
+
+  } catch(e) {
+    console.warn('Sin conexión:', e.message);
+    return false;
   }
+}
 
   // ── Sistema principal ─────────────────────────────────────────
   async function iniciarSistema() {
